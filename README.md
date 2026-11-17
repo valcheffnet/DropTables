@@ -1,6 +1,8 @@
 # Drop Tables
 
-Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game. This is an early test build, so expect bugs.
+Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game.
+
+This is an early test build, so expect bugs. For now every table comes from your own kills and loot: the addon starts empty, and the numbers get more reliable the more you play. There is also an experimental feature that sends drop counts between players who run the addon. That's the part I'm testing right now, and what it collects doesn't show up in anyone's tables yet.
 
 ## Download
 
