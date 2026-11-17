@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The addon no longer answers its own questions. The hidden channel hands each question back to the player who asked it, and the addon used to answer it and whisper other players' counts to you.
+
 ## [0.2.6] - 2026-11-18
 
 ### Added

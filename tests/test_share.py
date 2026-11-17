@@ -524,6 +524,13 @@ def main():
     expect("each form tried once", (pat.g.tries["Two Names"], pat.g.tries["Two-Names"]), (1, 1))
     pat.lua.execute("C_ChatInfo.SendAddonMessage = realSend")
 
+    # The channel hands a player their own question back; the addon does not answer it.
+    quinn_id = quinn.ns.db.installId
+    start = len(net.log)
+    quinn.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (quinn_id, b36(21)), "CHANNEL", "Quinn Ashwood")
+    net.run(15)
+    expect("own question not answered", [m for m in net.sent("Quinn", None, start) if m[2] == "WHISPER"], [])
+
     # Not in the channel at first (a loading screen, the channel limit): the addon keeps trying, then asks.
     late = Client("Late")
     late.lua.execute("""

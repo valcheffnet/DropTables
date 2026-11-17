@@ -554,7 +554,9 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
     if chatType == "CHANNEL" and kind == "Q|" then
         local asker, npc, held = text:match("^Q|(%x+)|([0-9a-z]+)|([0-9a-z,]*)$")
         npc = npc and Wire.ReadNumber(npc)
-        if npc and #asker == 16 then
+        if asker == ns.db.installId then
+            ns.Debug("own question about mob %s came back over the channel, ignored", npc or "?")
+        elseif npc and #asker == 16 then
             planAnswer(asker, npc, held, sender)
         end
     elseif chatType == "CHANNEL" and kind == "C|" then
