@@ -161,6 +161,36 @@ def main():
     party.advance(5)
     expect("partner's corpse not counted", party.ns.db.mobs[6], None)
 
+    # /dt debug is a saved setting and opens its own chat tab with no other messages in it.
+    tester = Client("Debugger")
+    tester.lua.execute("""
+        groupsRemoved = 0
+        FCF_OpenNewWindow = function(name) chatWindowNames[4] = name; return ChatFrame4 end
+        FCF_Close = function(frame) if frame == ChatFrame4 then chatWindowNames[4] = nil end end
+        ChatFrame_RemoveAllMessageGroups = function(frame) if frame == ChatFrame4 then groupsRemoved = 1 end end
+    """)
+    tester.g.SlashCmdList.DROPTABLES("debug")
+    expect("debug saved", tester.ns.settings.debug, True)
+    expect("debug tab opened", (tester.g.chatWindowNames[4], tester.g.groupsRemoved), ("DT Debug", 1))
+    expect("debug lines in the tab", len(tester.g.ChatFrame4.lines) > 0, True)
+    tester.g.SlashCmdList.DROPTABLES("debug")
+    expect("debug off closes the tab", (tester.ns.settings.debug, tester.g.chatWindowNames[4]), (False, None))
+    tester.g.SlashCmdList.DROPTABLES("debug")
+    expect("debug on opens it again", tester.g.chatWindowNames[4], "DT Debug")
+    reloaded = Client("Reloaded", saved="DropTablesDB = { settings = { debug = true } }")
+    reloaded.ns.Debug("after a reload")
+    expect("debug still on after a reload", len(reloaded.g.ChatFrame1.lines), 1)
+
+    # Restore defaults puts the settings back and forgets window places, and keeps the recorded drops.
+    ns.settings.minQuality = 3
+    ns.settings.debug = True
+    ns.settings.stripPos = lua.table(10, 20)
+    ns.settings.finderCategory = "7:0"
+    ns.RestoreDefaults()
+    expect("settings back to defaults", (ns.settings.minQuality, ns.settings.debug, ns.settings.stripPos,
+                                         ns.settings.finderCategory), (0, False, None, None))
+    expect("recorded drops kept", ns.db.mobs[1][1].kills, 8)
+
     report("collector")
 
 

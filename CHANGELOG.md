@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-11-17
+
+### Added
+
+- Restore defaults in the options puts every setting and window position back the way they were on first install. Your recorded drops stay.
+- Debug messages in the options, the same switch as `/dt debug`.
+
+### Changed
+
+- `/dt debug` stays on after a reload or an update. It opens its own DT Debug chat tab and closes it again when you turn it off.
+- `/dt debug` says when a group message is your own coming back, instead of calling it malformed.
+
 ## [0.2.3] - 2026-11-17
 
 ### Fixed
@@ -67,7 +79,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/valcheffnet/DropTables/compare/v0.2.0...v0.2.1

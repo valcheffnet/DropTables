@@ -26,13 +26,13 @@ Commands (`/droptables` works too):
 
 - `/dt` opens or closes the drop table window, on your target if you have one
 - `/dt find` opens the loot finder, and `/dt find linen` searches for linen straight away
-- `/dt options` (or `/dt config`) opens the settings
+- `/dt options` (or `/dt config`) opens the settings. Restore defaults at the bottom puts every setting and window back the way it was on first install.
 - `/dt unlock` lets you drag the icons under the target frame somewhere else, `/dt lock` fixes them in place again. Blizzard's Edit Mode does the same.
 - `/dt reset` puts the icons back under the target frame
 - `/dt icons`, `/dt tooltip` and `/dt minimap` turn the icons, the tooltip lines or the minimap button on and off
 - `/dt export` opens the window with the text to share (see below)
 - `/dt status` shows how many mobs and kills you have recorded, what other players have sent you and how many of your mobs are new since your last export
-- `/dt debug` puts a line in chat for every sharing message the addon sends or gets, and says why it ignored one, which helps when you test sharing with a friend. It turns itself off when you reload. If you make a chat tab called DT Debug, the lines go there and stay out of your main chat.
+- `/dt debug` puts a line in chat for every sharing message the addon sends or gets, and says why it ignored one, which helps when you test sharing with a friend. It opens a chat tab called DT Debug for these lines and stays on until you type `/dt debug` again, which closes the tab too.
 
 ## Sharing your tables
 

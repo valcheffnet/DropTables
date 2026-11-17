@@ -16,6 +16,7 @@ ns.DEFAULTS = {
     exportReminder = true,
     showMinimap = true,
     minimapAngle = 200,
+    debug = false,
 }
 
 -- Rates from fewer opened corpses than this are shown greyed out.
@@ -53,23 +54,47 @@ function ns.Print(msg)
     print("|cff66ccffDrop Tables|r " .. msg)
 end
 
--- /dt debug: a chat line for every sharing message in and out, for testing between players. Off after a reload.
--- The lines go to a chat tab named "DT Debug" when the player made one, otherwise to the main chat window.
-ns.debug = false
-local DEBUG_TAB = "dt debug"
+-- /dt debug: a chat line for every sharing message in and out, for testing between players. The lines go to a chat
+-- tab named "DT Debug", which /dt debug opens and closes again; without a free tab they go to the main window.
+local DEBUG_TAB = "DT Debug"
 
-local function debugFrame()
+local function findDebugFrame()
     for i = 1, NUM_CHAT_WINDOWS or 0 do
-        local name = GetChatWindowInfo(i)
-        if name and name:lower() == DEBUG_TAB and _G["ChatFrame" .. i] then
+        local name, _, _, _, _, _, shown = GetChatWindowInfo(i)
+        if name and name:lower() == DEBUG_TAB:lower() and shown ~= false and _G["ChatFrame" .. i] then
             return _G["ChatFrame" .. i]
         end
     end
-    return DEFAULT_CHAT_FRAME
+end
+
+local function debugFrame()
+    return findDebugFrame() or DEFAULT_CHAT_FRAME
+end
+
+-- Opens the DT Debug tab with no other messages in it. Blizzard's chat functions are optional: a client without
+-- them keeps the lines in the main window.
+local function openDebugTab()
+    if findDebugFrame() or not FCF_OpenNewWindow then
+        return
+    end
+    local frame = FCF_OpenNewWindow(DEBUG_TAB, true)
+    if frame and ChatFrame_RemoveAllMessageGroups then
+        ChatFrame_RemoveAllMessageGroups(frame)
+    end
+    if frame and ChatFrame_RemoveAllChannels then
+        ChatFrame_RemoveAllChannels(frame)
+    end
+end
+
+local function closeDebugTab()
+    local frame = findDebugFrame()
+    if frame and frame ~= DEFAULT_CHAT_FRAME and FCF_Close then
+        FCF_Close(frame)
+    end
 end
 
 function ns.Debug(text, ...)
-    if ns.debug then
+    if ns.settings and ns.settings.debug then
         debugFrame():AddMessage(("|cff888888%s DT|r %s"):format(date("%H:%M:%S"), text:format(...)))
     end
 end
@@ -175,6 +200,18 @@ function ns.SumBuckets(buckets, field)
 end
 
 -- "1-3" when the stack size varies, "2" when it never does; data recorded before ranges existed shows the average.
+-- Puts every setting back to its default and forgets window places and sizes; recorded drops are not touched.
+-- The same table stays in use, because the options panel holds on to it.
+function ns.RestoreDefaults()
+    for key in pairs(ns.settings) do
+        ns.settings[key] = nil
+    end
+    for key, value in pairs(ns.DEFAULTS) do
+        ns.settings[key] = value
+    end
+    ns.Fire("DT_SETTINGS_CHANGED")
+end
+
 function ns.FormatStack(entry)
     if entry.min and entry.max then
         return entry.min == entry.max and tostring(entry.min) or (entry.min .. "-" .. entry.max)
@@ -250,10 +287,15 @@ SlashCmdList.DROPTABLES = function(msg)
     elseif msg == "export" then
         ns.ToggleExport()
     elseif msg == "debug" then
-        ns.debug = not ns.debug
-        ns.Print(("debug messages %s."):format(ns.debug and "on, until you type /dt debug again or reload" or "off"))
-        if ns.debug then
+        ns.settings.debug = not ns.settings.debug
+        ns.Fire("DT_SETTINGS_CHANGED")
+        if ns.settings.debug then
+            openDebugTab()
+            ns.Print("debug messages on, in the DT Debug chat tab. /dt debug again turns them off.")
             ns.Debug("%s", ns.ShareDebugState())
+        else
+            closeDebugTab()
+            ns.Print("debug messages off.")
         end
     else
         ns.ToggleDetails(ns.UnitNpc("target"))

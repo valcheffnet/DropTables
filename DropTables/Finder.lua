@@ -634,8 +634,8 @@ function ns.ToggleFinder(text)
     end
 end
 
-ns.On("DT_READY", function()
-    frame:RestorePlacement()
+-- Reads the Finder's saved choices; after Restore defaults they are gone and start over.
+local function loadSettings()
     if not ns.settings.finderQualities then
         ns.settings.finderQualities = { [0] = true, true, true, true, true }
     end
@@ -644,7 +644,13 @@ ns.On("DT_READY", function()
     for _, button in pairs(qualityButtons) do
         button:Refresh()
     end
+end
+
+ns.On("DT_READY", function()
+    frame:RestorePlacement()
+    loadSettings()
 end)
+ns.On("DT_SETTINGS_CHANGED", loadSettings)
 
 local function redraw()
     if not frame:IsShown() then

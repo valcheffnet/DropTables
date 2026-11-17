@@ -1,6 +1,7 @@
 local _, ns = ...
 
-local category
+local category, layout
+local registered = {}
 
 local function onChange()
     ns.Fire("DT_SETTINGS_CHANGED")
@@ -10,6 +11,7 @@ local function register(key, name, varType)
     local variable = "DropTables_" .. key
     local setting = Settings.RegisterAddOnSetting(category, variable, key, ns.settings, varType, name, ns.DEFAULTS[key])
     Settings.SetOnValueChangedCallback(variable, onChange)
+    registered[key] = setting
     return setting
 end
 
@@ -40,8 +42,24 @@ local function qualityName(value)
     return ns.QualityColor(quality) .. name .. "|r"
 end
 
+StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS = {
+    text = "Put all Drop Tables settings and window places back to their defaults? Your recorded drops stay.",
+    button1 = YES,
+    button2 = NO,
+    OnAccept = function()
+        ns.RestoreDefaults()
+        -- The controls in the open panel show the new values only through their settings.
+        for key, setting in pairs(registered) do
+            setting:SetValue(ns.DEFAULTS[key])
+        end
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
+
 ns.On("DT_READY", function()
-    category = Settings.RegisterVerticalLayoutCategory("Drop Tables")
+    category, layout = Settings.RegisterVerticalLayoutCategory("Drop Tables")
     checkbox("showStrip", "Icons under the target", "Show the most likely drops of your target under its frame.")
     slider("stripIcons", "Number of icons", "How many icons the strip shows at most, money included.", 3, 10, 1, whole)
     slider("stripScale", "Icon size", "Scale of the icon strip.", 0.6, 2, 0.1, percent)
@@ -59,6 +77,13 @@ ns.On("DT_READY", function()
         0, 1, 0.05, percent)
     slider("finderAlpha", "Loot Finder background",
         "Opacity of the Loot Finder's background; also on the slider in its title bar.", 0, 1, 0.05, percent)
+    checkbox("debug", "Debug messages",
+        "A chat line for every sharing message in and out, for testing with other players. Same as /dt debug.")
+    if CreateSettingsButtonInitializer and layout then
+        layout:AddInitializer(CreateSettingsButtonInitializer("Default settings", "Restore defaults", function()
+            StaticPopup_Show("DROPTABLES_RESTORE_DEFAULTS")
+        end, "Put every setting and window place back to how it was on first install.", true))
+    end
     Settings.RegisterAddOnCategory(category)
 end)
 

@@ -384,14 +384,14 @@ def main():
     # many installs as they have.
     for i in range(5):
         quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(201 + i), ";".join(counts(21, 5, 5))),
-                   "PARTY", "Pat Prokazhen")
+                   "PARTY", "Pat Ashwood")
     expect("member not held to three new installs", len(plain(quinn.ns.db.peers[21])), 5)
 
     # Counts split over two messages that claim more drops than looted corpses stay out of the chances.
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(230), ";".join(counts(27, 40, 40))),
-               "PARTY", "Pat Prokazhen")
+               "PARTY", "Pat Ashwood")
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|I%s.1.%s.%s.%s.1.1" % (origin_id(230), b36(27), b36(100),
-               b36(120), b36(120)), "PARTY", "Pat Prokazhen")
+               b36(120), b36(120)), "PARTY", "Pat Ashwood")
     expect("both messages kept", quinn.ns.db.peers[27][origin_id(230)].buckets[1]["items"][100].drops, 120)
     stats = quinn.ns.GetStats(27, "all")
     impossible = [e for e in stats.list.values() if e.itemId == 100] if stats else []
@@ -491,9 +491,9 @@ def main():
     for client in (pat, quinn):
         client.g.SlashCmdList.DROPTABLES("debug")
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(210), ";".join(counts(25, 5, 5))),
-               "PARTY", "Pat Prokazhen")
+               "PARTY", "Pat Ashwood")
     lines = "\n".join(debug_lines(quinn))
-    expect("debug shows the message", "got PARTY from Pat Prokazhen: D||" in lines, True)
+    expect("debug shows the message", "got PARTY from Pat Ashwood: D||" in lines, True)
     expect("debug lines carry the time", re.search(r"\d\d:\d\d:\d\d DT", lines) is not None, True)
     loot_mob(pat, 26, "P4", [(100, 1)])
     net.run(70)

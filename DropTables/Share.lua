@@ -376,9 +376,13 @@ end
 -- messages only from members of the group, and one group brings only a handful of installs. (Forever names the
 -- sender "First Last", which does not match UnitName, so the sender is not checked against the group.)
 local function receiveGroup(text, sender)
+    if text:sub(3, 2 + #ns.db.installId) == ns.db.installId then
+        ns.Debug("  your own message, back from the group")
+        return
+    end
     local origin, npc, records = decodeAnswer(text)
     if not origin then
-        ns.Debug("  ignored: malformed, impossible counts or your own install")
+        ns.Debug("  ignored: malformed or impossible counts")
         return
     end
     ns.Debug("  stored: mob %d from group member %s", npc, sender)
