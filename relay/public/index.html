@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drop Tables: share your tables</title>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<style>
+  :root {
+    --ink: #e8dcc0;
+    --muted: #a8987a;
+    --gold: #d9b45a;
+    --paper: #1d1914;
+    --raised: #27221b;
+    --line: #4a3f30;
+    --bad: #d77a63;
+    --good: #9cc27a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 0, #2a241c 0, var(--paper) 60%);
+    color: var(--ink);
+    font: 16px/1.5 Georgia, "Times New Roman", serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  main { width: 100%; max-width: 640px; }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 30px;
+    font-weight: normal;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+  }
+  p { margin: 12px 0; }
+  ol { padding-left: 22px; margin: 12px 0 18px; }
+  li { margin: 4px 0; }
+  code { color: var(--gold); font-family: Consolas, monospace; }
+  textarea {
+    width: 100%;
+    height: 200px;
+    resize: vertical;
+    background: var(--raised);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 10px;
+    font: 12px/1.4 Consolas, monospace;
+    word-break: break-all;
+  }
+  textarea:focus { outline: none; border-color: var(--gold); }
+  .hint { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 14px; }
+  button {
+    background: var(--gold);
+    color: #1d1914;
+    border: none;
+    padding: 9px 28px;
+    font: 16px Georgia, serif;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #status { min-height: 24px; margin-top: 12px; }
+  #status.bad { color: var(--bad); }
+  #status.good { color: var(--good); }
+  .privacy { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); margin-top: 28px; padding-top: 12px; }
+  a { color: var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Share your drop tables</h1>
+  <p>The more players send their tables, the more accurate everyone's drop chances get. You don't need an account.</p>
+  <ol>
+    <li>In game, type <code>/dt export</code>, press Select and then Ctrl+C.</li>
+    <li>Paste the text into the box and press Send.</li>
+  </ol>
+  <textarea id="data" spellcheck="false" placeholder="DT1:..."></textarea>
+  <div class="hint">If the game splits it into several parts, send them one at a time.</div>
+  <div class="row">
+    <div id="turnstile"></div>
+    <button id="send" type="button" disabled>Send</button>
+  </div>
+  <div id="status" role="status"></div>
+  <p class="privacy">It carries mob and item ids, kill and drop counts, levels, the zones and spots of your kills and a random id of your addon install, never character or account names. Anything sent here is public.<br>
+  <a href="https://github.com/valcheffnet/DropTables">Drop Tables on GitHub</a></p>
+</main>
+<script>
+  const data = document.getElementById("data");
+  const send = document.getElementById("send");
+  const status = document.getElementById("status");
+  let token = null;
+  let widget = null;
+
+  function show(text, kind) {
+    status.textContent = text;
+    status.className = kind || "";
+  }
+
+  function update() {
+    send.disabled = !token || !data.value.trim().startsWith("DT1:");
+  }
+
+  async function setup() {
+    try {
+      const config = await (await fetch("/config")).json();
+      widget = turnstile.render("#turnstile", {
+        sitekey: config.sitekey,
+        theme: "dark",
+        callback: (value) => { token = value; update(); },
+        "expired-callback": () => { token = null; update(); },
+      });
+    } catch {
+      show("The page could not load. Reload it and try again.", "bad");
+    }
+  }
+
+  function waitForTurnstile() {
+    if (window.turnstile) {
+      setup();
+    } else {
+      setTimeout(waitForTurnstile, 100);
+    }
+  }
+
+  data.addEventListener("input", update);
+
+  send.addEventListener("click", async () => {
+    send.disabled = true;
+    show("Sending...");
+    try {
+      const response = await fetch("/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ data: data.value, token }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        show("Got it, thanks. Your counts will be in the next data update.", "good");
+        data.value = "";
+      } else {
+        show(result.error || "Something went wrong. Try again later.", "bad");
+      }
+    } catch {
+      show("The page could not reach the server. Try again later.", "bad");
+    }
+    token = null;
+    turnstile.reset(widget);
+    update();
+  });
+
+  waitForTurnstile();
+</script>
+</body>
+</html>

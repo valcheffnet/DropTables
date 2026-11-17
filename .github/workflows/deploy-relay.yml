@@ -1,0 +1,46 @@
+name: Deploy share page
+
+on:
+  push:
+    branches: [main]
+    paths: ["relay/**", ".github/workflows/deploy-relay.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-relay
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test
+        run: node --test "relay/test/*.test.mjs"
+      - name: Deploy
+        # Skipped until the share page is set up (relay/SETUP.md).
+        if: ${{ vars.RELAY_APP_ID != '' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: relay
+          secrets: |
+            APP_KEY
+            TURNSTILE_SECRET
+          vars: |
+            APP_ID
+            APP_INSTALLATION_ID
+            TURNSTILE_SITEKEY
+        env:
+          APP_KEY: ${{ secrets.RELAY_APP_KEY }}
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+          APP_ID: ${{ vars.RELAY_APP_ID }}
+          APP_INSTALLATION_ID: ${{ vars.RELAY_INSTALLATION_ID }}
+          TURNSTILE_SITEKEY: ${{ vars.TURNSTILE_SITEKEY }}
