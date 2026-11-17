@@ -91,7 +91,7 @@ local function showEntryTooltip(button)
             end
             GameTooltip:AddLine(("Killed %d times, %s."):format(stats.kills, reason), 1, 1, 1, true)
         elseif stats then
-            local text = stats.opened > 0 and "not enough looted corpses for rates yet" or "nothing looted yet"
+            local text = stats.opened > 0 and "nothing has dropped yet" or "nothing looted yet"
             GameTooltip:AddLine(("Killed %d times, %s."):format(stats.kills, text), 1, 1, 1, true)
         else
             GameTooltip:AddLine("No data for this mob yet. Kill and loot it to start its table.", 1, 1, 1, true)

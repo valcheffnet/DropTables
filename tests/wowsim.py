@@ -47,7 +47,7 @@ SlashCmdList = {}
 Enum = {}
 function issecretvalue() return false end
 function GetTime() return now end
-function time() return math.floor(now) end
+function time() return 1700000000 + math.floor(now) end
 groupMembers = {}  -- names of the other party members, party1 first
 function GetNumGroupMembers() return #groupMembers > 0 and #groupMembers + 1 or 0 end
 function IsInGroup(category) return category == nil and #groupMembers > 0 end

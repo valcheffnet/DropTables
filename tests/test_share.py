@@ -167,7 +167,7 @@ def main():
 
     stats = carol.ns.GetStats(1, "all")
     expect("peer kills counted", (stats.kills, stats.ownKills, stats.sources), (3, 0, 1))
-    expect("three corpses of another player give no rates yet", len(list(stats.list.values())), 0)
+    expect("another player's three corpses give chances at once", len(list(stats.list.values())) > 0, True)
     carol.ns.settings.onlyMine = True
     expect("only mine hides peer counts", carol.ns.GetStats(1, "all"), None)
     carol.ns.settings.onlyMine = False
@@ -231,13 +231,28 @@ def main():
     order = [m[0] for m in net.sent(None, "D|", start)]
     expect("60 corpses answer before 3", order, ["Mid", "Tiny"])
 
-    # A mob the player already holds 100 corpses of is not asked about.
+    # A mob the player already holds 100 corpses of is asked about once a day, to keep its counts fresh. That
+    # question runs until enough installs answered, not until the corpses add up.
     hold(george, 14, {origin_id(24): (120, [(100, 30)])})
+    fresh = Client("Fresh")
+    net.add(fresh)
+    # These two ids start differently from origin_id(24): a question names held installs by their first 6 hex.
+    hold(fresh, 14, {"1a2b3c4d5e6f7081": (50, [(100, 10)]), "9f8e7d6c5b4a3920": (40, [(100, 8)])})
     net.run(6)
     start = len(net.log)
     george.see(14, "G4", 5)
     net.run(10)
-    expect("well known mob not asked about", net.sent("George", "Q|", start), [])
+    expect("well known mob asked once a day", len(net.sent("George", "Q|", start)), 1)
+    expect("daily question takes more than one install", len(plain(george.ns.db.peers[14])), 3)
+    net.run(130)
+    start = len(net.log)
+    george.see(14, "G4b", 5)
+    net.run(5)
+    expect("not again the same day", net.sent("George", "Q|", start), [])
+    george.ns.db.refreshed[14] = george.g.time() - 86401
+    george.see(14, "G4c", 5)
+    net.run(5)
+    expect("asked again the next day", len(net.sent("George", "Q|", start)), 1)
 
     # The sample is looted corpses: many kills with few opened corpses still need more.
     hold(george, 16, {origin_id(25): (150, [(100, 30)], 60)})
@@ -246,6 +261,68 @@ def main():
     george.see(16, "G5", 5)
     net.run(10)
     expect("kills without corpses still asked about", len(net.sent("George", "Q|", start)), 1)
+
+    # The pause after a question: two minutes when someone answered, longer each time nobody did.
+    paula, helper = Client("Paula"), Client("Helper")
+    net.add(paula, helper)
+    net.run(10)
+
+    def asks(npc, spawn, seconds):
+        begin = len(net.log)
+        paula.see(npc, spawn, 5)
+        net.run(seconds)
+        return len(net.sent("Paula", "Q|", begin))
+
+    expect("first question", asks(40, "P1", 2), 1)
+    net.run(118)
+    expect("unanswered: asked again after 2 minutes", asks(40, "P2", 2), 1)
+    net.run(118)
+    expect("unanswered twice: not after 2 minutes", asks(40, "P3", 2), 0)
+    net.run(180)
+    expect("asked again after 5 minutes", asks(40, "P4", 8), 1)
+    hold(helper, 40, {origin_id(130): (20, [(100, 5)])})
+    net.run(600)
+    expect("asked after the longer pause", asks(40, "P5", 8), 1)
+    expect("helper answered", paula.ns.db.peers[40][origin_id(130)] is not None, True)
+    net.run(112)
+    expect("answered: two minutes again", asks(40, "P6", 2), 1)
+
+    # Mobs targeted during the gap wait in line, the newest three; a mob asked about a moment ago does not.
+    net.run(130)
+    begin = len(net.log)
+    for npc in (41, 42, 43, 44, 45):
+        paula.see(npc, "Q%d" % npc, 5)
+    net.run(1)
+    expect("first goes out at once", [m[1].split("|")[2] for m in net.sent("Paula", "Q|", begin)], [b36(41)])
+    net.run(30)
+    expect("the newest three follow, one per gap",
+           [m[1].split("|")[2] for m in net.sent("Paula", "Q|", begin)], [b36(n) for n in (41, 43, 44, 45)])
+    begin = len(net.log)
+    paula.see(41, "Q41b", 5)
+    net.run(10)
+    expect("recently asked mob not put in line", net.sent("Paula", "Q|", begin), [])
+    # Targeting a waiting mob again does not take a second place in line and push another mob out.
+    net.run(10)
+    begin = len(net.log)
+    for npc in (51, 52, 53, 52, 52, 54):
+        paula.see(npc, "R%d" % npc, 5)
+    net.run(30)
+    expect("each waiting mob asked once",
+           [m[1].split("|")[2] for m in net.sent("Paula", "Q|", begin)], [b36(n) for n in (51, 52, 53, 54)])
+
+    # A mob with many items fits in a few messages: the most frequent items go out, the rarest are left out.
+    giver, asker = Client("Giver"), Client("Asker")
+    net.add(giver, asker)
+    hold(giver, 50, {origin_id(140): (99, [(1000 + i, 60 - i) for i in range(60)])})
+    net.run(10)
+    begin = len(net.log)
+    asker.see(50, "A50", 5)
+    net.run(10)
+    texts = [m[1] for m in net.sent("Giver", "D|", begin)]
+    expect("at most four messages for one mob", len(texts), 4)
+    joined = ";".join(texts)
+    expect("most frequent item sent", ("I%s.1.%s." % (b36(50), b36(1000))) in joined, True)
+    expect("rarest item left out", ("I%s.1.%s." % (b36(50), b36(1059))) in joined, False)
 
     # Many small sources: the asker stops after ten installs.
     kate = Client("Kate")
@@ -330,32 +407,33 @@ def main():
     expect("twelve sources kept", len(kept), 12)
     expect("oldest dropped, not smallest", origin_id(60) in kept or origin_id(61) in kept, False)
 
-    # Rates of other players go through their median: one liar does not move them.
+    # Big sources are checked against their median: one liar does not move the chances.
     hold(carol, 9, {origin_id(80 + i): (40, [(100, 12 + 2 * i)]) for i in range(3)})
     hold(carol, 9, {origin_id(90): (3000, [(100, 3000), (555, 3000)])})
-    # A small source with a wild rate stays out of the rates until enough small ones add up.
+    # A small source is always added: too few corpses to tell a liar from luck.
     hold(carol, 9, {origin_id(91): (20, [(100, 20)])})
 
     def rates_of(npc):
         return {e.itemId: e for e in carol.ns.GetStats(npc, "all").list.values() if e.itemId}
 
     rates = rates_of(9)
-    expect("honest rate kept", round(rates[100].rate, 2), round((12 + 14 + 16) / 120, 2))
+    expect("honest rate kept", round(rates[100].rate, 3), round((12 + 14 + 16 + 20) / (120 + 20), 3))
+    expect("drops shown match the chance", rates[100].drops, 12 + 14 + 16 + 20)
     expect("item only the liar reports left out", 555 in rates, False)
     expect("big and small sources in the totals", carol.ns.GetStats(9, "all").kills, 3 * 40 + 300 + 20)
     droppers = [d.npc for d in carol.ns.FindDroppers(100).values()]
     expect("finder lists a mob known only from others", 9 in droppers, True)
-    expect("finder leaves out a mob without rates", 1 in droppers, False)
+    expect("finder lists a mob from three corpses", 1 in droppers, True)
 
-    # Three sources of ten corpses each count together once they reach thirty.
+    # Small sources count at once, each added to the rest.
     net.run(6)
     carol.see(10, "C10", 5)
     net.run(2)
     whisper(carol, "Small0", origin_id(100), counts(10, 10, 10, [(100, 5)]))
     whisper(carol, "Small1", origin_id(101), counts(10, 10, 10, [(100, 5)]))
-    expect("twenty pooled corpses give no rate", len(list(carol.ns.GetStats(10, "all").list.values())), 0)
-    whisper(carol, "Small2", origin_id(102), counts(10, 10, 10, [(100, 5)]))
-    expect("thirty pooled corpses give a rate", round(rates_of(10)[100].rate, 2), 0.5)
+    expect("two small sources give a chance", round(rates_of(10)[100].rate, 2), 0.5)
+    whisper(carol, "Small2", origin_id(102), counts(10, 10, 10, [(100, 1)]))
+    expect("a third one moves it at once", round(rates_of(10)[100].rate, 3), round(11 / 30, 3))
 
     # A rare item: a 40-corpse source that saw it three times is noise around 2%, not a liar.
     hold(carol, 11, {origin_id(110 + i): (100, [(777, 2)]) for i in range(3)})

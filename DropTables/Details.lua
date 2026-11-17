@@ -281,9 +281,9 @@ function render()
             end
         end
         if #stats.list == 0 then
-            emptyTitle:SetText("Not enough data yet")
-            emptyText:SetText(("Other players' counts show up once they reach %d looted corpses."):format(
-                ns.MIN_SOURCE_SAMPLE))
+            emptyTitle:SetText(stats.opened > 0 and "Nothing dropped yet" or "Nothing looted yet")
+            emptyText:SetText(stats.opened > 0 and "The looted corpses had no items or money so far."
+                or "Kills are counted, but no corpse of this mob has been looted yet.")
         elseif stats.small then
             used = used + 1
             fillSection(used, "", ("Rates from %d looted corpses are rough."):format(stats.opened))

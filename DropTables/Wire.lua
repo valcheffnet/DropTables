@@ -67,15 +67,6 @@ function Wire.ItemRecord(npc, bucket, itemId, item)
     }, ".")
 end
 
--- All records of one mob bucket: its counts first, then one record per item.
-function Wire.BucketRecords(npc, bucket, data)
-    local records = { Wire.MobRecord(npc, bucket, data) }
-    for itemId, item in pairs(data.items) do
-        table.insert(records, Wire.ItemRecord(npc, bucket, itemId, item))
-    end
-    return records
-end
-
 function Wire.LevelRecord(npc, minLevel, maxLevel)
     return "L" .. encodeNumber(npc) .. "." .. encodeNumber(minLevel) .. "." .. encodeNumber(maxLevel)
 end
@@ -110,12 +101,15 @@ end
 -- One install's records of a mob: counts per bucket, level range, kills per map and the name; nothing at all when
 -- no bucket is complete.
 -- source is { buckets, minLevel, maxLevel, maps = { [mapId] = kills } }.
+-- All records of one install's mob. Items come last, the most frequent first, so a message list cut short
+-- loses the rarest drops (mostly one-off world drops) and keeps the counts and the items that matter.
 function Wire.SourceRecords(npc, source, name)
-    local records = {}
+    local records, items = {}, {}
     for bucket, data in pairs(source.buckets) do
         if Wire.Complete(data) then
-            for _, record in ipairs(Wire.BucketRecords(npc, bucket, data)) do
-                table.insert(records, record)
+            table.insert(records, Wire.MobRecord(npc, bucket, data))
+            for itemId, item in pairs(data.items) do
+                table.insert(items, { drops = item.drops, record = Wire.ItemRecord(npc, bucket, itemId, item) })
             end
         end
     end
@@ -131,6 +125,15 @@ function Wire.SourceRecords(npc, source, name)
     local nameRecord = Wire.NameRecord(npc, name)
     if nameRecord then
         table.insert(records, nameRecord)
+    end
+    table.sort(items, function(a, b)
+        if a.drops ~= b.drops then
+            return a.drops > b.drops
+        end
+        return a.record < b.record
+    end)
+    for _, item in ipairs(items) do
+        table.insert(records, item.record)
     end
     return records
 end

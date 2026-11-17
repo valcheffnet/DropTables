@@ -20,7 +20,7 @@ To update, delete the old `DropTables` folder and unzip the new one. Your record
 
 ## Using it
 
-The addon starts with an empty table and fills it as you kill and loot. Target or mouse over a mob and its most likely drops show up under the target frame and in its tooltip. The minimap button opens the loot finder on left click and a menu on right click. The table window shows how many kills are yours and how many came from other players, and Only mine hides theirs. Their counts only feed into the chances once they add up to 30 looted corpses of a mob, so for a while a mob you've never killed can show other players' kills and no chances at all.
+The addon starts with an empty table and fills it as you kill and loot. Target or mouse over a mob and its most likely drops show up under the target frame and in its tooltip. The minimap button opens the loot finder on left click and a menu on right click. The table window shows how many kills are yours and how many came from other players, and Only mine hides theirs. Their counts go straight into the chances together with yours, and a chance from fewer than 10 looted corpses shows in grey.
 
 Commands (`/droptables` works too):
 

@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-11-18
+
+### Changed
+
+- Other players' counts go into the chances right away, added to yours, instead of waiting for 30 looted corpses of a mob. Chances from fewer than 10 looted corpses show in grey.
+- When the addon answers about a mob with many different drops, it sends the most frequent ones first and leaves out the rarest.
+- The addon asks about the same mob again after 2 minutes if someone answered last time, and waits longer each time nobody did.
+- Mobs you target one after another wait in line and get asked about in turn.
+- Mobs with 100 or more looted corpses are asked about once a day, so their chances keep up with what other players collect.
+
 ## [0.2.4] - 2026-11-17
 
 ### Added
@@ -79,7 +89,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/valcheffnet/DropTables/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...v0.2.2

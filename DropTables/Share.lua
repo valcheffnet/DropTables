@@ -22,8 +22,12 @@ local JOIN_RETRY = 15       -- seconds between tries while the player is not in 
 local MAX_SOURCES = 12      -- other installs kept per mob
 local SAMPLE_TARGET = 100   -- looted corpses of a mob (own plus other installs') worth asking for
 local MAX_ORIGINS_PER_QUESTION = 10
-local QUERY_COOLDOWN = 600  -- seconds before the same mob is asked about again
+-- Seconds before the same mob is asked about again: the first step after a question someone answered, one step
+-- longer after each question nobody answered.
+local PAUSES = { 120, 300, 600, 1800 }
+local REFRESH = 86400       -- a mob with SAMPLE_TARGET corpses or more is asked about once a day
 local QUERY_GAP = 5         -- seconds between any two questions
+local WAITING_QUESTIONS = 3 -- mobs targeted during the gap wait for their turn; only the newest are kept
 local ANSWER_WINDOW = 120   -- whispered counts are taken only this long after asking about that mob
 local ANSWER_ORIGINS = 3    -- installs one player whispers back per question, the biggest first
 -- Answer delay: BIG_DELAY for a source with SAMPLE_TARGET corpses or more, growing to BIG_DELAY + SIZE_DELAY for one
@@ -35,6 +39,7 @@ local QUEUE_TTL = 60
 local CHANNEL_PER_TICK, WHISPERS_PER_TICK, GROUP_PER_TICK = 1, 4, 1
 local GROUP_INTERVAL = 60   -- seconds between two sends of the player's changed counts to the group
 local GROUP_FLUSH_CAP = 10  -- messages per group send; mobs that do not fit wait for the next one
+local MOB_MESSAGES = 4      -- messages one install's mob may take; the rarest items are left out past that
 local RESULT = Enum.SendAddonMessageResult or {}
 local SUCCESS = RESULT.Success or 0
 -- Results worth sending again later; any other failure (target offline, not in a group, ...) drops the message.
@@ -49,6 +54,7 @@ local queue = {}     -- { text, at, chatType, target } waiting to go out
 local planned = {}   -- "<asker>:<npc>" -> { npc, target, due = { [origin] = time } } answers waiting to go out
 local asked = {}     -- npc -> { at, origins = { [origin] = true }, count, calledOff } of the player's last question
 local lastQuery = -QUERY_GAP
+local waiting = {}   -- npcs targeted while another question had just gone out, oldest first
 local knownOrigins   -- set of every install id the player holds counts of
 local newBySender = {} -- sender -> { day, count } of installs that sender brought; this session only, never saved
 local groupDirty = {}  -- npc -> true: the player's own counts changed since the last group send
@@ -99,6 +105,9 @@ local function pack(header, records)
         if text and #text + 1 + #record > Wire.MAX_MESSAGE then
             table.insert(texts, text)
             text = nil
+            if #texts == MOB_MESSAGES then
+                return texts
+            end
         end
         text = text and (text .. ";" .. record) or (header .. record)
     end
@@ -147,20 +156,68 @@ local function question(npc)
     return text
 end
 
-local function ask(npc)
-    local now = GetTime()
-    local reason = not channelId and "not in the channel"
-        or now - lastQuery < QUERY_GAP and "asked another mob a moment ago"
-        or asked[npc] and now - asked[npc].at < QUERY_COOLDOWN and "asked about it in the last 10 minutes"
-        or not wantsData(npc) and "already holds enough corpses"
-    if reason then
-        ns.Debug("not asking about mob %d: %s", npc, reason)
-        return
+-- The pause after the last question about a mob: short when someone answered it, longer each time nobody did.
+local function pauseAfter(question)
+    return question.count > 0 and PAUSES[1] or PAUSES[question.step]
+end
+
+-- Why a question about the mob cannot go out yet, or nil when it can. The gap between questions is left out; it only
+-- makes the mob wait in line.
+local function notYet(npc, now)
+    local last = asked[npc]
+    if not channelId then
+        return "not in the channel"
+    elseif last and now - last.at < pauseAfter(last) then
+        return ("asked %d s ago, next in %d s"):format(math.floor(now - last.at), math.ceil(pauseAfter(last) - (now - last.at)))
+    elseif not wantsData(npc) and (ns.db.refreshed[npc] or 0) > time() - REFRESH then
+        return "already holds enough corpses, asked again tomorrow"
     end
-    ns.Debug("asking about mob %d, %d looted corpses held", npc, sampleOf(npc))
-    asked[npc], lastQuery = { at = now, origins = {}, count = 0 }, now
+end
+
+local function sendQuestion(npc, now)
+    local last = asked[npc]
+    local step = not last and 1 or last.count > 0 and 1 or math.min(last.step + 1, #PAUSES)
+    local refresh = not wantsData(npc)
+    if refresh then
+        ns.db.refreshed[npc] = time()
+    end
+    ns.Debug("asking about mob %d, %d looted corpses held%s", npc, sampleOf(npc), refresh and " (daily refresh)" or "")
+    asked[npc] = { at = now, origins = {}, count = 0, step = step, refresh = refresh }
+    lastQuery = now
     enqueue(question(npc), "CHANNEL", channelId)
     session.queries = session.queries + 1
+end
+
+local function ask(npc)
+    local now = GetTime()
+    local reason = notYet(npc, now)
+    if reason then
+        ns.Debug("not asking about mob %d: %s", npc, reason)
+    elseif now - lastQuery >= QUERY_GAP and #waiting == 0 then
+        sendQuestion(npc, now)
+    else
+        for _, queued in ipairs(waiting) do
+            if queued == npc then
+                return
+            end
+        end
+        table.insert(waiting, npc)
+        if #waiting > WAITING_QUESTIONS then
+            table.remove(waiting, 1)
+        end
+        ns.Debug("mob %d waits its turn to be asked about", npc)
+    end
+end
+
+-- Sends the oldest waiting question once the gap has passed; mobs that became not worth asking about meanwhile drop
+-- out of the line.
+local function askWaiting(now)
+    while waiting[1] and now - lastQuery >= QUERY_GAP do
+        local npc = table.remove(waiting, 1)
+        if not notYet(npc, now) then
+            sendQuestion(npc, now)
+        end
+    end
 end
 
 -- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills.
@@ -365,7 +422,9 @@ local function receive(text, sender)
         question.origins[origin] = true
         question.count = question.count + 1
     end
-    if not question.calledOff and (sampleOf(npc) >= SAMPLE_TARGET or question.count >= MAX_ORIGINS_PER_QUESTION) then
+    -- A daily refresh of a well-known mob runs until enough installs answered, not until the corpses add up.
+    local enough = not question.refresh and sampleOf(npc) >= SAMPLE_TARGET
+    if not question.calledOff and (enough or question.count >= MAX_ORIGINS_PER_QUESTION) then
         question.calledOff = true
         callOff(npc)
     end
@@ -432,6 +491,7 @@ end
 local function tick()
     local now = GetTime()
     refreshChannel()
+    askWaiting(now)
     sendDueAnswers(now)
     if messagingBlocked() then
         return

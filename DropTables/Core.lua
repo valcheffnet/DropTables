@@ -243,6 +243,7 @@ ns.On("ADDON_LOADED", function(name)
     db.names = db.names or {}
     db.info = db.info or {}
     db.peers = db.peers or {}
+    db.refreshed = db.refreshed or {}  -- npc -> time of its last daily question
     db.settings = db.settings or {}
     for key, value in pairs(ns.DEFAULTS) do
         if db.settings[key] == nil then
