@@ -1,0 +1,125 @@
+"""Checks kill and loot recording and drop rates with stubbed WoW APIs.
+
+Requires: pip install lupa
+Run: python tests/test_collector.py
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from wowsim import Client, expect, report  # noqa: E402
+
+
+def guid(npc, spawn):
+    return "Creature-0-1-0-1-%d-%s" % (npc, spawn)
+
+
+def main():
+    client = Client("Tester")
+    lua, g, ns = client.lua, client.g, client.ns
+
+    def kill(spawn, has_loot, npc=1):
+        return client.kill(npc, spawn, has_loot)
+
+    loot = client.loot
+
+    a = kill("A", True)
+    kill("B", False)  # empty corpse
+    kill("C", True)  # has loot, never opened
+    d = kill("D", True)
+    # D is looted before the loot check runs (fast autoloot).
+    loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [d, 1]},
+          {"type": 2, "name": "5 Copper", "qty": 0, "sources": [d, 5]}])
+    g.advance(5)
+    loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 2, "sources": [a, 2]},
+          {"type": 1, "item": 102, "name": "Quest Paw", "qty": 1, "quest": True, "sources": [a, 1]},
+          {"type": 2, "name": "10 Copper", "qty": 0, "sources": [a, 10]}])
+    # Skinning D reopens the same corpse: must be ignored.
+    loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [d, 1]}])
+    # Pickpocket: a living mob that was never killed.
+    loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [guid(2, "P"), 1]}])
+    # A sparkling corpse that opens empty is found through the mouseover.
+    e = kill("E", True)
+    g.advance(5)
+    g.units["mouseover"] = e
+    loot([])
+    g.units["mouseover"] = None
+    # Area loot: one slot holding the same item from two corpses.
+    f = kill("F", True)
+    gg = kill("G", True)
+    g.advance(5)
+    loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 4, "sources": [f, 1, gg, 3]}])
+    # Loot from a container item is not mob loot.
+    loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [f, 1]}], from_item=True)
+    # One corpse with the same item split over two slots: one drop of a stack of 3.
+    h = kill("H", True)
+    g.advance(5)
+    loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [h, 1]},
+          {"type": 1, "item": 101, "name": "Meat", "qty": 2, "sources": [h, 2]}])
+
+    solo = ns.db.mobs[1][1]
+    expect("kills", solo.kills, 8)
+    expect("lootable", solo.lootable, 7)
+    expect("opened", solo.opened, 6)
+    fang_data = solo["items"][100]
+    expect("fang drops", fang_data.drops, 3)
+    expect("fang qty", fang_data.qty, 6)
+    expect("fang range", (fang_data.min, fang_data.max), (1, 3))
+    meat_data = solo["items"][101]
+    expect("meat drops", meat_data.drops, 2)
+    expect("meat qty", meat_data.qty, 4)
+    expect("meat range", (meat_data.min, meat_data.max), (1, 3))
+    expect("quest item skipped", solo["items"][102], None)
+    expect("money drops", solo.money.drops, 2)
+    expect("money copper", solo.money.copper, 15)
+    expect("money range", (solo.money.min, solo.money.max), (5, 10))
+    expect("pickpocket npc ignored", ns.db.mobs[2], None)
+
+    stats = ns.GetStats(1, "all")
+    fang = next(e for e in stats.list.values() if e.itemId == 100)
+    expect("fang rate", round(fang.rate, 6), round(7 / 8 * 3 / 6, 6))
+    expect("fang stack text", ns.FormatStack(fang), "1-3")
+    expect("money rate", round(stats.money.rate, 6), round(7 / 8 * 2 / 6, 6))
+    expect("money stats range", (stats.money.min, stats.money.max), (5, 10))
+    expect("empty kills", stats.empty, 1)
+
+    # Money is an entry of the list, sorted by chance with the items.
+    entries = list(stats.list.values())
+    rates = [e.rate for e in entries]
+    expect("list sorted by chance", rates, sorted(rates, reverse=True))
+    expect("money in the list", [e.money for e in entries].count(True), 1)
+    ns.settings.minQuality = 2
+    visible, _ = ns.VisibleEntries(stats)
+    expect("quality filter keeps only money", [bool(e.money) for e in visible.values()], [True])
+    ns.settings.minQuality = 0
+
+    # Gear of any quality is a world drop unless a well-sampled mob drops it often.
+    lua.execute("""
+        local base = C_Item.GetItemInfoInstant
+        C_Item.GetItemInfoInstant = function(id)
+            if id == 200 then return id, nil, nil, nil, 134400, 4 end
+            return base(id)
+        end
+    """)
+    gear_mob = ns.db.mobs
+    gear_mob[3] = lua.eval("{ [1] = { kills = 20, lootable = 20, opened = 20, items = { [200] = { drops = 1, qty = 1 } }, money = { drops = 0, copper = 0 } } }")
+    gear = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 200)
+    expect("grey gear at 5% is a world drop", gear.world, True)
+    gear_mob[3][1]["items"][200].drops = 8
+    gear = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 200)
+    expect("gear at 40% of 20 corpses is the mob's own", gear.world, False)
+    ns.settings.collapseWorldDrops = True
+    visible, world_count = ns.VisibleEntries(ns.GetStats(3, "all"))
+    expect("own gear stays visible", (len(list(visible.values())), world_count), (1, 0))
+    gear_mob[3][1]["items"][200].drops = 1
+    visible, world_count = ns.VisibleEntries(ns.GetStats(3, "all"))
+    expect("world drop left out of icons", (len(list(visible.values())), world_count), (0, 1))
+    expect("group mode empty", ns.GetStats(1, "group"), None)
+    expect("rate format", ns.FormatRate(0.514), "51%")
+    expect("rate format small", ns.FormatRate(0.0123), "1.2%")
+
+    report("collector")
+
+
+if __name__ == "__main__":
+    main()

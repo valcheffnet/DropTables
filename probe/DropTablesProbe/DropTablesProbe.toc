@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: Drop Tables Probe
+## Notes: Test-only helper that logs what the client exposes for Drop Tables.
+## Author: SasnycoN
+## Version: 0.0.1
+## SavedVariables: DropTablesProbeDB
+
+DropTablesProbe.lua
