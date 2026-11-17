@@ -4,6 +4,14 @@ local _, ns = ...
 -- unless a well-sampled mob drops one often enough to make it part of its own table.
 local WORLD_DROP_CLASSES = { [2] = true, [4] = true, [9] = true }
 local OWN_DROP_MIN_RATE = 0.2
+-- Another install with more looted corpses than this counts as this many in the kill and corpse totals.
+local PEER_CAP = 300
+-- Another install's rates count only from this many looted corpses of the mob; smaller installs are pooled into
+-- one source, which counts once the pool reaches it.
+ns.MIN_SOURCE_SAMPLE = 30
+-- How wide the confidence interval of the outlier check is, in standard deviations.
+local OUTLIER_Z = 3
+local MONEY = "money"
 
 local function mergeRange(into, from)
     if from.min then
@@ -16,76 +24,241 @@ local function inMode(bucket, mode)
     return mode == "all" or (mode == "solo") == (bucket == 1)
 end
 
--- Drop rates for one mob. mode is "all", "solo" or "group".
--- rate = (lootable / kills) * (drops / opened): kills that leave an empty corpse lower every rate,
--- while corpses the player never opened do not.
-function ns.GetStats(npc, mode)
-    local mob = npc and ns.db.mobs[npc]
-    if not mob then
-        return nil
+local function round(n)
+    return math.floor(n + 0.5)
+end
+
+local function openedOf(buckets)
+    local opened = 0
+    for _, data in pairs(buckets) do
+        opened = opened + data.opened
     end
-    local kills, lootable, opened, moneyDrops, copper = 0, 0, 0, 0, 0
-    local moneyRange = {}
-    local items = {}
-    for bucket, data in pairs(mob) do
-        if inMode(bucket, mode) then
-            kills = kills + data.kills
-            lootable = lootable + data.lootable
-            opened = opened + data.opened
-            moneyDrops = moneyDrops + data.money.drops
-            copper = copper + data.money.copper
-            mergeRange(moneyRange, data.money)
+    return opened
+end
+
+-- Sums one install's buckets that fall in the mode, scaled by factor. Money is the entry MONEY, with copper as
+-- its quantity. Returns nil when the install has no kills in the mode.
+local function aggregate(buckets, mode, factor)
+    local sum = { kills = 0, lootable = 0, opened = 0, entries = {} }
+    local function add(key, drops, qty, from)
+        local entry = sum.entries[key]
+        if not entry then
+            entry = { drops = 0, qty = 0 }
+            sum.entries[key] = entry
+        end
+        entry.drops = entry.drops + drops * factor
+        entry.qty = entry.qty + qty * factor
+        mergeRange(entry, from)
+    end
+    for bucket, data in pairs(buckets) do
+        if inMode(bucket, mode) and data.kills > 0 then
+            sum.kills = sum.kills + data.kills * factor
+            sum.lootable = sum.lootable + data.lootable * factor
+            sum.opened = sum.opened + data.opened * factor
+            if data.money.drops > 0 then
+                add(MONEY, data.money.drops, data.money.copper, data.money)
+            end
             for itemId, item in pairs(data.items) do
-                local sum = items[itemId]
-                if not sum then
-                    sum = { drops = 0, qty = 0 }
-                    items[itemId] = sum
-                end
-                sum.drops = sum.drops + item.drops
-                sum.qty = sum.qty + item.qty
-                mergeRange(sum, item)
+                add(itemId, item.drops, item.qty, item)
             end
         end
     end
-    if kills == 0 then
+    return sum.kills > 0 and sum or nil
+end
+
+-- rate = (lootable / kills) * (drops / opened): kills that leave an empty corpse lower every rate,
+-- while corpses the player never opened do not.
+local function rateOf(sum, key)
+    local entry = sum.entries[key]
+    return sum.lootable / sum.kills * (entry and entry.drops or 0) / sum.opened
+end
+
+local function median(values)
+    local sorted = {}
+    for i, value in ipairs(values) do
+        sorted[i] = value
+    end
+    table.sort(sorted)
+    local middle = math.floor(#sorted / 2)
+    if #sorted % 2 == 1 then
+        return sorted[middle + 1]
+    end
+    return (sorted[middle] + sorted[middle + 1]) / 2
+end
+
+-- The installs whose rates count: each with at least MIN_SOURCE_SAMPLE looted corpses, plus all smaller ones summed
+-- into one source when together they reach it.
+local function rateSources(peers)
+    local sources, pool = {}, { kills = 0, lootable = 0, opened = 0, entries = {} }
+    for _, peer in ipairs(peers) do
+        if peer.opened >= ns.MIN_SOURCE_SAMPLE then
+            table.insert(sources, peer)
+        else
+            pool.kills, pool.lootable, pool.opened = pool.kills + peer.kills, pool.lootable + peer.lootable,
+                pool.opened + peer.opened
+            for key, entry in pairs(peer.entries) do
+                local sum = pool.entries[key]
+                if not sum then
+                    sum = { drops = 0, qty = 0 }
+                    pool.entries[key] = sum
+                end
+                sum.drops, sum.qty = sum.drops + entry.drops, sum.qty + entry.qty
+                mergeRange(sum, entry)
+            end
+        end
+    end
+    if pool.opened >= ns.MIN_SOURCE_SAMPLE then
+        table.insert(sources, pool)
+    end
+    return sources
+end
+
+-- True when a drop chance of p fits what an install saw (a share seen of its opened corpses): p lies within the
+-- Wilson score interval at OUTLIER_Z. The interval widens for small samples and rare items, so noise is not taken
+-- for lying.
+local function plausible(seen, opened, p)
+    local z2 = OUTLIER_Z * OUTLIER_Z
+    local center = (seen + z2 / (2 * opened)) / (1 + z2 / opened)
+    local half = OUTLIER_Z * math.sqrt(seen * (1 - seen) / opened + z2 / (4 * opened * opened)) / (1 + z2 / opened)
+    return math.abs(p - center) <= half
+end
+
+local function dropShare(sum, key)
+    local entry = sum.entries[key]
+    return math.min(1, (entry and entry.drops or 0) / sum.opened)
+end
+
+-- Other players' rate of one entry: the mean, weighted by looted corpses, of the installs whose drops fit the
+-- median drop chance. Returns the rate, its weight and the installs it came from, or nil without usable installs.
+local function peerRate(candidates, key)
+    if #candidates == 0 then
         return nil
     end
+    local rates, shares = {}, {}
+    for i, peer in ipairs(candidates) do
+        rates[i] = rateOf(peer, key)
+        shares[i] = dropShare(peer, key)
+    end
+    local middle = median(shares)
+    local agreeing = {}
+    for i, peer in ipairs(candidates) do
+        if plausible(shares[i], peer.opened, middle) then
+            table.insert(agreeing, i)
+        end
+    end
+    if #agreeing == 0 then
+        -- Installs too far apart to tell which one is off, such as two that disagree: all of them count.
+        for i in ipairs(candidates) do
+            agreeing[i] = i
+        end
+    end
+    local total, weight, used = 0, 0, {}
+    for _, i in ipairs(agreeing) do
+        total = total + rates[i] * candidates[i].opened
+        weight = weight + candidates[i].opened
+        table.insert(used, candidates[i])
+    end
+    return total / weight, weight, used
+end
 
-    local share = lootable / kills
+-- The list entry of an item or of money, with drop counts, stack sizes and ranges summed over the given installs.
+local function newEntry(key, rate, sums, opened)
+    local merged = { drops = 0, qty = 0 }
+    for _, sum in ipairs(sums) do
+        local entry = sum.entries[key]
+        if entry then
+            merged.drops = merged.drops + entry.drops
+            merged.qty = merged.qty + entry.qty
+            mergeRange(merged, entry)
+        end
+    end
+    if merged.drops == 0 then
+        return nil
+    end
+    if key == MONEY then
+        -- Money is one more entry of the list (money = true, no itemId), so it is sorted by chance like any item.
+        return { money = true, rate = rate, avg = merged.qty / merged.drops, min = merged.min, max = merged.max }
+    end
+    local meta = ns.db.items[key]
+    local classId = select(6, C_Item.GetItemInfoInstant(key))
+    return {
+        itemId = key,
+        rate = rate,
+        drops = math.max(1, round(merged.drops)),
+        avgQty = merged.qty / merged.drops,
+        min = merged.min,
+        max = merged.max,
+        quality = meta and meta.quality or C_Item.GetItemQualityByID(key),
+        world = WORLD_DROP_CLASSES[classId] == true and not (opened >= ns.SMALL_SAMPLE and rate >= OWN_DROP_MIN_RATE),
+    }
+end
+
+-- Drop rates for one mob. mode is "all", "solo" or "group".
+-- The player's own rate and other players' agreed rate (see peerRate) are averaged, weighted by looted corpses.
+-- Kill and corpse totals count every install, each scaled down to PEER_CAP; scaling leaves fractions, so the
+-- totals on screen are rounded.
+function ns.GetStats(npc, mode)
+    if not npc then
+        return nil
+    end
+    local own = ns.db.mobs[npc] and aggregate(ns.db.mobs[npc], mode, 1) or nil
+    local peers = {}
+    if not ns.settings.onlyMine then
+        for _, peer in pairs(ns.db.peers[npc] or {}) do
+            local opened = openedOf(peer.buckets)
+            local sum = aggregate(peer.buckets, mode, opened > PEER_CAP and PEER_CAP / opened or 1)
+            if sum then
+                table.insert(peers, sum)
+            end
+        end
+    end
+    if not own and #peers == 0 then
+        return nil
+    end
+    local all = { own }
+    for _, sum in ipairs(peers) do
+        table.insert(all, sum)
+    end
+    local kills, lootable, opened, keys = 0, 0, 0, {}
+    for _, sum in ipairs(all) do
+        kills, lootable, opened = kills + sum.kills, lootable + sum.lootable, opened + sum.opened
+        for key in pairs(sum.entries) do
+            keys[key] = true
+        end
+    end
     local stats = {
         npc = npc,
-        kills = kills,
-        opened = opened,
-        empty = kills - lootable,
-        small = opened < ns.SMALL_SAMPLE,
+        kills = round(kills),
+        opened = round(opened),
+        empty = round(kills - lootable),
+        ownKills = own and own.kills or 0,
+        sources = #peers,
+        small = round(opened) < ns.SMALL_SAMPLE,
         list = {},
     }
-    for itemId, item in pairs(items) do
-        local rate = opened > 0 and share * item.drops / opened or 0
-        local meta = ns.db.items[itemId]
-        local quality = meta and meta.quality or C_Item.GetItemQualityByID(itemId)
-        local classId = select(6, C_Item.GetItemInfoInstant(itemId))
-        table.insert(stats.list, {
-            itemId = itemId,
-            rate = rate,
-            drops = item.drops,
-            avgQty = item.qty / item.drops,
-            min = item.min,
-            max = item.max,
-            quality = quality,
-            world = WORLD_DROP_CLASSES[classId] == true and not (opened >= ns.SMALL_SAMPLE and rate >= OWN_DROP_MIN_RATE),
-        })
-    end
-    -- Money is one more entry of the list (money = true, no itemId), so it is sorted by chance like any item.
-    if moneyDrops > 0 and opened > 0 then
-        stats.money = {
-            money = true,
-            rate = share * moneyDrops / opened,
-            avg = copper / moneyDrops,
-            min = moneyRange.min,
-            max = moneyRange.max,
-        }
-        table.insert(stats.list, stats.money)
+    local ownWeight = own and own.opened or 0
+    local candidates = rateSources(peers)
+    for key in pairs(keys) do
+        local ownRate = ownWeight > 0 and rateOf(own, key) or 0
+        local otherRate, otherWeight, agreeing = peerRate(candidates, key)
+        if not otherRate then
+            otherRate, otherWeight, agreeing = 0, 0, {}
+        end
+        local weight = ownWeight + otherWeight
+        local rate = weight > 0 and (ownRate * ownWeight + otherRate * otherWeight) / weight or 0
+        if rate > 0 then
+            local sums = { own }
+            for _, sum in ipairs(agreeing) do
+                table.insert(sums, sum)
+            end
+            local entry = newEntry(key, rate, sums, opened)
+            if entry then
+                table.insert(stats.list, entry)
+                if entry.money then
+                    stats.money = entry
+                end
+            end
+        end
     end
     table.sort(stats.list, function(a, b)
         if a.rate ~= b.rate then
@@ -96,20 +269,74 @@ function ns.GetStats(npc, mode)
     return stats
 end
 
--- Entries for the icons and the mob tooltip, plus how many world drops were left out of them.
--- Items below the minimum quality are left out; money always stays.
+-- Entries for the icons and the mob tooltip, plus how many world drops and how many items below the minimum
+-- quality were left out of them. Money always stays.
 function ns.VisibleEntries(stats)
-    local entries, worldCount = {}, 0
+    local entries, worldCount, lowCount = {}, 0, 0
     for _, entry in ipairs(stats.list) do
         if entry.world and ns.settings.collapseWorldDrops then
             worldCount = worldCount + 1
         elseif entry.money or (entry.quality or 0) >= ns.settings.minQuality then
             table.insert(entries, entry)
+        else
+            lowCount = lowCount + 1
         end
     end
-    return entries, worldCount
+    return entries, worldCount, lowCount
 end
 
 function ns.MobName(npc)
     return ns.db.names[npc] or ("NPC " .. npc)
+end
+
+-- Every mob with counts, the player's own and, unless only those are wanted, other players'.
+function ns.KnownNpcs()
+    local npcs = {}
+    for npc in pairs(ns.db.mobs) do
+        npcs[npc] = true
+    end
+    if not ns.settings.onlyMine then
+        for npc in pairs(ns.db.peers) do
+            npcs[npc] = true
+        end
+    end
+    return npcs
+end
+
+-- Level range and kills per map: the player's own records, completed by what other players sent.
+-- Kill spots (cells) come only from the player's own kills.
+function ns.MobInfo(npc)
+    local own = ns.db.info[npc]
+    local peers = not ns.settings.onlyMine and ns.db.peers[npc]
+    if not peers or not next(peers) then
+        return own
+    end
+    local info = { maps = {} }
+    local function addLevels(minLevel, maxLevel)
+        if minLevel then
+            info.minLevel = math.min(info.minLevel or minLevel, minLevel)
+            info.maxLevel = math.max(info.maxLevel or minLevel, maxLevel or minLevel)
+        end
+    end
+    local function addKills(mapId, kills, cells)
+        local place = info.maps[mapId]
+        if not place then
+            place = { kills = 0, cells = cells or {} }
+            info.maps[mapId] = place
+        end
+        place.kills = place.kills + kills
+    end
+    if own then
+        addLevels(own.minLevel, own.maxLevel)
+        for mapId, place in pairs(own.maps) do
+            addKills(mapId, place.kills, place.cells)
+        end
+    end
+    for _, peer in pairs(peers) do
+        addLevels(peer.minLevel, peer.maxLevel)
+        for mapId, kills in pairs(peer.maps) do
+            addKills(mapId, kills)
+        end
+    end
+    return info
 end

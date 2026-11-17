@@ -2,7 +2,7 @@
 
 Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game.
 
-This is an early test build, so expect bugs. For now every table comes from your own kills and loot: the addon starts empty, and the numbers get more reliable the more you play. There is also an experimental feature that sends drop counts between players who run the addon. That's the part I'm testing right now, and what it collects doesn't show up in anyone's tables yet.
+This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game. I'd like to turn those exports into a shared database that comes with the addon, but that part is new and I'm still testing it.
 
 ## Download
 
@@ -20,7 +20,7 @@ To update, delete the old `DropTables` folder and unzip the new one. Your record
 
 ## Using it
 
-The addon starts with an empty table and fills it as you kill and loot. Target or mouse over a mob and its most likely drops show up under the target frame and in its tooltip. The minimap button opens the loot finder on left click and a menu on right click.
+The addon starts with an empty table and fills it as you kill and loot. Target or mouse over a mob and its most likely drops show up under the target frame and in its tooltip. The minimap button opens the loot finder on left click and a menu on right click. The table window shows how many kills are yours and how many came from other players, and Only mine hides theirs. Their counts only feed into the chances once they add up to 30 looted corpses of a mob, so for a while a mob you've never killed can show other players' kills and no chances at all.
 
 Commands (`/droptables` works too):
 
@@ -30,12 +30,18 @@ Commands (`/droptables` works too):
 - `/dt unlock` lets you drag the icons under the target frame somewhere else, `/dt lock` fixes them in place again. Blizzard's Edit Mode does the same.
 - `/dt reset` puts the icons back under the target frame
 - `/dt icons`, `/dt tooltip` and `/dt minimap` turn the icons, the tooltip lines or the minimap button on and off
-- `/dt status` shows how many mobs and kills you have recorded and how sharing is going
-- `/dt bridge on` and `/dt bridge off` switch bridge mode, which collects other players' drop counts
+- `/dt export` opens the window with the text to share (see below)
+- `/dt status` shows how many mobs and kills you have recorded, what other players have sent you and how many of your mobs are new since your last export
+
+## Sharing your tables
+
+Every table someone shares makes the numbers better for everybody. Type `/dt export` (or pick Share my tables in the minimap button menu), press Select and then Ctrl+C in the window, open the form link under the text and paste it there. For now you need a GitHub account for that. An export only carries what changed since your last one, so doing it now and then is enough. A big table can come out in several parts, and each part goes into its own form.
 
 ## What it sends
 
-Share my data is on by default and you can turn it off in the options. While it's on, the addon sends your drop counts to players who run it in bridge mode, over addon whispers: mob and item ids, kill counts, and the zones and spots where the kills happened. Character names and account details are never part of it.
+Share drop counts with other players is on by default, and you can turn it off in the options. While it's on, the addon asks about mobs it has little data on over a hidden addon channel. The question says whose counts you already have, and players with something newer whisper theirs back to you as addon messages, so none of it shows up in your chat. Your addon answers other people's questions the same way. In a group, everyone who runs Drop Tables also sends their own new counts to the rest of the group once a minute. The messages carry mob and item ids, kill and drop counts, levels, the zones where the kills happened, the mob's name and a random id of your install. They never carry character names or account details. So that one player can't fill the tables with made-up numbers, the addon takes only a few new installs from each player per day and leaves out counts that are far off what everyone else reports. With sharing off, your addon stops sending anything, to the channel or to your group, but it still keeps whatever your group sends you.
+
+The export carries the same things plus the spots on the map where you made your kills. Anything you paste into the form is public.
 
 ## Bugs
 

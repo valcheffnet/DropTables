@@ -89,8 +89,9 @@ def main():
     expect("list sorted by chance", rates, sorted(rates, reverse=True))
     expect("money in the list", [e.money for e in entries].count(True), 1)
     ns.settings.minQuality = 2
-    visible, _ = ns.VisibleEntries(stats)
+    visible, world_count, low_count = ns.VisibleEntries(stats)
     expect("quality filter keeps only money", [bool(e.money) for e in visible.values()], [True])
+    expect("filtered items counted as low quality, not world", (world_count, low_count), (0, len(entries) - 1))
     ns.settings.minQuality = 0
 
     # Gear of any quality is a world drop unless a well-sampled mob drops it often.
@@ -109,10 +110,10 @@ def main():
     gear = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 200)
     expect("gear at 40% of 20 corpses is the mob's own", gear.world, False)
     ns.settings.collapseWorldDrops = True
-    visible, world_count = ns.VisibleEntries(ns.GetStats(3, "all"))
+    visible, world_count, _ = ns.VisibleEntries(ns.GetStats(3, "all"))
     expect("own gear stays visible", (len(list(visible.values())), world_count), (1, 0))
     gear_mob[3][1]["items"][200].drops = 1
-    visible, world_count = ns.VisibleEntries(ns.GetStats(3, "all"))
+    visible, world_count, _ = ns.VisibleEntries(ns.GetStats(3, "all"))
     expect("world drop left out of icons", (len(list(visible.values())), world_count), (0, 1))
     expect("group mode empty", ns.GetStats(1, "group"), None)
     expect("rate format", ns.FormatRate(0.514), "51%")

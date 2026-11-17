@@ -80,9 +80,19 @@ local function showEntryTooltip(button)
     else
         GameTooltip:SetText("Drop Tables")
         if stats and #stats.list > 0 then
-            GameTooltip:AddLine(("Killed %d times, only world drops so far."):format(stats.kills), 1, 1, 1, true)
+            local _, worldCount, lowCount = ns.VisibleEntries(stats)
+            local reason
+            if worldCount > 0 and lowCount > 0 then
+                reason = "only world drops and items below your minimum quality so far"
+            elseif worldCount > 0 then
+                reason = "only world drops so far"
+            else
+                reason = "everything it dropped is below your minimum quality (see Options)"
+            end
+            GameTooltip:AddLine(("Killed %d times, %s."):format(stats.kills, reason), 1, 1, 1, true)
         elseif stats then
-            GameTooltip:AddLine(("Killed %d times, nothing looted yet."):format(stats.kills), 1, 1, 1, true)
+            local text = stats.opened > 0 and "not enough looted corpses for rates yet" or "nothing looted yet"
+            GameTooltip:AddLine(("Killed %d times, %s."):format(stats.kills, text), 1, 1, 1, true)
         else
             GameTooltip:AddLine("No data for this mob yet. Kill and loot it to start its table.", 1, 1, 1, true)
         end

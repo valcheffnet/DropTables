@@ -9,7 +9,7 @@ local function addDropLines(tooltip, data)
     if not stats then
         return
     end
-    local entries, worldCount = ns.VisibleEntries(stats)
+    local entries, worldCount, lowCount = ns.VisibleEntries(stats)
     local rateShade = stats.small and 0.6 or 1
     tooltip:AddLine(" ")
     tooltip:AddDoubleLine("Drop Tables", ("%d kills"):format(stats.kills), 1, 0.82, 0, 0.6, 0.6, 0.6)
@@ -35,6 +35,9 @@ local function addDropLines(tooltip, data)
     end
     if worldCount > 0 then
         table.insert(more, ("%d world drops"):format(worldCount))
+    end
+    if lowCount > 0 then
+        table.insert(more, ("%d below min quality"):format(lowCount))
     end
     if #more > 0 then
         tooltip:AddLine(table.concat(more, ", ") .. " in /dt", 0.6, 0.6, 0.6)

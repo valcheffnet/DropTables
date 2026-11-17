@@ -1,18 +1,17 @@
 local _, ns = ...
 
--- Text format of shared counts. A data message is
---   "1|<install id>|<seq>|<record>;<record>;..."
--- and each record replaces the previous one with the same key, so resending is harmless:
+-- Text form of drop counts, used by peer sharing and by the export string. Records are joined with ";" and each
+-- one replaces the previous record with the same key, so sending the same counts twice is harmless:
 --   M<npc>.<bucket>.<kills>.<lootable>.<opened>.<money drops>.<copper>.<money min>.<money max>
 --   I<npc>.<bucket>.<item>.<drops>.<qty>.<min>.<max>
 --   L<npc>.<min level>.<max level>
 --   Z<npc>.<map>.<kills>
 --   P<npc>.<map>.<cell>.<kills>
+--   N<npc>.<mob name>
 -- Numbers are base 36; an empty field is a missing value (min/max, unknown level).
 local Wire = {}
 ns.Wire = Wire
 
-Wire.VERSION = "1"
 Wire.MAX_MESSAGE = 255
 
 local DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -39,7 +38,7 @@ local function decodeNumber(s)
     if s == "" then
         return nil
     end
-    if not s:match("^[0-9a-z]+$") then
+    if #s > 8 or not s:match("^[0-9a-z]+$") then
         error("bad number")
     end
     return tonumber(s, 36)
@@ -70,22 +69,76 @@ function Wire.BucketRecords(npc, bucket, data)
     return records
 end
 
--- Level range, kills per map and kill spots of one mob.
-function Wire.InfoRecords(npc, info)
+function Wire.LevelRecord(npc, minLevel, maxLevel)
+    return "L" .. encodeNumber(npc) .. "." .. encodeNumber(minLevel) .. "." .. encodeNumber(maxLevel)
+end
+
+function Wire.MapRecord(npc, mapId, kills)
+    return "Z" .. encodeNumber(npc) .. "." .. encodeNumber(mapId) .. "." .. encodeNumber(kills)
+end
+
+-- Mob names are client text; "|", ";" and control characters never occur in them and are refused.
+local function validName(name)
+    return type(name) == "string" and #name > 0 and #name <= 64 and not name:find("[%c|;]")
+end
+
+function Wire.NameRecord(npc, name)
+    return validName(name) and ("N" .. encodeNumber(npc) .. "." .. name) or nil
+end
+
+-- A bucket put together from other players' messages can be half there: items without the counts message, or an
+-- older counts message than the items. Such a bucket is not passed on.
+local function complete(data)
+    if data.kills == 0 then
+        return false
+    end
+    for _, item in pairs(data.items) do
+        if item.drops > data.opened then
+            return false
+        end
+    end
+    return true
+end
+
+-- One install's records of a mob: counts per bucket, level range, kills per map and the name; nothing at all when
+-- no bucket is complete.
+-- source is { buckets, minLevel, maxLevel, maps = { [mapId] = kills } }.
+function Wire.SourceRecords(npc, source, name)
+    local records = {}
+    for bucket, data in pairs(source.buckets) do
+        if complete(data) then
+            for _, record in ipairs(Wire.BucketRecords(npc, bucket, data)) do
+                table.insert(records, record)
+            end
+        end
+    end
+    if #records == 0 then
+        return records
+    end
+    if source.minLevel then
+        table.insert(records, Wire.LevelRecord(npc, source.minLevel, source.maxLevel))
+    end
+    for mapId, kills in pairs(source.maps) do
+        table.insert(records, Wire.MapRecord(npc, mapId, kills))
+    end
+    local nameRecord = Wire.NameRecord(npc, name)
+    if nameRecord then
+        table.insert(records, nameRecord)
+    end
+    return records
+end
+
+-- Kill spots of one of the player's own mobs.
+function Wire.CellRecords(npc, info)
     local id = encodeNumber(npc)
-    local records = { "L" .. id .. "." .. encodeNumber(info.minLevel) .. "." .. encodeNumber(info.maxLevel) }
+    local records = {}
     for mapId, place in pairs(info.maps) do
         local map = encodeNumber(mapId)
-        table.insert(records, "Z" .. id .. "." .. map .. "." .. encodeNumber(place.kills))
         for cell, kills in pairs(place.cells) do
             table.insert(records, "P" .. id .. "." .. map .. "." .. encodeNumber(cell) .. "." .. encodeNumber(kills))
         end
     end
     return records
-end
-
-function Wire.Header(installId, seq)
-    return Wire.VERSION .. "|" .. installId .. "|" .. encodeNumber(seq) .. "|"
 end
 
 local function split(text, sep)
@@ -106,8 +159,29 @@ local FIELDS = {
 local REQUIRED = { npc = true, bucket = true, kills = true, lootable = true, opened = true, moneyDrops = true,
     copper = true, item = true, drops = true, qty = true, map = true, cell = true }
 
+-- Counts that cannot come from the collector: an opened corpse is a lootable kill, an item or coin drops at most
+-- once per opened corpse.
+local function consistent(r)
+    if r.kind == "M" then
+        return r.lootable <= r.kills and r.opened <= r.lootable and r.moneyDrops <= r.opened
+            and (r.moneyDrops > 0 or r.copper == 0) and (r.moneyMin or 0) <= (r.moneyMax or 0)
+    elseif r.kind == "I" then
+        return r.drops >= 1 and r.qty >= r.drops and (r.min or 0) <= (r.max or 0)
+    elseif r.kind == "L" then
+        return (r.minLevel == nil) == (r.maxLevel == nil) and (r.minLevel or 0) <= (r.maxLevel or 0)
+    end
+    return true
+end
+
 local function decodeRecord(text)
     local kind = text:sub(1, 1)
+    if kind == "N" then
+        local npc, name = text:match("^N([0-9a-z]+)%.(.+)$")
+        if not npc or not validName(name) then
+            error("bad name record")
+        end
+        return { kind = kind, npc = decodeNumber(npc), name = name }
+    end
     local names = FIELDS[kind]
     if not names then
         error("bad record kind")
@@ -126,15 +200,14 @@ local function decodeRecord(text)
     if record.bucket and (record.bucket < 1 or record.bucket > 6) then
         error("bad bucket")
     end
+    if not consistent(record) then
+        error("inconsistent " .. kind .. " record")
+    end
     return record
 end
 
--- Returns install id, sequence number and records, or nil and a reason for a malformed message.
-function Wire.Decode(message)
-    local version, installId, seq, body = message:match("^(%w+)|(%x+)|([0-9a-z]+)|(.*)$")
-    if version ~= Wire.VERSION or #installId ~= 16 then
-        return nil, "bad header"
-    end
+-- Records of a ";"-joined text, or nil and the reason when any of them is malformed.
+function Wire.DecodeRecords(body)
     local records = {}
     local ok, err = pcall(function()
         for _, text in ipairs(split(body, ";")) do
@@ -144,5 +217,5 @@ function Wire.Decode(message)
     if not ok then
         return nil, tostring(err)
     end
-    return installId, tonumber(seq, 36), records
+    return records
 end

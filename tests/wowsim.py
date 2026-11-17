@@ -4,6 +4,7 @@ Requires: pip install lupa
 """
 import pathlib
 import sys
+import zlib
 
 from lupa import lua51
 
@@ -35,12 +36,19 @@ Enum = {}
 function issecretvalue() return false end
 function GetTime() return now end
 function time() return math.floor(now) end
-function GetNumGroupMembers() return 0 end
+groupMembers = {}  -- names of the other party members, party1 first
+function GetNumGroupMembers() return #groupMembers > 0 and #groupMembers + 1 or 0 end
+function IsInGroup(category) return category == nil and #groupMembers > 0 end
 function IsInRaid() return false end
+LE_PARTY_CATEGORY_INSTANCE = 2
 function IsEncounterInProgress() return false end
 function CanLootUnit(guid) return lootable[guid] end
 function UnitGUID(unit) return units[unit] end
-function UnitName() return "Test Mob" end
+function UnitName(unit)
+    local index = tonumber(unit:match("^party(%d+)$") or "")
+    if index then return groupMembers[index] end
+    return "Test Mob"
+end
 unitLevels = {}    -- unit token -> level
 playerMap = 1429   -- map the player stands on; nil = no map
 playerX, playerY = 0.5, 0.5  -- nil = no position (instances)
@@ -78,6 +86,30 @@ C_Item = {
     GetItemQualityByID = function() return 1 end,
     GetItemInfo = function() return nil end,
 }
+-- Base64 in Lua: compressed bytes cannot cross into Python as text.
+local B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+local function encodeBase64(data)
+    local out = {}
+    for i = 1, #data, 3 do
+        local a, b, c = data:byte(i, i + 2)
+        local n = a * 65536 + (b or 0) * 256 + (c or 0)
+        local chars = 2 + (b and 1 or 0) + (c and 1 or 0)
+        for j = 1, 4 do
+            if j <= chars then
+                local index = math.floor(n / 64 ^ (4 - j)) % 64
+                table.insert(out, B64:sub(index + 1, index + 1))
+            else
+                table.insert(out, "=")
+            end
+        end
+    end
+    return table.concat(out)
+end
+Enum.CompressionMethod = { Deflate = 0, Zlib = 1, Gzip = 2 }
+C_EncodingUtil = {
+    CompressString = function(text, method) return pyCompress(text, method) end,
+    EncodeBase64 = encodeBase64,
+}
 function GetNumLootItems() return #lootSlots end
 function GetLootSlotType(i) return lootSlots[i].type end
 function GetLootSlotInfo(i)
@@ -110,17 +142,28 @@ function advance(seconds)
 end
 """
 
-ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua", "Stats.lua", "Search.lua")
+ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua", "Export.lua", "Stats.lua",
+             "Search.lua")
+
+
+def py_compress(text, method):
+    """Zlib as C_EncodingUtil.CompressString(text, Enum.CompressionMethod.Zlib) gives it."""
+    assert method == 1, "export must use zlib"
+    return zlib.compress(text.encode("ascii"))
 
 
 class Client:
     """One game client with the addon loaded."""
 
-    def __init__(self, name, files=ALL_FILES):
+    def __init__(self, name, files=ALL_FILES, saved=None):
+        """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would."""
         self.name = name
         self.lua = lua51.LuaRuntime(unpack_returned_tuples=True)
-        self.lua.execute(STUBS)
         self.g = self.lua.globals()
+        self.g.pyCompress = py_compress
+        self.lua.execute(STUBS)
+        if saved:
+            self.lua.execute(saved)
         self.ns = self.lua.table()
         loader = self.lua.execute("return function(src, name) return assert(loadstring(src, name)) end")
         for file_name in files:

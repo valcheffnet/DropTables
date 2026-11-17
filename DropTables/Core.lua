@@ -13,7 +13,8 @@ ns.DEFAULTS = {
     detailsAlpha = 1,
     finderAlpha = 1,
     shareData = true,
-    bridgeMode = false,
+    onlyMine = false,
+    exportReminder = true,
     showMinimap = true,
     minimapAngle = 200,
 }
@@ -171,6 +172,7 @@ ns.On("ADDON_LOADED", function(name)
     db.items = db.items or {}
     db.names = db.names or {}
     db.info = db.info or {}
+    db.peers = db.peers or {}
     db.settings = db.settings or {}
     for key, value in pairs(ns.DEFAULTS) do
         if db.settings[key] == nil then
@@ -211,10 +213,9 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Print(("%d mobs, %d kills recorded. Empty-corpse check: %s."):format(mobs, kills,
             CanLootUnit and "available" or "not available, rates may read high"))
         ns.Print(ns.ShareStatus())
-    elseif msg == "bridge on" or msg == "bridge off" then
-        ns.SetBridgeMode(msg == "bridge on")
-        ns.Print(ns.settings.bridgeMode and "Bridge mode on: collecting other players' data for upload."
-            or "Bridge mode off.")
+        ns.Print(("%d of your mobs have new counts since your last /dt export."):format(ns.ChangedCount()))
+    elseif msg == "export" then
+        ns.ToggleExport()
     else
         ns.ToggleDetails(ns.UnitNpc("target"))
     end

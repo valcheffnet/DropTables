@@ -13,7 +13,7 @@ function ns.SearchItems(text, qualities)
     local results = {}
     for itemId, meta in pairs(ns.db.items) do
         local name = ns.ItemName(itemId)
-        local quality = meta.quality or 1
+        local quality = meta.quality or C_Item.GetItemQualityByID(itemId) or 1
         if (text == "" or itemId == id or name:lower():find(text, 1, true))
             and (not qualities or qualities[quality]) then
             local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(itemId)
@@ -85,10 +85,24 @@ function ns.BuildItemTree(items)
     return tree
 end
 
-local function dropsItem(mob, itemId)
-    for _, data in pairs(mob) do
+local function bucketsDrop(buckets, itemId)
+    for _, data in pairs(buckets) do
         if data.items[itemId] then
             return true
+        end
+    end
+    return false
+end
+
+local function dropsItem(npc, itemId)
+    if ns.db.mobs[npc] and bucketsDrop(ns.db.mobs[npc], itemId) then
+        return true
+    end
+    if not ns.settings.onlyMine then
+        for _, peer in pairs(ns.db.peers[npc] or {}) do
+            if bucketsDrop(peer.buckets, itemId) then
+                return true
+            end
         end
     end
     return false
@@ -97,16 +111,17 @@ end
 -- Every mob with recorded drops of the item, with its chance over all kills, level range and maps by kill count.
 function ns.FindDroppers(itemId)
     local results = {}
-    for npc, mob in pairs(ns.db.mobs) do
-        local stats = dropsItem(mob, itemId) and ns.GetStats(npc, "all")
-        if stats then
-            local entry
-            for _, candidate in ipairs(stats.list) do
-                if candidate.itemId == itemId then
-                    entry = candidate
-                end
+    for npc in pairs(ns.KnownNpcs()) do
+        local stats = dropsItem(npc, itemId) and ns.GetStats(npc, "all")
+        local entry
+        for _, candidate in ipairs(stats and stats.list or {}) do
+            if candidate.itemId == itemId then
+                entry = candidate
             end
-            local info = ns.db.info[npc]
+        end
+        -- The counts can hold the item while the rates leave it out: too few corpses, or an install far off the rest.
+        if entry then
+            local info = ns.MobInfo(npc)
             local maps = {}
             for mapId, place in pairs(info and info.maps or {}) do
                 table.insert(maps, { mapId = mapId, kills = place.kills })

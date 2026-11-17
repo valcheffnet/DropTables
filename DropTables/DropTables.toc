@@ -2,7 +2,7 @@
 ## Title: Drop Tables
 ## Notes: Drop rates for every mob, from what players actually loot.
 ## Author: SasnycoN
-## Version: 0.1.0
+## Version: 0.2.0
 ## IconTexture: Interface\Icons\INV_Misc_Bag_10
 ## SavedVariables: DropTablesDB
 ## AddonCompartmentFunc: DropTables_OnCompartmentClick
@@ -12,6 +12,7 @@ Wire.lua
 Collector.lua
 Places.lua
 Share.lua
+Export.lua
 Stats.lua
 Strip.lua
 Tooltip.lua
@@ -19,6 +20,7 @@ Style.lua
 Details.lua
 Search.lua
 Finder.lua
+ExportWindow.lua
 Map.lua
 MinimapButton.lua
 Options.lua

@@ -22,6 +22,27 @@ frame:SetScript("OnHide", function()
     ns.settings.detailsOpen = false
 end)
 
+local share = CreateFrame("Button", nil, frame)
+share:SetPoint("TOPRIGHT", -36, -11)
+share.label = Style.Text(share, "label")
+share.label:SetPoint("RIGHT")
+share.label:SetText("SHARE")
+share:SetSize(share.label:GetStringWidth() + 4, 16)
+share:SetScript("OnClick", function()
+    ns.ToggleExport()
+end)
+share:SetScript("OnEnter", function(self)
+    self.label:SetTextColor(unpack(C.text))
+    GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+    GameTooltip:SetText("Share my tables")
+    GameTooltip:AddLine("Copy your drop counts into the shared database, for every player's tables.", 1, 1, 1, true)
+    GameTooltip:Show()
+end)
+share:SetScript("OnLeave", function(self)
+    self.label:SetTextColor(unpack(C.gold))
+    GameTooltip:Hide()
+end)
+
 local shownNpc
 local mode = "all"
 local tabs = {}
@@ -75,7 +96,8 @@ end
 
 local last = toggle("detailsFollow", "Follow target", "Switch to each mob you target. Off keeps the current mob.")
 last = toggle("showStrip", "Icons", "Show the likely drops of your target as icons.", last)
-toggle("showTooltip", "Tooltip", "Add the likely drops to the mob tooltip.", last)
+last = toggle("showTooltip", "Tooltip", "Add the likely drops to the mob tooltip.", last)
+toggle("onlyMine", "Only mine", "Count only your own kills, without the drop counts other players shared.", last)
 
 local headerY = -(TOP + 62)
 local rule = Style.Line(frame, C.faint)
@@ -228,8 +250,14 @@ function render()
         emptyTitle:SetText(mode == "all" and "No data yet" or ("No " .. mode .. " kills yet"))
         emptyText:SetText(mode == "all" and "Kill and loot this mob to start its table." or "Switch to All to see every kill.")
     else
-        local text = ("%d kills  |  %d looted  |  %d left nothing"):format(stats.kills, stats.opened, stats.empty)
-        local info = ns.db.info[shownNpc]
+        local text
+        if stats.sources > 0 then
+            text = ("%d kills by you, %d by %d %s  |  %d looted"):format(stats.ownKills, stats.kills - stats.ownKills,
+                stats.sources, stats.sources == 1 and "player" or "players", stats.opened)
+        else
+            text = ("%d kills  |  %d looted  |  %d left nothing"):format(stats.kills, stats.opened, stats.empty)
+        end
+        local info = ns.MobInfo(shownNpc)
         if info and info.minLevel then
             local level = info.minLevel == info.maxLevel and info.minLevel or (info.minLevel .. "-" .. info.maxLevel)
             text = ("Level %s  |  "):format(level) .. text
@@ -252,7 +280,11 @@ function render()
                 fillEntry(used, entry, stats.small)
             end
         end
-        if stats.small then
+        if #stats.list == 0 then
+            emptyTitle:SetText("Not enough data yet")
+            emptyText:SetText(("Other players' counts show up once they reach %d looted corpses."):format(
+                ns.MIN_SOURCE_SAMPLE))
+        elseif stats.small then
             used = used + 1
             fillSection(used, "", ("Rates from %d looted corpses are rough."):format(stats.opened))
         end
