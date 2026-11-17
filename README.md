@@ -20,11 +20,16 @@ To update, delete the old `DropTables` folder and unzip the new one. Your record
 
 The addon starts with an empty table and fills it as you kill and loot. Target or mouse over a mob and its most likely drops show up under the target frame and in its tooltip. The minimap button opens the loot finder on left click and a menu on right click.
 
-Commands:
+Commands (`/droptables` works too):
 
-- `/dt` drop table of your target
-- `/dt find` loot finder
-- `/dt options` settings
+- `/dt` opens or closes the drop table window, on your target if you have one
+- `/dt find` opens the loot finder, and `/dt find linen` searches for linen straight away
+- `/dt options` (or `/dt config`) opens the settings
+- `/dt unlock` lets you drag the icons under the target frame somewhere else, `/dt lock` fixes them in place again. Blizzard's Edit Mode does the same.
+- `/dt reset` puts the icons back under the target frame
+- `/dt icons`, `/dt tooltip` and `/dt minimap` turn the icons, the tooltip lines or the minimap button on and off
+- `/dt status` shows how many mobs and kills you have recorded and how sharing is going
+- `/dt bridge on` and `/dt bridge off` switch bridge mode, which collects other players' drop counts
 
 ## What it sends
 
