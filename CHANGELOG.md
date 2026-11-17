@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-11-18
+
+### Added
+
+- `/dt debug` also shows what each loot window gave and why the addon skipped one.
+
+### Fixed
+
+- A corpse that sparkles but opens with nothing in it now counts as one that left nothing.
+
 ## [0.2.5] - 2026-11-18
 
 ### Changed
@@ -89,7 +99,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.5...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.6...HEAD
+[0.2.6]: https://github.com/valcheffnet/DropTables/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/valcheffnet/DropTables/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...v0.2.3

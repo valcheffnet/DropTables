@@ -121,6 +121,22 @@ local function claim(guid)
     return kill, data
 end
 
+-- A corpse that sparkled but opened with nothing in it is an empty corpse: the kill counts, the loot does not.
+local function claimEmpty(guid)
+    local kill = pending[guid]
+    if not kill or kill.state == "done" then
+        return nil
+    end
+    local data = bucketData(kill.npc, kill.bucket)
+    if kill.state == "lootable" then
+        data.lootable = data.lootable - 1
+    else
+        data.kills = data.kills + 1
+    end
+    kill.state = "done"
+    return kill
+end
+
 local function isQuestItem(itemId, questFlag)
     return questFlag or select(6, C_Item.GetItemInfoInstant(itemId)) == QUEST_CLASS
 end
@@ -154,6 +170,7 @@ ns.On("UNIT_SPELLCAST_FAILED", castEnded)
 
 ns.On("LOOT_OPENED", function(_, fromItem)
     if fromItem or GetTime() - lastCastEnd < CAST_LOOT_WINDOW then
+        ns.Debug("loot window skipped: %s", fromItem and "from an item" or "right after a cast (skinning, herbs, ore, chest)")
         return
     end
     -- found[guid] collects one corpse's items and money across all slots before they are counted,
@@ -191,6 +208,8 @@ ns.On("LOOT_OPENED", function(_, fromItem)
                 elseif itemId and not isQuestItem(itemId, questFlag) then
                     loot.items[itemId] = (loot.items[itemId] or 0) + quantity
                     ns.db.items[itemId] = { name = name, quality = quality }
+                elseif itemId then
+                    ns.Debug("  quest item %s left out", tostring(name))
                 end
             end
         end
@@ -198,6 +217,11 @@ ns.On("LOOT_OPENED", function(_, fromItem)
 
     for guid, loot in pairs(found) do
         local data = claims[guid]
+        local itemCount = 0
+        for _ in pairs(loot.items) do
+            itemCount = itemCount + 1
+        end
+        ns.Debug("loot from %s: %d items, %d copper", ns.MobName(pending[guid].npc), itemCount, loot.money)
         for itemId, quantity in pairs(loot.items) do
             local item = data.items[itemId]
             if not item then
@@ -215,10 +239,16 @@ ns.On("LOOT_OPENED", function(_, fromItem)
     -- is on does. The target is left out: it is often another corpse killed after this one.
     if count == 0 then
         for _, unit in ipairs({ "softinteract", "mouseover" }) do
-            if UnitIsDead(unit) and corpse(UnitGUID(unit)) then
+            local guid = UnitGUID(unit)
+            local kill = UnitIsDead(unit) and type(guid) == "string" and not ns.IsSecret(guid) and claimEmpty(guid)
+            if kill then
+                changed[kill.npc] = true
+                ns.Debug("loot window empty: %s counted as a corpse that left nothing", ns.MobName(kill.npc))
                 break
             end
         end
+    elseif not next(found) then
+        ns.Debug("loot window with %d slots from no kill of yours", count)
     end
 
     for npc in pairs(changed) do

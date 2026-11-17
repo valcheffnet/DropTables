@@ -38,7 +38,7 @@ def main():
     loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [d, 1]}])
     # Pickpocket: a living mob that was never killed.
     loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [guid(2, "P"), 1]}])
-    # A sparkling corpse that opens empty is found through the mouseover.
+    # A sparkling corpse that opens empty is found through the mouseover and counts as one that left nothing.
     e = kill("E", True)
     g.advance(5)
     g.units["mouseover"] = e
@@ -59,8 +59,8 @@ def main():
 
     solo = ns.db.mobs[1][1]
     expect("kills", solo.kills, 8)
-    expect("lootable", solo.lootable, 7)
-    expect("opened", solo.opened, 6)
+    expect("lootable", solo.lootable, 6)
+    expect("opened", solo.opened, 5)
     fang_data = solo["items"][100]
     expect("fang drops", fang_data.drops, 3)
     expect("fang qty", fang_data.qty, 6)
@@ -77,11 +77,11 @@ def main():
 
     stats = ns.GetStats(1, "all")
     fang = next(e for e in stats.list.values() if e.itemId == 100)
-    expect("fang rate", round(fang.rate, 6), round(7 / 8 * 3 / 6, 6))
+    expect("fang rate", round(fang.rate, 6), round(6 / 8 * 3 / 5, 6))
     expect("fang stack text", ns.FormatStack(fang), "1-3")
-    expect("money rate", round(stats.money.rate, 6), round(7 / 8 * 2 / 6, 6))
+    expect("money rate", round(stats.money.rate, 6), round(6 / 8 * 2 / 5, 6))
     expect("money stats range", (stats.money.min, stats.money.max), (5, 10))
-    expect("empty kills", stats.empty, 1)
+    expect("empty kills", stats.empty, 2)
 
     # Money is an entry of the list, sorted by chance with the items.
     entries = list(stats.list.values())
@@ -151,7 +151,8 @@ def main():
     skinner.loot([])
     skinner.g.units["softinteract"] = None
     skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [y, 1]}])
-    expect("both corpses opened once", skinner.ns.db.mobs[5][1].opened, 2)
+    lurker = skinner.ns.db.mobs[5][1]
+    expect("empty window is a corpse that left nothing", (lurker.kills, lurker.lootable, lurker.opened), (2, 1, 1))
     expect("the target's own loot counted", skinner.ns.db.mobs[5][1]["items"][100].drops, 1)
 
     # In a party, a corpse the player may not loot is someone else's, not an empty kill.
