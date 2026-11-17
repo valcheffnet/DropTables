@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-17
+
+### Added
+
+- `/dt debug` lines go to a chat tab called DT Debug if you make one, and stay out of your main chat.
+
 ## [0.2.1] - 2026-11-17
 
 ### Added
@@ -37,7 +43,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/valcheffnet/DropTables/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/valcheffnet/DropTables/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/valcheffnet/DropTables/releases/tag/v0.1.0

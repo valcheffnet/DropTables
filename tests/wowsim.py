@@ -31,6 +31,14 @@ end
 function strtrim(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
 function wipe(t) for k in pairs(t) do t[k] = nil end return t end
 function print() end
+-- Chat windows: chatWindowNames[i] is the tab name of ChatFrame<i>; each frame keeps what it was given.
+chatWindowNames = { "General", "Combat Log" }
+NUM_CHAT_WINDOWS = 10
+for i = 1, NUM_CHAT_WINDOWS do
+    _G["ChatFrame" .. i] = { lines = {}, AddMessage = function(self, text) table.insert(self.lines, text) end }
+end
+DEFAULT_CHAT_FRAME = ChatFrame1
+function GetChatWindowInfo(i) return chatWindowNames[i] end
 SlashCmdList = {}
 Enum = {}
 function issecretvalue() return false end

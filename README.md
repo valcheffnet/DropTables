@@ -32,7 +32,7 @@ Commands (`/droptables` works too):
 - `/dt icons`, `/dt tooltip` and `/dt minimap` turn the icons, the tooltip lines or the minimap button on and off
 - `/dt export` opens the window with the text to share (see below)
 - `/dt status` shows how many mobs and kills you have recorded, what other players have sent you and how many of your mobs are new since your last export
-- `/dt debug` puts a line in chat for every sharing message the addon sends or gets, and says why it ignored one, which helps when you test sharing with a friend. It turns itself off when you reload.
+- `/dt debug` puts a line in chat for every sharing message the addon sends or gets, and says why it ignored one, which helps when you test sharing with a friend. It turns itself off when you reload. If you make a chat tab called DT Debug, the lines go there and stay out of your main chat.
 
 ## Sharing your tables
 

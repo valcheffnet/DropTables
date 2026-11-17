@@ -51,10 +51,23 @@ function ns.Print(msg)
 end
 
 -- /dt debug: a chat line for every sharing message in and out, for testing between players. Off after a reload.
+-- The lines go to a chat tab named "DT Debug" when the player made one, otherwise to the main chat window.
 ns.debug = false
+local DEBUG_TAB = "dt debug"
+
+local function debugFrame()
+    for i = 1, NUM_CHAT_WINDOWS or 0 do
+        local name = GetChatWindowInfo(i)
+        if name and name:lower() == DEBUG_TAB and _G["ChatFrame" .. i] then
+            return _G["ChatFrame" .. i]
+        end
+    end
+    return DEFAULT_CHAT_FRAME
+end
+
 function ns.Debug(text, ...)
     if ns.debug then
-        print("|cff888888DT debug|r " .. text:format(...))
+        debugFrame():AddMessage("|cff888888DT debug|r " .. text:format(...))
     end
 end
 
