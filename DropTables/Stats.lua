@@ -14,7 +14,7 @@ local OUTLIER_Z = 3
 local MONEY = "money"
 
 local function mergeRange(into, from)
-    if from.min then
+    if from.min and from.max then
         into.min = math.min(into.min or from.min, from.min)
         into.max = math.max(into.max or from.max, from.max)
     end
@@ -43,7 +43,8 @@ local function aggregate(buckets, mode, factor)
         mergeRange(entry, from)
     end
     for bucket, data in pairs(buckets) do
-        if inMode(bucket, mode) and data.kills > 0 then
+        -- A bucket put together from several messages can claim more drops than opened corpses; it waits.
+        if inMode(bucket, mode) and ns.Wire.Complete(data) then
             sum.kills = sum.kills + data.kills * factor
             sum.lootable = sum.lootable + data.lootable * factor
             sum.opened = sum.opened + data.opened * factor

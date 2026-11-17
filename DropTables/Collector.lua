@@ -6,11 +6,15 @@ local MONEY_SLOT = 2
 local FIRST_CHECK = 1.5
 local FINAL_CHECK = 4
 local PENDING_TTL = 900
+-- Skinning, mining, herbs and chests are spells with a cast time and open the loot window as they finish; plain
+-- corpse loot needs no cast. Loot opened this soon after such a cast is profession loot.
+local CAST_LOOT_WINDOW = 1
 
 -- Kills waiting for their corpse to be checked or looted, by victim GUID. States:
 -- checking: loot state not known yet; lootable: has loot, kill counted; unknown: CanLootUnit gave no answer;
 -- done: empty kill counted or corpse already recorded.
 local pending = {}
+local casting, lastCastEnd = false, -math.huge
 
 local function groupBucket()
     local members = GetNumGroupMembers()
@@ -60,8 +64,12 @@ local function check(guid, final)
         data.kills = data.kills + 1
         data.lootable = data.lootable + 1
         kill.state = "lootable"
+        ns.Fire("DT_DATA_CHANGED", kill.npc)
     elseif final then
-        if loot == false then
+        if loot == false and kill.bucket > 1 then
+            -- In a group a corpse can be someone else's to loot, which looks the same as an empty one.
+            kill.state = "done"
+        elseif loot == false then
             local data = bucketData(kill.npc, kill.bucket)
             data.kills = data.kills + 1
             kill.state = "done"
@@ -100,15 +108,13 @@ end)
 -- or were opened before (skinning and other profession loot reuse the corpse GUID).
 local function claim(guid)
     local kill = pending[guid]
-    if not kill then
+    if not kill or kill.state == "done" then
         return nil
     end
     local data = bucketData(kill.npc, kill.bucket)
-    if kill.state == "checking" or kill.state == "unknown" then
+    if kill.state ~= "lootable" then
         data.kills = data.kills + 1
         data.lootable = data.lootable + 1
-    elseif kill.state ~= "lootable" then
-        return nil
     end
     data.opened = data.opened + 1
     kill.state = "done"
@@ -126,8 +132,28 @@ local function addStack(entry, totalKey, amount)
     entry.max = math.max(entry.max or amount, amount)
 end
 
+ns.On("UNIT_SPELLCAST_START", function(unit)
+    if unit == "player" then
+        casting = true
+    end
+end)
+
+ns.On("UNIT_SPELLCAST_SUCCEEDED", function(unit)
+    if unit == "player" and casting then
+        casting, lastCastEnd = false, GetTime()
+    end
+end)
+
+local function castEnded(unit)
+    if unit == "player" then
+        casting = false
+    end
+end
+ns.On("UNIT_SPELLCAST_INTERRUPTED", castEnded)
+ns.On("UNIT_SPELLCAST_FAILED", castEnded)
+
 ns.On("LOOT_OPENED", function(_, fromItem)
-    if fromItem then
+    if fromItem or GetTime() - lastCastEnd < CAST_LOOT_WINDOW then
         return
     end
     -- found[guid] collects one corpse's items and money across all slots before they are counted,
@@ -185,10 +211,11 @@ ns.On("LOOT_OPENED", function(_, fromItem)
         end
     end
 
-    -- A corpse that sparkled but opened empty has no slots to name it; the corpse under the mouse or the target does.
+    -- A corpse that sparkled but opened empty has no slots to name it; the corpse the interact key or the mouse
+    -- is on does. The target is left out: it is often another corpse killed after this one.
     if count == 0 then
-        for _, unit in ipairs({ "mouseover", "target" }) do
-            if corpse(UnitGUID(unit)) then
+        for _, unit in ipairs({ "softinteract", "mouseover" }) do
+            if UnitIsDead(unit) and corpse(UnitGUID(unit)) then
                 break
             end
         end

@@ -4,6 +4,7 @@ Requires: pip install lupa
 Run: python tests/test_share.py
 """
 import pathlib
+import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -297,6 +298,9 @@ def main():
                     ["Mz.1.a.a.a.0.0..", "M6.1.a.a.a.0.0.."],  # two mobs in one answer
                     ["Iz.1.2s.0.0.."],                        # an item that dropped zero times
                     ["Mz.1.a.a.a.0.0..", "Nz.|cffff0000Evil"], # name with an escape code
+                    ["Mz.1.a.a.a.0.0..", "Iz.1.2s.5.5.0."],      # stack size 0, no largest stack
+                    ["Mz.1.a.a.a.0.0..", "Iz.1.2s.5.5.0.3"],     # stack size 0
+                    ["Mz.1.a.a.a.1.5.0."],                       # money 0 copper at least, no most
                     ["Mz.1.123456789.a.a.0.0.."]):             # number too long
         whisper(carol, "Olga", fake, records)
     carol.fire("CHAT_MSG_ADDON", "DropTables", "D|nothex|Mz.1.a.a.a.0.0..", "WHISPER", "Olga")
@@ -358,18 +362,6 @@ def main():
     hold(carol, 11, {origin_id(113): (40, [(777, 3)])})
     expect("noisy rare source kept", rates_of(11)[777].drops, 2 * 3 + 3)
 
-    # With sharing off a player neither asks nor answers.
-    erin = Client("Erin")
-    net.add(erin)
-    net.run(10)
-    alice.ns.settings.shareData = False
-    loot_mob(alice, 2, "A9", [(100, 1)])
-    start = len(net.log)
-    erin.see(2, "E1", 5)
-    alice.see(3, "A9", 5)
-    net.run(10)
-    expect("alice off sends nothing", net.sent("Alice", None, start), [])
-    alice.ns.settings.shareData = True
 
     # Party members send each other their own changed counts once a minute, without being asked.
     pat, quinn = Client("Pat"), Client("Quinn")
@@ -388,14 +380,22 @@ def main():
     net.run(130)
     expect("nothing changed, nothing sent", net.sent("Pat", "D|", start), [])
 
-    # Counts from someone outside the group are not taken; members bring as many installs as they have.
-    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(200), ";".join(counts(21, 5, 5))),
-               "PARTY", "Stranger")
-    expect("non-member ignored", quinn.ns.db.peers[21], None)
+    # Group members are taken under whatever name the server gives them ("First Last" on Forever), and bring as
+    # many installs as they have.
     for i in range(5):
         quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(201 + i), ";".join(counts(21, 5, 5))),
-                   "PARTY", "Pat")
+                   "PARTY", "Pat Prokazhen")
     expect("member not held to three new installs", len(plain(quinn.ns.db.peers[21])), 5)
+
+    # Counts split over two messages that claim more drops than looted corpses stay out of the chances.
+    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(230), ";".join(counts(27, 40, 40))),
+               "PARTY", "Pat Prokazhen")
+    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|I%s.1.%s.%s.%s.1.1" % (origin_id(230), b36(27), b36(100),
+               b36(120), b36(120)), "PARTY", "Pat Prokazhen")
+    expect("both messages kept", quinn.ns.db.peers[27][origin_id(230)].buckets[1]["items"][100].drops, 120)
+    stats = quinn.ns.GetStats(27, "all")
+    impossible = [e for e in stats.list.values() if e.itemId == 100] if stats else []
+    expect("120 drops from 40 corpses not shown", impossible, [])
 
     # One send carries at most ten messages; the rest goes a minute later.
     for npc in range(30, 45):
@@ -420,16 +420,57 @@ def main():
     net.run(5)
     expect("sent after the lockdown", len(net.sent("Pat", "D|", start)) >= 1, True)
 
-    # With sharing off nothing goes to the group, and counts from the group are still kept.
-    pat.ns.settings.shareData = False
-    loot_mob(pat, 23, "P3", [(100, 1)])
+    # A message that cannot go out is dropped, unless the server only asks to wait; the queue keeps moving.
+    pat.lua.execute("""
+        tries = {}
+        realSend = C_ChatInfo.SendAddonMessage
+        C_ChatInfo.SendAddonMessage = function(prefix, text, chatType, target)
+            local key = target or chatType
+            tries[key] = (tries[key] or 0) + 1
+            if target == "Gone" or target == "Two Names" then return 12 end
+            if target == "Busy" and tries.Busy == 1 then return 3 end
+            return realSend(prefix, text, chatType, target)
+        end
+    """)
+    pat.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (origin_id(220), b36(20)), "CHANNEL", "Gone")
+    pat.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (origin_id(221), b36(20)), "CHANNEL", "Busy")
     start = len(net.log)
-    net.run(130)
-    expect("sharing off, no group send", net.sent("Pat", None, start), [])
-    loot_mob(quinn, 24, "Q1", [(100, 1)])
-    net.run(70)
-    expect("sharing off still keeps group counts", pat.ns.db.peers[24][quinn.ns.db.installId] is not None, True)
-    pat.ns.settings.shareData = True
+    net.run(15)
+    expect("offline target tried once", pat.g.tries.Gone, 1)
+    expect("throttled answer goes out on a later try", (pat.g.tries.Busy, len(net.sent("Pat", "D|", start))), (2, 1))
+    # A whisper to "First Last" that fails goes out once more as "First-Last".
+    pat.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (origin_id(222), b36(20)), "CHANNEL", "Two Names")
+    start = len(net.log)
+    net.run(15)
+    expect("whisper retried as First-Last", [m[3] for m in net.sent("Pat", "D|", start)], ["Two-Names"])
+    expect("each form tried once", (pat.g.tries["Two Names"], pat.g.tries["Two-Names"]), (1, 1))
+    pat.lua.execute("C_ChatInfo.SendAddonMessage = realSend")
+
+    # Not in the channel at first (a loading screen, the channel limit): the addon keeps trying, then asks.
+    late = Client("Late")
+    late.lua.execute("""
+        inChannel, joins = false, 0
+        GetChannelName = function() if inChannel then return 7, "DropTablesShare" end return 0 end
+        JoinTemporaryChannel = function() joins = joins + 1 end
+    """)
+    net.add(late)
+    start = len(net.log)
+    net.run(40)
+    late.see(20, "L1", 5)
+    net.run(3)
+    expect("no question outside the channel", net.sent("Late", "Q|", start), [])
+    expect("joining is tried again", late.g.joins >= 2, True)
+    late.lua.execute("inChannel = true")
+    net.run(16)
+    late.see(20, "L2", 5)
+    net.run(3)
+    expect("asks once in the channel", len(net.sent("Late", "Q|", start)), 1)
+    late.lua.execute('GetChannelName = function() return 9, "DropTablesShare" end')
+    net.run(2)
+    late.see(21, "L3", 5)
+    net.run(1)
+    expect("question follows a new channel number", net.sent("Late", "Q|", start)[-1][3], 9)
+
 
     # Counts in db.relay, saved by the 0.1.0 bridge mode, move to db.peers.
     old = ('DropTablesDB = { installId = "%s", mobs = {}, settings = { bridgeMode = true },'
@@ -450,11 +491,10 @@ def main():
     for client in (pat, quinn):
         client.g.SlashCmdList.DROPTABLES("debug")
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(210), ";".join(counts(25, 5, 5))),
-               "PARTY", "Stranger")
-    stranger = "\n".join(debug_lines(quinn))
-    expect("debug shows the message", "got PARTY from Stranger: D||" in stranger, True)
-    expect("debug names the group as the game does", 'sender "Stranger" is not in the group' in stranger
-           and "(Pat)" in stranger, True)
+               "PARTY", "Pat Prokazhen")
+    lines = "\n".join(debug_lines(quinn))
+    expect("debug shows the message", "got PARTY from Pat Prokazhen: D||" in lines, True)
+    expect("debug lines carry the time", re.search(r"\d\d:\d\d:\d\d DT", lines) is not None, True)
     loot_mob(pat, 26, "P4", [(100, 1)])
     net.run(70)
     expect("debug shows the send", any("sent PARTY D||" in line for line in debug_lines(pat)), True)

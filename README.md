@@ -38,11 +38,9 @@ Commands (`/droptables` works too):
 
 Every table someone shares makes the numbers better for everybody. Type `/dt export` (or pick Share my tables in the minimap button menu), press Select and then Ctrl+C in the window, open the form link under the text and paste it there. For now you need a GitHub account for that. An export only carries what changed since your last one, so doing it now and then is enough. A big table can come out in several parts, and each part goes into its own form.
 
-## What it sends
+## Data from other players
 
-Share drop counts with other players is on by default, and you can turn it off in the options. While it's on, the addon asks about mobs it has little data on over a hidden addon channel. The question says whose counts you already have, and players with something newer whisper theirs back to you as addon messages, so none of it shows up in your chat. Your addon answers other people's questions the same way. In a group, everyone who runs Drop Tables also sends their own new counts to the rest of the group once a minute. The messages carry mob and item ids, kill and drop counts, levels, the zones where the kills happened, the mob's name and a random id of your install. They never carry character names or account details. So that one player can't fill the tables with made-up numbers, the addon takes only a few new installs from each player per day and leaves out counts that are far off what everyone else reports. With sharing off, your addon stops sending anything, to the channel or to your group, but it still keeps whatever your group sends you.
-
-The export carries the same things plus the spots on the map where you made your kills. Anything you paste into the form is public.
+Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you paste into the export form is public.
 
 ## Bugs
 

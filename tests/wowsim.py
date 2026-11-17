@@ -31,6 +31,10 @@ end
 function strtrim(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
 function wipe(t) for k in pairs(t) do t[k] = nil end return t end
 function print() end
+date = os.date
+-- Errors that ns.Fire hands to the error handler; the Client raises them in Python.
+luaErrors = {}
+function geterrorhandler() return function(err) table.insert(luaErrors, tostring(err)) end end
 -- Chat windows: chatWindowNames[i] is the tab name of ChatFrame<i>; each frame keeps what it was given.
 chatWindowNames = { "General", "Combat Log" }
 NUM_CHAT_WINDOWS = 10
@@ -52,6 +56,7 @@ LE_PARTY_CATEGORY_INSTANCE = 2
 function IsEncounterInProgress() return false end
 function CanLootUnit(guid) return lootable[guid] end
 function UnitGUID(unit) return units[unit] end
+function UnitIsDead(unit) return units[unit] ~= nil end
 function UnitName(unit)
     local index = tonumber(unit:match("^party(%d+)$") or "")
     if index then return groupMembers[index] end
@@ -178,11 +183,18 @@ class Client:
             loader((ADDON_DIR / file_name).read_text(encoding="utf-8"), file_name)("DropTables", self.ns)
         self.fire("ADDON_LOADED", "DropTables")
 
+    def raise_errors(self):
+        errors = self.g.luaErrors
+        if len(errors):
+            raise RuntimeError("%s: Lua error in a listener: %s" % (self.name, errors[1]))
+
     def fire(self, event, *args):
         self.ns.Fire(event, *args)
+        self.raise_errors()
 
     def advance(self, seconds):
         self.g.advance(seconds)
+        self.raise_errors()
 
     def kill(self, npc, spawn, has_loot):
         guid = "Creature-0-1-0-1-%d-%s" % (npc, spawn)

@@ -50,13 +50,20 @@ def or_zero(value):
     return 0 if value is None else value
 
 
+def stack_range(low, high):
+    """A stack range is either missing or 1 <= min <= max."""
+    if low is None or high is None:
+        return low is None and high is None
+    return 1 <= low <= high
+
+
 def consistent(r):
     kind = r["kind"]
     if kind == "M":
         return (r["lootable"] <= r["kills"] and r["opened"] <= r["lootable"] and r["moneyDrops"] <= r["opened"]
-                and (r["moneyDrops"] > 0 or r["copper"] == 0) and or_zero(r["moneyMin"]) <= or_zero(r["moneyMax"]))
+                and (r["moneyDrops"] > 0 or r["copper"] == 0) and stack_range(r["moneyMin"], r["moneyMax"]))
     if kind == "I":
-        return r["drops"] >= 1 and r["qty"] >= r["drops"] and or_zero(r["min"]) <= or_zero(r["max"])
+        return r["drops"] >= 1 and r["qty"] >= r["drops"] and stack_range(r["min"], r["max"])
     if kind == "L":
         return (r["minLevel"] is None) == (r["maxLevel"] is None) and or_zero(r["minLevel"]) <= or_zero(r["maxLevel"])
     return True

@@ -53,8 +53,6 @@ ns.On("DT_READY", function()
     checkbox("collapseWorldDrops", "World drops only in the table",
         "Keep random gear and recipe drops out of the icons and the tooltip; the /dt table lists them in their own section.")
     checkbox("showMinimap", "Minimap button", "Show the Drop Tables button on the minimap edge.")
-    checkbox("shareData", "Share drop counts with other players",
-        "Ask other players with Drop Tables about mobs you have little data for, and answer their questions with your counts (mobs, items, kill numbers, zones; no names). Off still keeps what others send.")
     checkbox("exportReminder", "Remind me to share my tables",
         "Once a session, when 25 or more mobs have new counts, a chat line points to /dt export.")
     slider("detailsAlpha", "Table window background", "Opacity of the /dt window's background; text and icons stay solid.",

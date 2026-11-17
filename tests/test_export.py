@@ -147,6 +147,7 @@ def main():
         "bomb": pack(header + "\n".join(["M1.1.a.a.a.0.0.."] * 200_000)),
         "number too long": pack(header + "M1.1.123456789.a.a.0.0.."),
         "item above opened": pack(header + "M1.1.5.5.5.0.0..;I1.1.2s.6.6.1.1"),
+        "stack size 0": pack(header + "M1.1.5.5.5.0.0..;I1.1.2s.1.1.0.3"),
         "lua in place of records": pack(header + "os.execute('rm -rf /')"),
         "records before install": pack("DTX|1|%s|0.2.0|1700000000|1/1\nM1.1.a.a.a.0.0.." % own),
         "bad header": pack("DTX|9|x\n@%s\nM1.1.a.a.a.0.0.." % own),

@@ -12,7 +12,6 @@ ns.DEFAULTS = {
     detailsOpen = true,
     detailsAlpha = 1,
     finderAlpha = 1,
-    shareData = true,
     onlyMine = false,
     exportReminder = true,
     showMinimap = true,
@@ -35,9 +34,13 @@ function ns.On(event, callback)
     table.insert(listeners[event], callback)
 end
 
+-- Each listener runs on its own: an error in one goes to the error frame and the others still get the event.
 function ns.Fire(event, ...)
+    local count, args = select("#", ...), { ... }
     for _, callback in ipairs(listeners[event] or {}) do
-        callback(...)
+        xpcall(function()
+            callback(unpack(args, 1, count))
+        end, geterrorhandler())
     end
 end
 
@@ -67,7 +70,7 @@ end
 
 function ns.Debug(text, ...)
     if ns.debug then
-        debugFrame():AddMessage("|cff888888DT debug|r " .. text:format(...))
+        debugFrame():AddMessage(("|cff888888%s DT|r %s"):format(date("%H:%M:%S"), text:format(...)))
     end
 end
 

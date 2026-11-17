@@ -95,7 +95,7 @@ end
 
 -- A bucket put together from other players' messages can be half there: items without the counts message, or an
 -- older counts message than the items. Such a bucket is not passed on.
-local function complete(data)
+function Wire.Complete(data)
     if data.kills == 0 then
         return false
     end
@@ -113,7 +113,7 @@ end
 function Wire.SourceRecords(npc, source, name)
     local records = {}
     for bucket, data in pairs(source.buckets) do
-        if complete(data) then
+        if Wire.Complete(data) then
             for _, record in ipairs(Wire.BucketRecords(npc, bucket, data)) do
                 table.insert(records, record)
             end
@@ -168,12 +168,20 @@ local REQUIRED = { npc = true, bucket = true, kills = true, lootable = true, ope
 
 -- Counts that cannot come from the collector: an opened corpse is a lootable kill, an item or coin drops at most
 -- once per opened corpse.
+-- A stack range is either missing or 1 <= min <= max.
+local function range(min, max)
+    if min == nil or max == nil then
+        return min == max
+    end
+    return min >= 1 and min <= max
+end
+
 local function consistent(r)
     if r.kind == "M" then
         return r.lootable <= r.kills and r.opened <= r.lootable and r.moneyDrops <= r.opened
-            and (r.moneyDrops > 0 or r.copper == 0) and (r.moneyMin or 0) <= (r.moneyMax or 0)
+            and (r.moneyDrops > 0 or r.copper == 0) and range(r.moneyMin, r.moneyMax)
     elseif r.kind == "I" then
-        return r.drops >= 1 and r.qty >= r.drops and (r.min or 0) <= (r.max or 0)
+        return r.drops >= 1 and r.qty >= r.drops and range(r.min, r.max)
     elseif r.kind == "L" then
         return (r.minLevel == nil) == (r.maxLevel == nil) and (r.minLevel or 0) <= (r.maxLevel or 0)
     end

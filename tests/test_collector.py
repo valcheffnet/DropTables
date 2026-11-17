@@ -119,6 +119,48 @@ def main():
     expect("rate format", ns.FormatRate(0.514), "51%")
     expect("rate format small", ns.FormatRate(0.0123), "1.2%")
 
+    # Skinning an empty corpse right after the kill is profession loot, not the mob's drop.
+    skinner = Client("Skinner")
+    s = skinner.kill(4, "S", False)
+    skinner.advance(2)
+    skinner.fire("UNIT_SPELLCAST_START", "player")
+    skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player")
+    skinner.loot([{"type": 1, "item": 300, "name": "Light Leather", "qty": 1, "sources": [s, 1]}])
+    skinner.advance(3)
+    skinned = skinner.ns.db.mobs[4][1]
+    expect("skinned corpse counted as an empty kill", (skinned.kills, skinned.lootable, skinned.opened), (1, 0, 0))
+    expect("leather not a drop", skinned["items"][300], None)
+    # An instant spell just before looting does not hide the loot.
+    t = skinner.kill(4, "T", True)
+    skinner.advance(5)
+    skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player")
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [t, 1]}])
+    expect("loot after an instant spell counted", skinned["items"][100].drops, 1)
+    # Opening a recorded corpse again does not mark the mob as changed.
+    skinner.lua.execute("changes = 0")
+    skinner.ns.On("DT_COUNTS_CHANGED", skinner.lua.eval("function() changes = changes + 1 end"))
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [t, 1]}])
+    expect("reopened corpse is no change", skinner.g.changes, 0)
+
+    # An empty window belongs to the corpse under the interact key or the mouse, not to the target.
+    x = skinner.kill(5, "X", True)
+    y = skinner.kill(5, "Y", True)
+    skinner.advance(5)
+    skinner.g.units["target"] = y
+    skinner.g.units["softinteract"] = x
+    skinner.loot([])
+    skinner.g.units["softinteract"] = None
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [y, 1]}])
+    expect("both corpses opened once", skinner.ns.db.mobs[5][1].opened, 2)
+    expect("the target's own loot counted", skinner.ns.db.mobs[5][1]["items"][100].drops, 1)
+
+    # In a party, a corpse the player may not loot is someone else's, not an empty kill.
+    party = Client("Partner")
+    party.g.groupMembers = party.lua.table("Looter")
+    party.kill(6, "R", False)
+    party.advance(5)
+    expect("partner's corpse not counted", party.ns.db.mobs[6], None)
+
     report("collector")
 
 

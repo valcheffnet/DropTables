@@ -31,6 +31,7 @@ local intro = Style.Text(frame, "body")
 intro:SetPoint("TOPLEFT", 16, -(TOP + 12))
 intro:SetPoint("RIGHT", -16, 0)
 intro:SetJustifyH("LEFT")
+intro:SetWordWrap(true)
 intro:SetText("Drop Tables gets better with every table players share. Press Select and then Ctrl+C, open the link "
     .. "under the text in your browser and paste the text into the form. Your kills then help other players' tables, "
     .. "the way theirs help yours.")
@@ -70,6 +71,7 @@ local status = Style.Text(frame, "body")
 status:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, -8)
 status:SetPoint("RIGHT", -16, 0)
 status:SetJustifyH("LEFT")
+status:SetWordWrap(true)
 
 local linkLabel = Style.Text(frame, "label")
 linkLabel:SetPoint("TOPLEFT", status, "BOTTOMLEFT", 0, -12)

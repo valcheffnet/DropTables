@@ -646,7 +646,7 @@ ns.On("DT_READY", function()
     end
 end)
 
-local function refresh()
+local function redraw()
     if not frame:IsShown() then
         return
     end
@@ -657,5 +657,21 @@ local function refresh()
     renderMain()
 end
 
+-- Kills, looks at mobs and item info arriving can come many times a second; one redraw covers them all.
+local REFRESH_DELAY = 0.5
+local refreshPending = false
+local function refresh()
+    if refreshPending or not frame:IsShown() then
+        return
+    end
+    refreshPending = true
+    C_Timer.After(REFRESH_DELAY, function()
+        refreshPending = false
+        redraw()
+    end)
+end
+
 ns.On("DT_DATA_CHANGED", refresh)
 ns.On("DT_INFO_CHANGED", refresh)
+ns.On("DT_SETTINGS_CHANGED", refresh)
+ns.On("GET_ITEM_INFO_RECEIVED", refresh)

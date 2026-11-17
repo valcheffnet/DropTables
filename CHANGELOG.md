@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-11-17
+
+### Fixed
+
+- In a group, counts from the other players never arrived, because the game gives their names in a different form than the addon expected.
+- If an answer whispered to a two-part name doesn't go through, the addon tries the name once more with a dash between the parts.
+- In a group, a corpse your partner looted counted as an empty kill on your side, which halved the chances.
+- Skinning a corpse right after the kill no longer counts the leather as a drop.
+- An empty loot window no longer gets put on your target when it belongs to another corpse.
+- If the addon can't join its channel at login, it keeps trying instead of giving up until the next reload.
+- A message that can't be delivered, for example to a player who just logged off, no longer holds up the others for a minute.
+- Counts from other players that can't be right (more drops than corpses, a stack of 0) are left out instead of breaking the drop table window.
+- New kills show up in the table right away instead of after looting.
+- The text in the export window wraps instead of being cut off.
+- The Loot Finder updates when you switch Only mine and when item names load.
+
+### Changed
+
+- `/dt debug` lines start with the time.
+
+### Removed
+
+- The Share drop counts option. Drop Tables always swaps counts with other players.
+
 ## [0.2.2] - 2026-11-17
 
 ### Added
@@ -43,7 +67,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/valcheffnet/DropTables/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/valcheffnet/DropTables/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/valcheffnet/DropTables/compare/v0.1.0...v0.2.0

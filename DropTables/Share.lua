@@ -18,6 +18,7 @@ local PREFIX = "DropTables"
 local CHANNEL = "DropTablesShare"
 local TICK = 1.1
 local JOIN_DELAY = 6
+local JOIN_RETRY = 15       -- seconds between tries while the player is not in the channel
 local MAX_SOURCES = 12      -- other installs kept per mob
 local SAMPLE_TARGET = 100   -- looted corpses of a mob (own plus other installs') worth asking for
 local MAX_ORIGINS_PER_QUESTION = 10
@@ -34,7 +35,14 @@ local QUEUE_TTL = 60
 local CHANNEL_PER_TICK, WHISPERS_PER_TICK, GROUP_PER_TICK = 1, 4, 1
 local GROUP_INTERVAL = 60   -- seconds between two sends of the player's changed counts to the group
 local GROUP_FLUSH_CAP = 10  -- messages per group send; mobs that do not fit wait for the next one
-local SUCCESS = Enum.SendAddonMessageResult and Enum.SendAddonMessageResult.Success or 0
+local RESULT = Enum.SendAddonMessageResult or {}
+local SUCCESS = RESULT.Success or 0
+-- Results worth sending again later; any other failure (target offline, not in a group, ...) drops the message.
+local RETRY = {
+    [RESULT.AddonMessageThrottle or 3] = true,
+    [RESULT.ChannelThrottle or 8] = true,
+    [RESULT.AddOnMessageLockdown or 11] = true,
+}
 
 local channelId
 local queue = {}     -- { text, at, chatType, target } waiting to go out
@@ -142,7 +150,6 @@ end
 local function ask(npc)
     local now = GetTime()
     local reason = not channelId and "not in the channel"
-        or not ns.settings.shareData and "sharing is off"
         or now - lastQuery < QUERY_GAP and "asked another mob a moment ago"
         or asked[npc] and now - asked[npc].at < QUERY_COOLDOWN and "asked about it in the last 10 minutes"
         or not wantsData(npc) and "already holds enough corpses"
@@ -158,9 +165,6 @@ end
 
 -- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills.
 local function planAnswer(asker, npc, heldText, sender)
-    if not ns.settings.shareData then
-        return
-    end
     local held = {}
     for entry in heldText:gmatch("[^,]+") do
         local prefix, kills = entry:match("^(%x%x%x%x%x%x)([0-9a-z]+)$")
@@ -171,7 +175,8 @@ local function planAnswer(asker, npc, heldText, sender)
     local due, count = {}, 0
     for _, source in ipairs(sources(npc)) do
         local theirs = held[source.origin:sub(1, HELD_PREFIX)]
-        if source.origin ~= asker and (not theirs or theirs < source.kills) then
+        if source.origin ~= asker and (not theirs or theirs < source.kills)
+            and #Wire.SourceRecords(npc, source) > 0 then
             local size = math.min(ns.SumBuckets(source.buckets, "opened"), SAMPLE_TARGET) / SAMPLE_TARGET
             due[source.origin] = GetTime() + BIG_DELAY + SIZE_DELAY * (1 - size) + math.random() * JITTER
             count = count + 1
@@ -197,6 +202,12 @@ local function sendDueAnswers(now)
                     enqueue(text, "WHISPER", plan.target)
                 end
                 session.answers = session.answers + 1
+            end
+        end
+        -- Installs dropped from the store since the question have nothing left to send.
+        for origin, due in pairs(plan.due) do
+            if now >= due then
+                plan.due[origin] = nil
             end
         end
         if not next(plan.due) then
@@ -361,38 +372,13 @@ local function receive(text, sender)
     ns.Fire("DT_DATA_CHANGED", npc)
 end
 
--- The sender of a group message is checked against the group: only members' counts are taken this way.
--- Senders come as "Name" or "Name-Realm".
-local function inGroup(sender)
-    local short = sender:match("^[^-]+")
-    local raid = IsInRaid()
-    for i = 1, GetNumGroupMembers() do
-        local name, realm = UnitName(raid and ("raid" .. i) or ("party" .. i))
-        if name and (name == sender or name == short or (realm and realm ~= "" and name .. "-" .. realm == sender)) then
-            return true
-        end
-    end
-    return false
-end
-
--- Group members are taken without a question and without the limit on new installs: the server vouches that the
--- sender is in the group, and one group brings only a handful of installs.
+-- Group members are taken without a question and without the limit on new installs: the server delivers group
+-- messages only from members of the group, and one group brings only a handful of installs. (Forever names the
+-- sender "First Last", which does not match UnitName, so the sender is not checked against the group.)
 local function receiveGroup(text, sender)
     local origin, npc, records = decodeAnswer(text)
     if not origin then
         ns.Debug("  ignored: malformed, impossible counts or your own install")
-        return
-    end
-    if not inGroup(sender) then
-        local names = {}
-        local raid = IsInRaid()
-        for i = 1, GetNumGroupMembers() do
-            local name, realm = UnitName(raid and ("raid" .. i) or ("party" .. i))
-            if name then
-                table.insert(names, realm and realm ~= "" and name .. "-" .. realm or name)
-            end
-        end
-        ns.Debug("  ignored: sender %q is not in the group as the game names it (%s)", sender, table.concat(names, ", "))
         return
     end
     ns.Debug("  stored: mob %d from group member %s", npc, sender)
@@ -433,15 +419,22 @@ local BUDGET_KEY = { CHANNEL = "CHANNEL", WHISPER = "WHISPER", PARTY = "GROUP", 
 
 -- Sends up to one channel message, one group message and a few whispers per tick; whispers outside instances have
 -- no addon throttle.
+local function refreshChannel()
+    local id = GetChannelName(CHANNEL)
+    channelId = id and id > 0 and id or nil
+    return channelId
+end
+
 local function tick()
     local now = GetTime()
+    refreshChannel()
     sendDueAnswers(now)
     if messagingBlocked() then
         return
     end
     if now - lastGroupSend >= GROUP_INTERVAL then
         lastGroupSend = now
-        if ns.settings.shareData and IsInGroup() and next(groupDirty) then
+        if IsInGroup() and next(groupDirty) then
             flushGroup()
         end
     end
@@ -453,17 +446,30 @@ local function tick()
         if now - message.at > QUEUE_TTL then
             table.remove(queue, i)
         elseif budget[key] > 0 and (message.chatType ~= "CHANNEL" or channelId) then
-            local result = C_ChatInfo.SendAddonMessage(PREFIX, message.text, message.chatType, message.target)
+            -- The channel number can change while a message waits; the current one is used.
+            local target = message.chatType == "CHANNEL" and channelId or message.target
+            local result = C_ChatInfo.SendAddonMessage(PREFIX, message.text, message.chatType, target)
             if result == SUCCESS then
                 ns.Debug("sent %s%s %s", message.chatType,
                     message.chatType == "WHISPER" and " to " .. message.target or "", shown(message.text))
                 table.remove(queue, i)
                 budget[key] = budget[key] - 1
-            else
-                ns.Debug("could not send %s, result %s", message.chatType, tostring(result))
-                session.failed = session.failed + 1
+            elseif RETRY[result] or result == false then
+                ns.Debug("could not send %s yet, result %s", message.chatType, tostring(result))
                 budget[key] = 0
                 i = i + 1
+            elseif message.chatType == "WHISPER" and message.target:find(" ") then
+                -- Forever names players "First Last". If a whisper to that form fails, "First-Last" is tried once.
+                ns.Debug("could not whisper %s, result %s, trying %s", message.target, tostring(result),
+                    (message.target:gsub(" ", "-")))
+                message.target = message.target:gsub(" ", "-")
+                budget[key] = 0
+                i = i + 1
+            else
+                ns.Debug("could not send %s%s, result %s, dropped", message.chatType,
+                    message.target and " to " .. tostring(message.target) or "", tostring(result))
+                session.failed = session.failed + 1
+                table.remove(queue, i)
             end
         else
             i = i + 1
@@ -507,12 +513,15 @@ ns.On("PLAYER_TARGET_CHANGED", function()
     end
 end)
 
+-- Joins the hidden channel, and tries again every JOIN_RETRY seconds while the player is not in it (loading
+-- screens, a /leave, the channel limit).
 local function joinChannel()
+    if refreshChannel() then
+        return
+    end
     JoinTemporaryChannel(CHANNEL)
     C_Timer.After(2, function()
-        local id = GetChannelName(CHANNEL)
-        channelId = id and id > 0 and id or nil
-        ns.Debug(channelId and "joined the sharing channel" or "could not join the sharing channel")
+        ns.Debug(refreshChannel() and "joined the sharing channel" or "could not join the sharing channel, trying again")
     end)
 end
 
@@ -540,6 +549,7 @@ local function migrateRelay(db)
     db.relay = nil
     db.share = nil
     db.settings.bridgeMode = nil
+    db.settings.shareData = nil
 end
 
 ns.On("DT_READY", function()
@@ -551,13 +561,16 @@ ns.On("DT_READY", function()
     end
     migrateRelay(ns.db)
     C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
-    C_Timer.After(JOIN_DELAY, joinChannel)
+    C_Timer.After(JOIN_DELAY, function()
+        joinChannel()
+        C_Timer.NewTicker(JOIN_RETRY, joinChannel)
+    end)
     C_Timer.NewTicker(TICK, tick)
 end)
 
 function ns.ShareDebugState()
-    return ("sharing %s, channel %s, %s, %d messages waiting"):format(ns.settings.shareData and "on" or "off",
-        channelId and "joined" or "not joined", IsInGroup() and groupChatType() .. " group" or "no group", #queue)
+    return ("channel %s, %s, %d messages waiting"):format(channelId and "joined" or "not joined",
+        IsInGroup() and groupChatType() .. " group" or "no group", #queue)
 end
 
 function ns.ShareStatus()
@@ -572,8 +585,8 @@ function ns.ShareStatus()
     for _ in pairs(installs) do
         count = count + 1
     end
-    local text = ("Sharing %s. Other players' counts for %d mobs from %d installs. This session: %d questions asked, %d answers whispered, %d received."):format(
-        ns.settings.shareData and "on" or "off", mobs, count, session.queries, session.answers, session.received)
+    local text = ("Other players' counts for %d mobs from %d installs. This session: %d questions asked, %d answers whispered, %d received."):format(
+        mobs, count, session.queries, session.answers, session.received)
     if session.groupSent + session.groupReceived > 0 then
         text = text .. (" Group: %d messages sent, %d received."):format(session.groupSent, session.groupReceived)
     end
