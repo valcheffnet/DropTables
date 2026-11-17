@@ -34,14 +34,21 @@ local function encodeNumber(n)
 end
 Wire.EncodeNumber = encodeNumber
 
+local MAX_DIGITS = 8
+
+-- A number from a message field, or nil when it is empty, too long or not base 36.
+function Wire.ReadNumber(s)
+    if #s > MAX_DIGITS or not s:match("^[0-9a-z]+$") then
+        return nil
+    end
+    return tonumber(s, 36)
+end
+
 local function decodeNumber(s)
     if s == "" then
         return nil
     end
-    if #s > 8 or not s:match("^[0-9a-z]+$") then
-        error("bad number")
-    end
-    return tonumber(s, 36)
+    return Wire.ReadNumber(s) or error("bad number")
 end
 
 function Wire.MobRecord(npc, bucket, data)

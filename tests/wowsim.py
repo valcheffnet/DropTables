@@ -149,7 +149,7 @@ ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua",
 def py_compress(text, method):
     """Zlib as C_EncodingUtil.CompressString(text, Enum.CompressionMethod.Zlib) gives it."""
     assert method == 1, "export must use zlib"
-    return zlib.compress(text.encode("ascii"))
+    return zlib.compress(text.encode("utf-8"))
 
 
 class Client:

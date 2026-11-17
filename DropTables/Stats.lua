@@ -28,14 +28,6 @@ local function round(n)
     return math.floor(n + 0.5)
 end
 
-local function openedOf(buckets)
-    local opened = 0
-    for _, data in pairs(buckets) do
-        opened = opened + data.opened
-    end
-    return opened
-end
-
 -- Sums one install's buckets that fall in the mode, scaled by factor. Money is the entry MONEY, with copper as
 -- its quantity. Returns nil when the install has no kills in the mode.
 local function aggregate(buckets, mode, factor)
@@ -205,7 +197,7 @@ function ns.GetStats(npc, mode)
     local peers = {}
     if not ns.settings.onlyMine then
         for _, peer in pairs(ns.db.peers[npc] or {}) do
-            local opened = openedOf(peer.buckets)
+            local opened = ns.SumBuckets(peer.buckets, "opened")
             local sum = aggregate(peer.buckets, mode, opened > PEER_CAP and PEER_CAP / opened or 1)
             if sum then
                 table.insert(peers, sum)

@@ -13,7 +13,9 @@ local PREFIX = "DT1:"
 local FORMAT = "1"
 local MAX_STRING = 60000  -- characters per part, below the size limit of a GitHub issue
 local FIRST_BUDGET = 150000 -- uncompressed characters per part on the first try
+local MIN_BUDGET = 2000     -- below this a part is taken as it is, even if it is over MAX_STRING
 local REMIND_AFTER = 25
+local REMIND_DELAY = 30     -- seconds after login
 
 local reminded = false
 
@@ -65,8 +67,7 @@ ns.On("DT_READY", function()
             markDirty(npc)
         end
     end
-    db.share = nil
-    C_Timer.After(30, remind)
+    C_Timer.After(REMIND_DELAY, remind)
 end)
 
 function ns.CanExport()
@@ -117,7 +118,7 @@ local function collect(everything)
     local byOrigin = {}
     for npc, peers in pairs(db.peers) do
         for origin, peer in pairs(peers) do
-            local line = (everything or (peer.t or 0) >= export.last) and peerLine(npc, peer)
+            local line = (everything or peer.t >= export.last) and peerLine(npc, peer)
             if line then
                 local section = byOrigin[origin]
                 if not section then
@@ -148,7 +149,7 @@ local function split(sections, budget)
             end
             if not opened then
                 table.insert(part, "@" .. section.origin)
-                size = size + 18
+                size = size + #section.origin + 2
                 opened = true
             end
             table.insert(part, line)
@@ -186,7 +187,7 @@ function ns.BuildExport(everything)
             strings[i] = encode(header .. "\n" .. table.concat(lines, "\n"))
             fits = fits and #strings[i] <= MAX_STRING
         end
-        if fits or budget < 2000 then
+        if fits or budget < MIN_BUDGET then
             result.strings = strings
             return result
         end

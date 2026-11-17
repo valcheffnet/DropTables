@@ -68,7 +68,7 @@ Actions, Deploy share page, Run workflow. The log shows the page address. Open i
 
 - Free plan: 100,000 requests a day. Past that the Worker answers with an error until midnight UTC; nothing gets billed.
 - Each address may send 10 times a minute. Change it in `wrangler.jsonc` (`ratelimits`).
-- The Worker only checks the shape of the text. Decoding and validation happen in the repository's workflow, which also has to drop duplicate issues.
+- The Worker only checks the shape of the text. `tools/check_export.py` decodes and validates it. The same text sent twice opens two issues, so merging has to skip duplicates.
 - If the Cloudflare account is lost, make a new one, repeat steps 1 to 3, put the new values into the secrets and run the deploy again. The page address changes, so the link in the addon has to change too.
 
 ## Tests

@@ -22,7 +22,8 @@ STRING_RE = re.compile(r"DT1:([A-Za-z0-9+/]+={0,2})")
 HEADER_RE = re.compile(r"DTX\|1\|([0-9a-f]{16})\|([0-9A-Za-z.\-]{1,20}|\?)\|(\d{1,12})\|(\d{1,3})/(\d{1,3})")
 SECTION_RE = re.compile(r"@([0-9a-f]{16})")
 NUMBER_RE = re.compile(r"[0-9a-z]{0,%d}" % MAX_NUMBER_DIGITS)
-NAME_RE = re.compile(r"N([0-9a-z]{1,%d})\.([^|;\x00-\x1f\x7f]{1,64})" % MAX_NUMBER_DIGITS)
+MAX_NAME_BYTES = 64
+NAME_RE = re.compile(r"N([0-9a-z]{1,%d})\.([^|;\x00-\x1f\x7f]+)" % MAX_NUMBER_DIGITS)
 
 FIELDS = {
     "M": ("npc", "bucket", "kills", "lootable", "opened", "moneyDrops", "copper", "moneyMin", "moneyMax"),
@@ -65,7 +66,8 @@ def decode_record(text):
     kind = text[:1]
     if kind == "N":
         match = NAME_RE.fullmatch(text)
-        if not match:
+        # Names come from the game client in its own language; the addon caps them in bytes, not characters.
+        if not match or len(match.group(2).encode("utf-8")) > MAX_NAME_BYTES:
             raise Invalid("bad name record")
         return {"kind": "N", "npc": decode_number(match.group(1)), "name": match.group(2)}
     names = FIELDS.get(kind)
@@ -110,9 +112,9 @@ def unpack(string):
     if inflater.unused_data:
         raise Invalid("extra data after the packed text")
     try:
-        return text.decode("ascii")
+        return text.decode("utf-8")
     except UnicodeDecodeError:
-        raise Invalid("text is not ASCII") from None
+        raise Invalid("text is not UTF-8") from None
 
 
 def parse(text):

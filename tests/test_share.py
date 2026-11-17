@@ -123,15 +123,17 @@ def origin_id(n):
 
 
 def hold(client, npc, sources):
-    """Puts other installs' counts straight into a client's store: {origin: (kills, [(item, drops)])}."""
-    for origin, (kills, items) in sources.items():
+    """Puts other installs' counts straight into a client's store: {origin: (kills, [(item, drops)][, opened])}."""
+    for origin, spec in sources.items():
+        kills, items = spec[0], spec[1]
+        opened = spec[2] if len(spec) > 2 else kills
         item_table = ", ".join("[%d] = { drops = %d, qty = %d, min = 1, max = 1 }" % (i, d, d) for i, d in items)
         client.lua.execute("""
             local peers = DropTablesDB.peers[%d] or {}
             DropTablesDB.peers[%d] = peers
             peers["%s"] = { t = 1, maps = {}, buckets = { [1] = { kills = %d, lootable = %d, opened = %d,
                 items = { %s }, money = { drops = 0, copper = 0 } } } }
-        """ % (npc, npc, origin, kills, kills, kills, item_table))
+        """ % (npc, npc, origin, kills, kills, opened, item_table))
 
 
 def main():
@@ -236,6 +238,14 @@ def main():
     net.run(10)
     expect("well known mob not asked about", net.sent("George", "Q|", start), [])
 
+    # The sample is looted corpses: many kills with few opened corpses still need more.
+    hold(george, 16, {origin_id(25): (150, [(100, 30)], 60)})
+    net.run(6)
+    start = len(net.log)
+    george.see(16, "G5", 5)
+    net.run(10)
+    expect("kills without corpses still asked about", len(net.sent("George", "Q|", start)), 1)
+
     # Many small sources: the asker stops after ten installs.
     kate = Client("Kate")
     givers = [Client("Giver%d" % i) for i in range(5)]
@@ -278,18 +288,24 @@ def main():
     whisper(carol, "Mallory", origin_id(40), counts(5, 20, 20))
     expect("known install updated by anyone", carol.ns.db.peers[5][origin_id(40)].buckets[1].kills, 20)
 
-    # Malformed and impossible answers are ignored.
+    # Malformed and impossible answers to an open question are ignored.
     fake = origin_id(50)
-    for records in (["M5.1.a.b.1.0.0.."],                     # lootable above kills
-                    ["M5.1.a.a.a.0.0..", "M6.1.a.a.a.0.0.."],  # two mobs in one answer
-                    ["I5.1.2s.0.0.."],                        # an item that dropped zero times
-                    ["M5.1.a.a.a.0.0..", "Nx|cffff0000Evil"],  # name with an escape code
-                    ["M5.1.123456789.a.a.0.0.."]):             # number too long
+    net.run(6)
+    carol.see(35, "C35", 5)
+    net.run(2)
+    for records in (["Mz.1.a.b.1.0.0.."],                     # lootable above kills
+                    ["Mz.1.a.a.a.0.0..", "M6.1.a.a.a.0.0.."],  # two mobs in one answer
+                    ["Iz.1.2s.0.0.."],                        # an item that dropped zero times
+                    ["Mz.1.a.a.a.0.0..", "Nz.|cffff0000Evil"], # name with an escape code
+                    ["Mz.1.123456789.a.a.0.0.."]):             # number too long
         whisper(carol, "Olga", fake, records)
-    carol.fire("CHAT_MSG_ADDON", "DropTables", "D|nothex|M5.1.a.a.a.0.0..", "WHISPER", "Olga")
-    whisper(carol, "Olga", carol.ns.db.installId, ["M5.1.a.a.a.0.0.."])
-    expect("garbage not stored", carol.ns.db.peers[5][fake], None)
-    expect("own install id not stored", carol.ns.db.peers[5][carol.ns.db.installId], None)
+    carol.fire("CHAT_MSG_ADDON", "DropTables", "D|nothex|Mz.1.a.a.a.0.0..", "WHISPER", "Olga")
+    whisper(carol, "Olga", carol.ns.db.installId, ["Mz.1.a.a.a.0.0.."])
+    expect("garbage not stored", carol.ns.db.peers[35][fake] if carol.ns.db.peers[35] else None, None)
+    expect("own install id not stored",
+           carol.ns.db.peers[35][carol.ns.db.installId] if carol.ns.db.peers[35] else None, None)
+    whisper(carol, "Olga", fake, ["Mz.1.a.a.a.0.0.."])
+    expect("the same answer, well formed, is taken", carol.ns.db.peers[35][fake] is not None, True)
 
     # At most twelve other installs per mob; the oldest go first, however big they are. One question takes at most
     # ten, so the twelve come from two questions.
@@ -415,7 +431,7 @@ def main():
     expect("sharing off still keeps group counts", pat.ns.db.peers[24][quinn.ns.db.installId] is not None, True)
     pat.ns.settings.shareData = True
 
-    # Counts from the bridge test builds move to the new store.
+    # Counts in db.relay, saved by the 0.1.0 bridge mode, move to db.peers.
     old = ('DropTablesDB = { installId = "%s", mobs = {}, settings = { bridgeMode = true },'
            ' relay = { ["%s"] = { t = 1, mobs = { [9] = { [1] = { kills = 4, lootable = 4, opened = 4, items = {'
            ' [100] = { drops = 2, qty = 2, min = 1, max = 1 } }, money = { drops = 0, copper = 0 } } } },'

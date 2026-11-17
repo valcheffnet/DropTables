@@ -47,22 +47,6 @@ local groupDirty = {}  -- npc -> true: the player's own counts changed since the
 local lastGroupSend = 0
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
 
-local function openedOf(buckets)
-    local opened = 0
-    for _, data in pairs(buckets) do
-        opened = opened + data.opened
-    end
-    return opened
-end
-
-local function killsOf(buckets)
-    local kills = 0
-    for _, data in pairs(buckets) do
-        kills = kills + data.kills
-    end
-    return kills
-end
-
 -- The player's own counts of a mob in the same shape as another install's: buckets, levels, kills per map.
 function ns.OwnSource(npc)
     local own = ns.db.mobs[npc]
@@ -90,7 +74,7 @@ local function sources(npc)
         })
     end
     for _, source in ipairs(list) do
-        source.kills = killsOf(source.buckets)
+        source.kills = ns.SumBuckets(source.buckets, "kills")
     end
     table.sort(list, function(a, b)
         if a.kills ~= b.kills then
@@ -121,9 +105,9 @@ end
 -- Looted corpses of a mob the player holds: their own plus every other install's.
 local function sampleOf(npc)
     local own = ns.db.mobs[npc]
-    local opened = own and openedOf(own) or 0
+    local opened = own and ns.SumBuckets(own, "opened") or 0
     for _, peer in pairs(ns.db.peers[npc] or {}) do
-        opened = opened + openedOf(peer.buckets)
+        opened = opened + ns.SumBuckets(peer.buckets, "opened")
     end
     return opened
 end
@@ -168,15 +152,15 @@ local function planAnswer(asker, npc, heldText, sender)
     local held = {}
     for entry in heldText:gmatch("[^,]+") do
         local prefix, kills = entry:match("^(%x%x%x%x%x%x)([0-9a-z]+)$")
-        if prefix and #kills <= 8 then
-            held[prefix] = tonumber(kills, 36)
+        if prefix then
+            held[prefix] = Wire.ReadNumber(kills)
         end
     end
     local due, count = {}, 0
     for _, source in ipairs(sources(npc)) do
         local theirs = held[source.origin:sub(1, HELD_PREFIX)]
         if source.origin ~= asker and (not theirs or theirs < source.kills) then
-            local size = math.min(openedOf(source.buckets), SAMPLE_TARGET) / SAMPLE_TARGET
+            local size = math.min(ns.SumBuckets(source.buckets, "opened"), SAMPLE_TARGET) / SAMPLE_TARGET
             due[source.origin] = GetTime() + BIG_DELAY + SIZE_DELAY * (1 - size) + math.random() * JITTER
             count = count + 1
             if count == ANSWER_ORIGINS then
@@ -460,13 +444,15 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
     local kind = text:sub(1, 2)
     if chatType == "CHANNEL" and kind == "Q|" then
         local asker, npc, held = text:match("^Q|(%x+)|([0-9a-z]+)|([0-9a-z,]*)$")
-        if asker and #asker == 16 and #npc <= 8 then
-            planAnswer(asker, tonumber(npc, 36), held, sender)
+        npc = npc and Wire.ReadNumber(npc)
+        if npc and #asker == 16 then
+            planAnswer(asker, npc, held, sender)
         end
     elseif chatType == "CHANNEL" and kind == "C|" then
         local asker, npc = text:match("^C|(%x+)|([0-9a-z]+)$")
-        if asker and #npc <= 8 then
-            planned[asker .. ":" .. tonumber(npc, 36)] = nil
+        npc = npc and Wire.ReadNumber(npc)
+        if npc then
+            planned[asker .. ":" .. npc] = nil
         end
     elseif chatType == "WHISPER" and kind == "D|" then
         receive(text, sender)
@@ -490,7 +476,7 @@ local function joinChannel()
     end)
 end
 
--- Counts from the bridge test builds (db.relay, by install) move to db.peers (by mob).
+-- Data of the 0.1.0 bridge mode: counts in db.relay (by install) move to db.peers (by mob), the rest goes.
 local function migrateRelay(db)
     for origin, entry in pairs(db.relay or {}) do
         for npc, buckets in pairs(entry.mobs or {}) do
@@ -512,15 +498,15 @@ local function migrateRelay(db)
         end
     end
     db.relay = nil
+    db.share = nil
     db.settings.bridgeMode = nil
 end
 
 ns.On("DT_READY", function()
     knownOrigins = {}
     for _, peers in pairs(ns.db.peers) do
-        for origin, peer in pairs(peers) do
+        for origin in pairs(peers) do
             knownOrigins[origin] = true
-            peer.t = peer.t or 0
         end
     end
     migrateRelay(ns.db)

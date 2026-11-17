@@ -29,8 +29,8 @@ def checked(string):
         return "rejected: %s" % error
 
 
-def pack(text):
-    return "DT1:" + base64.b64encode(zlib.compress(text.encode("latin-1"))).decode("ascii")
+def pack(text, encoding="utf-8"):
+    return "DT1:" + base64.b64encode(zlib.compress(text.encode(encoding))).decode("ascii")
 
 
 def json_view(bucket):
@@ -80,7 +80,6 @@ def main():
     ns.MarkExported(pending)
     expect("kill after building still new", ns.ChangedCount(), 1)
 
-    # Counts other players shared go out in their own section.
     # Counts other players whispered back go out in their own section (answers count only after asking).
     peer = "0123456789abcdef"
     alice.advance(10)
@@ -100,6 +99,12 @@ def main():
     parsed = checked(lua_list(ns.BuildExport(True).strings)[0])
     expect("export with a half bucket still valid", isinstance(parsed, dict), True)
     expect("half bucket left out", isinstance(parsed, dict) and other in parsed["sources"], False)
+
+    # Mob names come in the language of the game client.
+    ns.db.names[2] = "Пещерен вълк"
+    parsed = checked(lua_list(ns.BuildExport(True).strings)[0])
+    expect("name in another language", isinstance(parsed, dict) and parsed["sources"][own]["mobs"]["2"]["name"],
+           "Пещерен вълк")
 
     # A big table is split into parts that each fit and each check out.
     alice.lua.execute("""
@@ -146,7 +151,8 @@ def main():
         "records before install": pack("DTX|1|%s|0.2.0|1700000000|1/1\nM1.1.a.a.a.0.0.." % own),
         "bad header": pack("DTX|9|x\n@%s\nM1.1.a.a.a.0.0.." % own),
         "two mobs on a line": pack(header + "M1.1.a.a.a.0.0..;M2.1.a.a.a.0.0.."),
-        "not ascii": pack(header + "N1.Gnöll"),
+        "not utf-8": pack(header + "N1.Gnöll", "latin-1"),
+        "name over 64 bytes": pack(header + "N1." + "ö" * 33),
         "name with escape": pack(header + "N1.|cffff0000x"),
         "empty": pack("DTX|1|%s|0.2.0|1700000000|1/1" % own),
     }

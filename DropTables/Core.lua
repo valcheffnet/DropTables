@@ -141,6 +141,15 @@ function ns.FormatRate(rate)
     return ("%.2f%%"):format(rate * 100)
 end
 
+-- Total of one count (kills, opened, ...) over a mob's buckets.
+function ns.SumBuckets(buckets, field)
+    local total = 0
+    for _, data in pairs(buckets) do
+        total = total + data[field]
+    end
+    return total
+end
+
 -- "1-3" when the stack size varies, "2" when it never does; data recorded before ranges existed shows the average.
 function ns.FormatStack(entry)
     if entry.min and entry.max then

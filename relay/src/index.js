@@ -1,6 +1,6 @@
 // Takes an export string from the web page and opens the same GitHub issue the share form would,
-// so players without a GitHub account can share. The string is checked for shape only; decoding
-// and validation happen in the repository's Actions workflow.
+// so players without a GitHub account can share. The string is checked for shape only; tools/check_export.py
+// decodes and validates the issues.
 
 const MAX_BODY = 256 * 1024;
 const EXPORT_PATTERN = /^DT1:[A-Za-z0-9+/]+={0,2}$/;
