@@ -98,6 +98,12 @@ local function pack(header, records)
     return texts
 end
 
+-- A message as it can be shown in chat: pipes doubled so the chat frame does not read them as codes.
+local function shown(text)
+    local short = #text > 48 and text:sub(1, 48) .. "..." or text
+    return short:gsub("|", "||") .. (" (%d bytes)"):format(#text)
+end
+
 local function enqueue(text, chatType, target)
     table.insert(queue, { text = text, at = GetTime(), chatType = chatType, target = target })
 end
@@ -135,10 +141,16 @@ end
 
 local function ask(npc)
     local now = GetTime()
-    if not channelId or not ns.settings.shareData or now - lastQuery < QUERY_GAP
-        or (asked[npc] and now - asked[npc].at < QUERY_COOLDOWN) or not wantsData(npc) then
+    local reason = not channelId and "not in the channel"
+        or not ns.settings.shareData and "sharing is off"
+        or now - lastQuery < QUERY_GAP and "asked another mob a moment ago"
+        or asked[npc] and now - asked[npc].at < QUERY_COOLDOWN and "asked about it in the last 10 minutes"
+        or not wantsData(npc) and "already holds enough corpses"
+    if reason then
+        ns.Debug("not asking about mob %d: %s", npc, reason)
         return
     end
+    ns.Debug("asking about mob %d, %d looted corpses held", npc, sampleOf(npc))
     asked[npc], lastQuery = { at = now, origins = {}, count = 0 }, now
     enqueue(question(npc), "CHANNEL", channelId)
     session.queries = session.queries + 1
@@ -171,6 +183,7 @@ local function planAnswer(asker, npc, heldText, sender)
     if count > 0 then
         planned[asker .. ":" .. npc] = { npc = npc, target = sender, due = due }
     end
+    ns.Debug("%s asks about mob %d: answering with %d installs", sender, npc, count)
 end
 
 local function sendDueAnswers(now)
@@ -289,6 +302,8 @@ local function callOff(npc)
     if not channelId or messagingBlocked()
         or C_ChatInfo.SendAddonMessage(PREFIX, text, "CHANNEL", channelId) ~= SUCCESS then
         enqueue(text, "CHANNEL", channelId)
+    else
+        ns.Debug("sent CHANNEL %s", shown(text))
     end
 end
 
@@ -314,20 +329,25 @@ end
 local function receive(text, sender)
     local origin, npc, records = decodeAnswer(text)
     if not origin then
+        ns.Debug("  ignored: malformed, impossible counts or your own install")
         return
     end
     local question = asked[npc]
     if not question or GetTime() - question.at > ANSWER_WINDOW then
+        ns.Debug("  ignored: no open question about mob %d", npc)
         return
     end
     -- After the call-off only the rest of answers already under way are taken.
     if question.calledOff and not question.origins[origin] then
+        ns.Debug("  ignored: the question is already answered")
         return
     end
     if not knownOrigins[origin] and not allowNewOrigin(sender) then
         session.refused = session.refused + 1
+        ns.Debug("  refused: %s brought too many new installs today", sender)
         return
     end
+    ns.Debug("  stored: mob %d from install %s", npc, origin)
     store(origin, npc, records)
     session.received = session.received + 1
     if not question.origins[origin] then
@@ -359,9 +379,23 @@ end
 -- sender is in the group, and one group brings only a handful of installs.
 local function receiveGroup(text, sender)
     local origin, npc, records = decodeAnswer(text)
-    if not origin or not inGroup(sender) then
+    if not origin then
+        ns.Debug("  ignored: malformed, impossible counts or your own install")
         return
     end
+    if not inGroup(sender) then
+        local names = {}
+        local raid = IsInRaid()
+        for i = 1, GetNumGroupMembers() do
+            local name, realm = UnitName(raid and ("raid" .. i) or ("party" .. i))
+            if name then
+                table.insert(names, realm and realm ~= "" and name .. "-" .. realm or name)
+            end
+        end
+        ns.Debug("  ignored: sender %q is not in the group as the game names it (%s)", sender, table.concat(names, ", "))
+        return
+    end
+    ns.Debug("  stored: mob %d from group member %s", npc, sender)
     store(origin, npc, records)
     session.groupReceived = session.groupReceived + 1
     ns.Fire("DT_DATA_CHANGED", npc)
@@ -419,10 +453,14 @@ local function tick()
         if now - message.at > QUEUE_TTL then
             table.remove(queue, i)
         elseif budget[key] > 0 and (message.chatType ~= "CHANNEL" or channelId) then
-            if C_ChatInfo.SendAddonMessage(PREFIX, message.text, message.chatType, message.target) == SUCCESS then
+            local result = C_ChatInfo.SendAddonMessage(PREFIX, message.text, message.chatType, message.target)
+            if result == SUCCESS then
+                ns.Debug("sent %s%s %s", message.chatType,
+                    message.chatType == "WHISPER" and " to " .. message.target or "", shown(message.text))
                 table.remove(queue, i)
                 budget[key] = budget[key] - 1
             else
+                ns.Debug("could not send %s, result %s", message.chatType, tostring(result))
                 session.failed = session.failed + 1
                 budget[key] = 0
                 i = i + 1
@@ -441,6 +479,7 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
     if prefix ~= PREFIX or ns.IsSecret(text) or ns.IsSecret(sender) then
         return
     end
+    ns.Debug("got %s from %s: %s", chatType, sender, shown(text))
     local kind = text:sub(1, 2)
     if chatType == "CHANNEL" and kind == "Q|" then
         local asker, npc, held = text:match("^Q|(%x+)|([0-9a-z]+)|([0-9a-z,]*)$")
@@ -473,6 +512,7 @@ local function joinChannel()
     C_Timer.After(2, function()
         local id = GetChannelName(CHANNEL)
         channelId = id and id > 0 and id or nil
+        ns.Debug(channelId and "joined the sharing channel" or "could not join the sharing channel")
     end)
 end
 
@@ -514,6 +554,11 @@ ns.On("DT_READY", function()
     C_Timer.After(JOIN_DELAY, joinChannel)
     C_Timer.NewTicker(TICK, tick)
 end)
+
+function ns.ShareDebugState()
+    return ("sharing %s, channel %s, %s, %d messages waiting"):format(ns.settings.shareData and "on" or "off",
+        channelId and "joined" or "not joined", IsInGroup() and groupChatType() .. " group" or "no group", #queue)
+end
 
 function ns.ShareStatus()
     local mobs, installs = 0, {}

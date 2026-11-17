@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-17
+
+### Added
+
+- `/dt debug` puts a chat line for every sharing message the addon sends or gets, and says why it ignored one. It turns itself off when you reload.
+
+### Fixed
+
+- Exports from game clients in languages other than English are no longer turned down because of the mob names in them.
+
 ## [0.2.0] - 2026-11-17
 
 ### Added
@@ -27,6 +37,7 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/valcheffnet/DropTables/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/valcheffnet/DropTables/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/valcheffnet/DropTables/releases/tag/v0.1.0

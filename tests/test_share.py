@@ -442,6 +442,31 @@ def main():
     expect("relay migrated", (peer.buckets[1].kills, peer.buckets[1]["items"][100].drops, peer.maps[12]), (4, 2, 4))
     expect("relay and bridge setting removed", (upgraded.ns.db.relay, upgraded.ns.settings.bridgeMode), (None, None))
 
+    # /dt debug puts a chat line for every message in and out, with the reason when one is not taken.
+    def debug_lines(client):
+        lines = client.g.debugLines
+        return [lines[i] for i in range(1, len(lines) + 1)]
+
+    for client in (pat, quinn):
+        client.lua.execute("debugLines = {}; print = function(text) table.insert(debugLines, text) end")
+        client.g.SlashCmdList.DROPTABLES("debug")
+    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(210), ";".join(counts(25, 5, 5))),
+               "PARTY", "Stranger")
+    stranger = "\n".join(debug_lines(quinn))
+    expect("debug shows the message", "got PARTY from Stranger: D||" in stranger, True)
+    expect("debug names the group as the game does", 'sender "Stranger" is not in the group' in stranger
+           and "(Pat)" in stranger, True)
+    loot_mob(pat, 26, "P4", [(100, 1)])
+    net.run(70)
+    expect("debug shows the send", any("sent PARTY D||" in line for line in debug_lines(pat)), True)
+    expect("debug shows it stored", any("stored: mob 26 from group member Pat" in line for line in debug_lines(quinn)),
+           True)
+    quinn.g.SlashCmdList.DROPTABLES("debug")
+    quinn.lua.execute("debugLines = {}")
+    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(211), ";".join(counts(25, 5, 5))),
+               "PARTY", "Stranger")
+    expect("debug off is quiet", debug_lines(quinn), [])
+
     report("sharing")
 
 

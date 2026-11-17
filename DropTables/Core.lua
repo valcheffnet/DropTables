@@ -50,6 +50,14 @@ function ns.Print(msg)
     print("|cff66ccffDrop Tables|r " .. msg)
 end
 
+-- /dt debug: a chat line for every sharing message in and out, for testing between players. Off after a reload.
+ns.debug = false
+function ns.Debug(text, ...)
+    if ns.debug then
+        print("|cff888888DT debug|r " .. text:format(...))
+    end
+end
+
 local function isSecret(value)
     return issecretvalue ~= nil and issecretvalue(value)
 end
@@ -225,6 +233,12 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Print(("%d of your mobs have new counts since your last /dt export."):format(ns.ChangedCount()))
     elseif msg == "export" then
         ns.ToggleExport()
+    elseif msg == "debug" then
+        ns.debug = not ns.debug
+        ns.Print(("debug messages %s."):format(ns.debug and "on, until you type /dt debug again or reload" or "off"))
+        if ns.debug then
+            ns.Debug("%s", ns.ShareDebugState())
+        end
     else
         ns.ToggleDetails(ns.UnitNpc("target"))
     end
