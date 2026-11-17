@@ -38,3 +38,7 @@ Share my data is on by default and you can turn it off in the options. While it'
 ## Bugs
 
 Open an issue here. To see Lua errors in game, type `/console scriptErrors 1` once.
+
+## License
+
+All rights reserved, see LICENSE. You can use the addon in game and read the code, but not republish it or reuse the code without asking first.
