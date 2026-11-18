@@ -24,6 +24,7 @@ local ITEM_COLUMNS = {
     { key = "mobs", label = "Mobs", width = 44, justify = "CENTER" },
     { key = "best", label = "Best mob", width = 150, justify = "LEFT" },
     { key = "rate", label = "Chance", width = 60, justify = "RIGHT" },
+    { key = "kills", label = "Kills", width = 52, justify = "RIGHT" },
 }
 
 local frame = Style.Window("DropTablesFinder", 800, 500, 660, 320, "finderPos", "finderSize", "finderAlpha")
@@ -403,7 +404,7 @@ local itemTable = makeTable(ITEM_COLUMNS, 8, function(key)
     if itemSort == key then
         itemDescending = not itemDescending
     else
-        itemSort, itemDescending = key, key == "rate" or key == "mobs"
+        itemSort, itemDescending = key, key == "rate" or key == "mobs" or key == "kills"
     end
     renderMain()
 end)
@@ -522,7 +523,9 @@ local function renderCategory()
         row.cells.mobs:SetText(summary.mobs)
         row.cells.best:SetText(summary.best)
         row.cells.rate:SetText(ns.FormatRate(summary.rate))
+        row.cells.rate:SetAlpha(summary.small and 0.6 or 1)
         row.bar:SetChance(summary.rate, ITEM_COLUMNS[4].width)
+        row.cells.kills:SetText(summary.kills)
         row:Show()
     end
     itemTable:Finish(#summaries, #items == 0 and "Nothing here yet" or "No item matches",

@@ -181,8 +181,8 @@ function ns.FindDroppers(itemId)
     return results
 end
 
--- One line per item for a category: how many mobs drop it and which one gives the best chance, counting only
--- mobs that pass the zone and level filters. With a filter set, items no listed mob drops are left out.
+-- One line per item for a category: how many mobs drop it and which one gives the best chance (on a tie the one with
+-- more kills behind it), counting only mobs that pass the zone and level filters. With a filter set, items no listed mob drops are left out.
 -- Also returns the maps of all droppers (before filtering), for the zone choice.
 function ns.SummarizeItems(items, filters)
     filters = filters or {}
@@ -201,10 +201,11 @@ function ns.SummarizeItems(items, filters)
         end
         if #droppers > 0 or not active then
             local summary = { itemId = item.itemId, name = item.name, quality = item.quality, mobs = #droppers, rate = 0,
-                best = "" }
+                best = "", kills = 0 }
             for _, dropper in ipairs(droppers) do
-                if dropper.rate > summary.rate then
+                if dropper.rate > summary.rate or dropper.rate == summary.rate and dropper.kills > summary.kills then
                     summary.rate, summary.best, summary.bestNpc = dropper.rate, dropper.name, dropper.npc
+                    summary.kills, summary.small = dropper.kills, dropper.small
                 end
             end
             table.insert(results, summary)
@@ -236,6 +237,7 @@ local SUMMARY_SORT = {
     mobs = function(s) return s.mobs end,
     best = function(s) return s.best end,
     rate = function(s) return s.rate end,
+    kills = function(s) return s.kills end,
 }
 
 function ns.SortSummaries(summaries, sortKey, descending)

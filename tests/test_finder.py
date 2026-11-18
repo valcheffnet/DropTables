@@ -132,6 +132,8 @@ def main():
     expect("zones offered for the category", lua_list(summary_maps), [12, 40])
     expect("cloth mobs", summaries[2589].mobs, 3)
     expect("cloth best mob", (summaries[2589].bestNpc, round(summaries[2589].rate, 4)), (3, 1.0))
+    expect("kills behind the best chance", (summaries[2589].kills, summaries[2589].small), (1, True))
+    expect("kills behind the fang chance", summaries[100].kills, 3)
     expect("fang mobs", summaries[100].mobs, 1)
     expect("fang best chance", round(summaries[100].rate, 4), round(2 / 3, 4))
     zone40, zone40_maps = ns.SummarizeItems(ns.SearchItems(""), c.lua.table_from({"mapId": 40}))
@@ -166,6 +168,14 @@ def main():
     expect("a settings change rebuilds them", sorted(d.npc for d in lua_list(ns.FindDroppers(100))), [1, 5])
     ns.settings.onlyMine = False
     c.fire("DT_SETTINGS_CHANGED")
+
+    # Two mobs with the same best chance: the one with more kills behind it is shown.
+    for spawn in ("t1", "t2"):
+        kill_and_loot(c, 7, spawn, [cloth])
+    tie_list = ns.SummarizeItems(ns.SearchItems(""))[0]
+    tie = {s.itemId: s for s in lua_list(tie_list)}
+    expect("a tie goes to more kills", (tie[2589].bestNpc, tie[2589].kills), (7, 2))
+    expect("sorted by kills", [s.itemId for s in lua_list(ns.SortSummaries(tie_list, "kills", True))], [2589, 100])
 
     # Names and levels saved by earlier versions for creatures without any counts are dropped on login.
     old = Client("Old", saved="""DropTablesDB = {
