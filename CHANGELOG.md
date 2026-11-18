@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-11-18
 
 ### Added
 
@@ -12,7 +12,7 @@
 
 ### Changed
 
-- The drop table window has a new top: kills, looted corpses and the share of empty ones as large numbers, and a bar of where the kills come from (you, other players, the shared database). The subtitle gives the level and the zone. The Icons and Tooltip switches moved out of it; they're in the options and in `/dt icons` and `/dt tooltip`.
+- The drop table window has a new top: kills, looted corpses and the share of empty ones as large numbers, and a bar of where the kills come from (you, other players, the shared database). The subtitle gives the level and the zone, and the window can be made as narrow as 300 pixels. The Icons and Tooltip switches moved out of it; they're in the options and in `/dt icons` and `/dt tooltip`.
 - `/dt export` always holds everything of yours that the shared database doesn't have yet, plus what other players sent you. Copying the text and never sending it no longer leaves those counts out of later exports, and the Everything checkbox is gone.
 - Exports leave out kill spots, which the shared database doesn't use, so more mobs fit in one part.
 - A mob the shared database already knows well is asked about once a day, the same as one you've looted 100 times yourself.
@@ -22,7 +22,7 @@
 
 ### Fixed
 
-- The window you open or click comes to the front as a whole, and its frame turns gold, instead of parts of two windows showing through each other.
+- The window you open or click comes to the front as a whole, and its frame lights up, instead of parts of two windows showing through each other.
 - Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the details window no longer jumps to it.
 - One player can no longer drag all chances of a mob down to zero with made-up empty kills. Another player's counts weigh at most 300 kills, and counts that claim far more empty corpses than everyone else are left out of the chances.
 - A group member's counts are taken only for their own install, and one member can bring at most 30 mobs a day that you have no counts of.
@@ -35,7 +35,7 @@
 - Copying the export text counts when you let go of Ctrl before C, and Cmd+C works on a Mac.
 - /dt on a friendly NPC opens the table without it, and /dt find keeps your capital letters.
 - In the Loot Finder the map button shows only for mobs you killed yourself, a new list starts at the top, and the zone list picks up zones from new kills.
-- A long mob name stops before the SHARE button.
+- A long mob name no longer runs under the buttons in the title bar.
 
 ### Removed
 
@@ -144,7 +144,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.2.6...HEAD
+[0.3.0]: https://github.com/valcheffnet/DropTables/compare/v0.2.7...v0.3.0
+[0.2.7]: https://github.com/valcheffnet/DropTables/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/valcheffnet/DropTables/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/valcheffnet/DropTables/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/valcheffnet/DropTables/compare/v0.2.3...v0.2.4
