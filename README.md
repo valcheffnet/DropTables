@@ -2,7 +2,7 @@
 
 Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game.
 
-This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game. I'd like to turn those exports into a shared database that comes with the addon, but that part is new and I'm still testing it.
+This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it on GitHub. Everything sent there goes into a shared database that comes with the addon, so a new install already has chances for mobs you've never killed. That part is new and still being tested.
 
 ## Download
 
@@ -36,11 +36,11 @@ Commands (`/droptables` works too):
 
 ## Sharing your tables
 
-Every table someone shares makes the numbers better for everybody. Type `/dt export` (or pick Share my tables in the minimap button menu), press Select and then Ctrl+C in the window, open the form link under the text and paste it there. For now you need a GitHub account for that. An export only carries what changed since your last one, so doing it now and then is enough. A big table can come out in several parts, and each part goes into its own form.
+Every table someone shares makes the numbers better for everybody. Type `/dt export` (or pick Share my tables in the minimap button menu), press Select and then Ctrl+C in the window, open the form link under the text and paste it there. For now you need a GitHub account for that. An export only carries what changed since your last one, so doing it now and then is enough. A big table can come out in several parts, and each part goes into its own form. A bot on GitHub checks the text and adds it to the shared database, and it answers in the issue, usually within a few minutes. Players get the new counts with the next release of the addon.
 
 ## Data from other players
 
-Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you paste into the export form is public.
+Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you paste into the export form is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). In the drop table window, Only mine hides the counts of other players and the shared database alike.
 
 ## Bugs
 

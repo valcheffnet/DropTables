@@ -90,11 +90,14 @@ local function dropShare(sum, key)
     return math.min(1, (entry and entry.drops or 0) / sum.opened)
 end
 
--- The installs whose counts make one entry's chance: the player's own and every small install always, big installs
--- only when their share of drops fits the median of the big ones. Installs too far apart to tell which one is off
--- (none fits) all count.
-local function usedFor(key, own, small, big)
-    local used = { own }
+-- The counts that make one entry's chance: the player's own, the shared database and every small install always,
+-- big installs only when their share of drops fits the median of the big ones. Installs too far apart to tell which
+-- one is off (none fits) all count.
+local function usedFor(key, always, small, big)
+    local used = {}
+    for _, sum in ipairs(always) do
+        table.insert(used, sum)
+    end
     for _, sum in ipairs(small) do
         table.insert(used, sum)
     end
@@ -135,7 +138,7 @@ end
 -- The installs whose kills say how many corpses have loot. Empty kills lower every chance of the mob, so an install
 -- claiming hundreds of them must not pull all chances down, even when it is the only other one. The install whose
 -- share of lootable corpses is furthest from all the others together goes out, one at a time, until the rest fit.
--- The player's own kills and installs with fewer than BIG_SOURCE kills always count.
+-- The player's own kills, the shared database and installs with fewer than BIG_SOURCE kills always count.
 local function lootableSources(all)
     local used = {}
     for _, sum in ipairs(all) do
@@ -149,7 +152,7 @@ local function lootableSources(all)
         local worst, worstZ = nil, OUTLIER_Z
         for i, sum in ipairs(used) do
             local restKills = kills - sum.kills
-            if not sum.own and sum.kills >= BIG_SOURCE and restKills > 0 then
+            if sum.kind == "peer" and sum.kills >= BIG_SOURCE and restKills > 0 then
                 local z = zScore(sum.lootable, sum.kills, lootable - sum.lootable, restKills)
                 if z > worstZ then
                     worst, worstZ = i, z
@@ -210,30 +213,55 @@ local function newEntry(key, rate, sums, opened)
     }
 end
 
+-- The part of an install's counts the shared database does not hold yet. The database lists the installs it was
+-- built from with their kills at the time; counts only grow, so whatever came after is the new part.
+local function newShare(shared, origin, buckets)
+    local before = shared and shared.from[origin]
+    if not before then
+        return 1
+    end
+    local kills = ns.SumBuckets(buckets, "kills")
+    return kills > before and (kills - before) / kills or 0
+end
+
 -- Drop rates for one mob. mode is "all", "solo" or "group".
 -- Each chance comes from the player's counts and other players' counts added together (see usedFor and
 -- lootableSources), so every kill and every message moves it at once. Each other install is scaled down to PEER_CAP
 -- kills; scaling leaves fractions, so the totals on screen are rounded. The kill totals leave out installs whose
 -- empty kills do not fit the rest.
 local function computeStats(npc, mode)
-    local own = ns.db.mobs[npc] and aggregate(ns.db.mobs[npc], mode, 1) or nil
+    local shared = not ns.settings.onlyMine and ns.shared[npc] or nil
+    local ownBuckets = ns.db.mobs[npc]
+    local ownTotal = ownBuckets and aggregate(ownBuckets, mode, 1) or nil
+    local own = ownBuckets and aggregate(ownBuckets, mode, newShare(shared, ns.db.installId, ownBuckets)) or nil
+    local always, peers = {}, {}
     if own then
-        own.own = true
+        own.kind = "own"
+        table.insert(always, own)
     end
-    local peers = {}
+    local sharedSum = shared and aggregate(shared.buckets, mode, 1) or nil
+    if sharedSum then
+        sharedSum.kind = "shared"
+        table.insert(always, sharedSum)
+    end
     if not ns.settings.onlyMine then
-        for _, peer in pairs(ns.db.peers[npc] or {}) do
+        for origin, peer in pairs(ns.db.peers[npc] or {}) do
             local kills = ns.SumBuckets(peer.buckets, "kills")
-            local sum = aggregate(peer.buckets, mode, kills > PEER_CAP and PEER_CAP / kills or 1)
+            local factor = (kills > PEER_CAP and PEER_CAP / kills or 1) * newShare(shared, origin, peer.buckets)
+            local sum = aggregate(peer.buckets, mode, factor)
             if sum then
+                sum.kind = "peer"
                 table.insert(peers, sum)
             end
         end
     end
-    if not own and #peers == 0 then
+    if not ownTotal and not sharedSum and #peers == 0 then
         return nil
     end
-    local all = { own }
+    local all = {}
+    for _, sum in ipairs(always) do
+        table.insert(all, sum)
+    end
     for _, sum in ipairs(peers) do
         table.insert(all, sum)
     end
@@ -244,17 +272,20 @@ local function computeStats(npc, mode)
             keys[key] = true
         end
     end
-    local kills, lootable = 0, 0
+    local kills, lootable, byKind = 0, 0, { own = 0, shared = 0, peer = 0 }
     for _, sum in ipairs(lootableSources(all)) do
         kills, lootable = kills + sum.kills, lootable + sum.lootable
+        byKind[sum.kind] = byKind[sum.kind] + sum.kills
     end
-    local lootableShare = lootable / kills
+    local lootableShare = kills > 0 and lootable / kills or 0
     local stats = {
         npc = npc,
         kills = round(kills),
         opened = round(opened),
         empty = round(kills - lootable),
-        ownKills = own and own.kills or 0,
+        ownKills = ownTotal and round(ownTotal.kills) or 0,
+        peerKills = round(byKind.peer),
+        sharedKills = round(byKind.shared),
         sources = #peers,
         small = round(opened) < ns.SMALL_SAMPLE,
         list = {},
@@ -264,7 +295,7 @@ local function computeStats(npc, mode)
         table.insert(sum.opened >= BIG_SOURCE and big or small, sum)
     end
     for key in pairs(keys) do
-        local used = usedFor(key, own, small, big)
+        local used = usedFor(key, always, small, big)
         local rate, usedOpened = pooledRate(key, used, lootableShare)
         if rate > 0 then
             local entry = newEntry(key, rate, used, usedOpened)
@@ -337,10 +368,11 @@ end
 
 function ns.MobName(npc)
     local sight = ns.SeenMob(npc)
-    return ns.db.names[npc] or (sight and sight.name) or ("NPC " .. npc)
+    local shared = ns.shared[npc]
+    return ns.db.names[npc] or (sight and sight.name) or (shared and shared.name) or ("NPC " .. npc)
 end
 
--- Every mob with counts, the player's own and, unless only those are wanted, other players'.
+-- Every mob with counts, the player's own and, unless only those are wanted, other players' and the shared database's.
 function ns.KnownNpcs()
     local npcs = {}
     for npc in pairs(ns.db.mobs) do
@@ -350,16 +382,20 @@ function ns.KnownNpcs()
         for npc in pairs(ns.db.peers) do
             npcs[npc] = true
         end
+        for npc in pairs(ns.shared) do
+            npcs[npc] = true
+        end
     end
     return npcs
 end
 
--- Level range and kills per map: the player's own records, completed by what other players sent.
--- Kill spots (cells) come only from the player's own kills.
+-- Level range and kills per map: the player's own records, completed by what other players sent and by the shared
+-- database. Kill spots (cells) come only from the player's own kills.
 function ns.MobInfo(npc)
     local own = ns.db.info[npc] or ns.SeenMob(npc)
-    local peers = not ns.settings.onlyMine and ns.db.peers[npc]
-    if not peers or not next(peers) then
+    local peers = not ns.settings.onlyMine and ns.db.peers[npc] or {}
+    local shared = not ns.settings.onlyMine and ns.shared[npc] or nil
+    if not next(peers) and not shared then
         return own
     end
     local info = { maps = {} }
@@ -386,6 +422,12 @@ function ns.MobInfo(npc)
     for _, peer in pairs(peers) do
         addLevels(peer.minLevel, peer.maxLevel)
         for mapId, kills in pairs(peer.maps) do
+            addKills(mapId, kills)
+        end
+    end
+    if shared then
+        addLevels(shared.minLevel, shared.maxLevel)
+        for mapId, kills in pairs(shared.maps) do
             addKills(mapId, kills)
         end
     end

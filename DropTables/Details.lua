@@ -267,9 +267,16 @@ function render()
         emptyText:SetText(mode == "all" and "Kill and loot this mob to start its table." or "Switch to All to see every kill.")
     else
         local text
-        if stats.sources > 0 then
-            text = ("%d kills by you, %d by %d %s  |  %d looted"):format(stats.ownKills, stats.kills - stats.ownKills,
-                stats.sources, stats.sources == 1 and "player" or "players", stats.opened)
+        if stats.sources > 0 or stats.sharedKills > 0 then
+            local parts = { ("%d kills by you"):format(stats.ownKills) }
+            if stats.peerKills > 0 then
+                table.insert(parts, ("%d by %d %s"):format(stats.peerKills, stats.sources,
+                    stats.sources == 1 and "player" or "players"))
+            end
+            if stats.sharedKills > 0 then
+                table.insert(parts, ("%d shared"):format(stats.sharedKills))
+            end
+            text = ("%s  |  %d looted"):format(table.concat(parts, ", "), stats.opened)
         else
             text = ("%d kills  |  %d looted  |  %d left nothing"):format(stats.kills, stats.opened, stats.empty)
         end

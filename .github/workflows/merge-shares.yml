@@ -1,0 +1,88 @@
+name: Merge shared counts
+
+# Every run takes all open issues labelled share or relay, so a run that GitHub drops from the queue loses nothing:
+# the next one picks its issues up. Issue text is only ever read from JSON files by the Python scripts.
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: An issue to take in even without the share label (number); empty only rebuilds
+        required: false
+  push:
+    branches: [main]
+    paths: ["tools/build_data.py", "tools/check_export.py", "tools/ingest_issue.py"]
+
+concurrency:
+  group: shared-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  merge:
+    if: >-
+      github.event_name != 'issues' ||
+      contains(github.event.issue.labels.*.name, 'share') || contains(github.event.issue.labels.*.name, 'relay')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Collect the issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ inputs.issue }}
+        run: |
+          set -euo pipefail
+          fields=number,body,author,labels,createdAt
+          gh issue list --repo "$GITHUB_REPOSITORY" --state open --label share --limit 100 --json "$fields" > "$RUNNER_TEMP/share.json"
+          gh issue list --repo "$GITHUB_REPOSITORY" --state open --label relay --limit 100 --json "$fields" > "$RUNNER_TEMP/relay.json"
+          echo "[]" > "$RUNNER_TEMP/extra.json"
+          if [ -n "${ISSUE:-}" ]; then
+            if ! [[ "$ISSUE" =~ ^[0-9]+$ ]]; then echo "The issue must be a number."; exit 1; fi
+            gh issue view "$ISSUE" --repo "$GITHUB_REPOSITORY" --json "$fields" | jq -s . > "$RUNNER_TEMP/extra.json"
+          fi
+          jq -s '(.[0] + .[1] | map(select(.labels | map(.name) | index("rejected") | not))) + .[2] | unique_by(.number)' \
+            "$RUNNER_TEMP/share.json" "$RUNNER_TEMP/relay.json" "$RUNNER_TEMP/extra.json" > "$RUNNER_TEMP/issues.json"
+          echo "$(jq length "$RUNNER_TEMP/issues.json") issues to take in"
+
+      - name: Take in the exports
+        run: python tools/ingest_issue.py "$RUNNER_TEMP/issues.json" --replies "$RUNNER_TEMP/replies"
+
+      - name: Build the shared database
+        run: python tools/build_data.py
+
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git add data DropTables/Data.lua
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -F "$RUNNER_TEMP/replies/message.txt"
+          git push || { git pull --rebase -q && git push; }
+
+      - name: Answer the issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh label create rejected --repo "$GITHUB_REPOSITORY" --color B60205 \
+            --description "Export text that could not be taken in" --force
+          while read -r number outcome; do
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/replies/$number.md"
+            if [ "$outcome" = "rejected" ]; then
+              gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --add-label rejected
+              gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason "not planned"
+            else
+              gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason completed
+            fi
+          done < "$RUNNER_TEMP/replies/outcomes.txt"

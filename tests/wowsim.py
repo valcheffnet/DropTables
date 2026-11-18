@@ -198,8 +198,9 @@ def py_compress(text, method):
 class Client:
     """One game client with the addon loaded."""
 
-    def __init__(self, name, files=ALL_FILES, saved=None):
-        """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would."""
+    def __init__(self, name, files=ALL_FILES, saved=None, data=None):
+        """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would.
+        data: the text of a Data.lua (shared database) loaded right after Core.lua, as the toc does."""
         self.name = name
         self.lua = lua51.LuaRuntime(unpack_returned_tuples=True)
         self.g = self.lua.globals()
@@ -211,6 +212,8 @@ class Client:
         loader = self.lua.execute("return function(src, name) return assert(loadstring(src, name)) end")
         for file_name in files:
             loader((ADDON_DIR / file_name).read_text(encoding="utf-8"), file_name)("DropTables", self.ns)
+            if file_name == "Core.lua" and data:
+                loader(data, "Data.lua")("DropTables", self.ns)
         self.fire("ADDON_LOADED", "DropTables")
 
     def raise_errors(self):

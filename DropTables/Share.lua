@@ -131,10 +131,11 @@ local function enqueue(text, chatType, target)
     table.insert(queue, { text = text, at = GetTime(), chatType = chatType, target = target })
 end
 
--- Looted corpses of a mob the player holds: their own plus every other install's.
+-- Looted corpses of a mob the player holds: their own, every other install's and the shared database's.
 local function sampleOf(npc)
     local own = ns.db.mobs[npc]
-    local opened = own and ns.SumBuckets(own, "opened") or 0
+    local shared = ns.shared[npc]
+    local opened = (own and ns.SumBuckets(own, "opened") or 0) + (shared and ns.SumBuckets(shared.buckets, "opened") or 0)
     for _, peer in pairs(ns.db.peers[npc] or {}) do
         opened = opened + ns.SumBuckets(peer.buckets, "opened")
     end

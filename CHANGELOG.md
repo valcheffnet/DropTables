@@ -4,10 +4,13 @@
 
 ### Added
 
+- A shared database comes with the addon. It holds the counts from every `/dt export` sent on GitHub, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
+- Exports sent through the GitHub form are checked and added to the shared database by a bot, which replies in the issue.
 - The Loot Finder item list has a Kills column: how many kills of the best mob its chance comes from. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
 
 ### Changed
 
+- A mob the shared database already knows well is asked about once a day, the same as one you've looted 100 times yourself.
 - The Loot Finder stays quick with a big table. It works out each mob's chances once and keeps them until that mob's counts change, and the search waits for you to stop typing.
 - The table window redraws once after several changes in a row, and only for item info it actually shows.
 - Names and levels of creatures you never killed, and that nobody sent counts of, stay in memory for the session and are not saved. Those saved by earlier versions are dropped at login.

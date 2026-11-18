@@ -222,6 +222,16 @@ function ns.FormatRate(rate)
     return ("%.2f%%"):format(rate * 100)
 end
 
+-- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name }, in the shape of the
+-- player's own counts. It ships with the addon and is never saved, sent or exported.
+ns.shared = {}
+
+function ns.AddSharedData(chunk)
+    for npc, mob in pairs(chunk()) do
+        ns.shared[npc] = mob
+    end
+end
+
 -- Total of one count (kills, opened, ...) over a mob's buckets.
 function ns.SumBuckets(buckets, field)
     local total = 0
