@@ -15,7 +15,7 @@ local buttons = {}
 local currentNpc
 local unlocked = false
 
--- Shown while the strip can be dragged: in Blizzard's Edit Mode or after /dt unlock.
+-- Shown while the strip can be dragged, which is in Blizzard's Edit Mode or after /dt unlock.
 local mover = CreateFrame("Frame", nil, strip)
 mover:SetPoint("TOPLEFT", -6, 6)
 mover:SetPoint("BOTTOMRIGHT", 6, -18)
@@ -30,8 +30,8 @@ local moverLabel = mover:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmal
 moverLabel:SetPoint("BOTTOM", mover, "TOP", 0, 2)
 moverLabel:SetText("Drop Tables")
 
--- Anchor offsets are in the strip's own scaled units, so they are divided by the scale: the top-left corner
--- stays where it is when the icon size changes. stripPos holds that corner in UIParent units.
+-- Anchor offsets are in the strip's own scaled units, so they get divided by the scale, which keeps the top-left
+-- corner in place when the icon size changes. stripPos holds that corner in UIParent units.
 local function placeStrip()
     local scale = ns.settings.stripScale
     strip:SetScale(scale)

@@ -29,7 +29,7 @@ def main():
     cloth = (2589, "Linen Cloth")
     fang = (100, "Wolf Fang")
 
-    # Levels come from targeting and mouseover; unknown (-1 / skull) levels are ignored.
+    # Levels come from targeting and mouseover, and unknown (-1 / skull) levels are ignored.
     c.see(1, "a", 5)
     c.see(1, "b", 7, unit="mouseover")
     c.see(1, "c", -1)
@@ -52,7 +52,7 @@ def main():
     x, y = ns.CellCenter(cell)
     expect("cell center", (round(x, 3), round(y, 3)), (0.41, 0.31))
 
-    # Mob 2 (level 12) in zone 40 drops cloth once in four kills; one kill inside an instance has no spot.
+    # Mob 2 (level 12) in zone 40 drops cloth once in four kills, and one kill inside an instance has no spot.
     c.see(2, "a", 12)
     c.stand(40, 0.2, 0.2)
     kill_and_loot(c, 2, "k1", [cloth])
@@ -169,7 +169,7 @@ def main():
     ns.settings.onlyMine = False
     c.fire("DT_SETTINGS_CHANGED")
 
-    # Two mobs with the same best chance: the one with more kills behind it is shown.
+    # When two mobs give the same best chance, the one with more kills behind it is shown.
     for spawn in ("t1", "t2"):
         kill_and_loot(c, 7, spawn, [cloth])
     tie_list = ns.SummarizeItems(ns.SearchItems(""))[0]

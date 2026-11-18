@@ -1,23 +1,25 @@
 local _, ns = ...
 
--- Item class of quest items; they belong to quest helpers, not to drop tables.
+-- Item class of quest items. Those belong in quest helpers rather than in drop tables.
 local QUEST_CLASS = 12
 local MONEY_SLOT = 2
 local FIRST_CHECK = 1.5
 local FINAL_CHECK = 4
 local PENDING_TTL = 900
--- Skinning is a spell with a cast time and opens the loot window of the corpse as it finishes; plain corpse loot
--- needs no cast. Loot opened this soon after such a cast is profession loot, unless the corpse was known to hold loot:
--- a caster may loot one corpse right after a cast at the next mob.
+-- Skinning is a spell with a cast time that opens the corpse's loot window when it finishes, while plain corpse loot
+-- needs no cast. So loot opened this soon after a cast is profession loot, unless the corpse was already known to hold
+-- loot, since a caster may loot one corpse right after casting at the next mob.
 local CAST_LOOT_WINDOW = 1
 -- Units that can show the corpse whose loot window is open.
 local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 
--- Kills waiting for their corpse to be checked or looted, by victim GUID. States:
--- checking: loot state not known yet; lootable: has loot, kill counted; unknown: CanLootUnit gave no answer;
--- empty: no loot at the last check, kill counted (opened later with loot after all, the loot still counts);
--- unclaimed: in a group, no loot for the player at the last check, often someone else's corpse, nothing counted;
--- done: the corpse is recorded.
+-- Kills waiting for their corpse to be checked or looted, by victim GUID. The states are:
+--   checking   the loot state isn't known yet
+--   lootable   the corpse has loot and the kill is counted
+--   unknown    CanLootUnit gave no answer
+--   empty      no loot at the last check, kill counted (if it opens with loot after all, the loot still counts)
+--   unclaimed  in a group, no loot for the player at the last check, often someone else's corpse; nothing counted
+--   done       the corpse is recorded
 local pending = {}
 local casting, lastCastEnd = false, -math.huge
 
@@ -31,7 +33,7 @@ local function groupBucket()
     return math.min(members, 5)
 end
 
--- Returns the counts of a mob bucket that is about to change; sharing picks the bucket up from DT_COUNTS_CHANGED.
+-- Returns the counts of a mob bucket that's about to change. Sharing learns which bucket from DT_COUNTS_CHANGED.
 local function bucketData(npc, bucket)
     ns.Fire("DT_COUNTS_CHANGED", npc, bucket)
     local mob = ns.db.mobs[npc]
@@ -109,8 +111,8 @@ ns.On("PARTY_KILL", function(_, victim)
     end)
 end)
 
--- Takes a corpse for recording on its first opening; returns nil for corpses that are not our kills
--- or were opened before (skinning and other profession loot reuse the corpse GUID).
+-- Takes a corpse for recording the first time it's opened. Returns nil for corpses that aren't our kills or were
+-- opened before, since skinning and other profession loot reuse the corpse GUID.
 local function claim(guid)
     local kill = pending[guid]
     if not kill or kill.state == "done" then
@@ -132,7 +134,7 @@ local function emptyCandidate(kill)
     return kill and kill.state ~= "done" and kill.state ~= "empty"
 end
 
--- A corpse that sparkled but opened with nothing in it is an empty corpse: the kill counts, the loot does not.
+-- A corpse that sparkled but opened with nothing in it counts as empty, so the kill counts and no loot does.
 local function claimEmpty(guid)
     local kill = pending[guid]
     if not emptyCandidate(kill) then
@@ -157,9 +159,9 @@ local function deadUnitGuid(unit)
     return guid
 end
 
--- A corpse of a mob that no one in the group finished (a guard, another player or a damage over time effect after
--- leaving the group) has no PARTY_KILL. Its kill is taken when the player opens it while it is under the interact
--- key, the mouse or the target. A living mob (pickpocketing) is not a corpse.
+-- A mob that nobody in the group finished (a guard, another player, or a damage over time effect after leaving the
+-- group) never gets a PARTY_KILL, so its kill is taken when the player opens the corpse under the interact key, the
+-- mouse or the target. A living mob being pickpocketed isn't a corpse.
 local function lateKill(guid)
     local npc = ns.NpcFromGuid(guid)
     if not npc then
@@ -278,9 +280,9 @@ ns.On("LOOT_OPENED", function(_, fromItem)
         end
     end
 
-    -- A corpse that sparkled but opened empty has no slots to name it; the corpse the interact key or the mouse
-    -- is on does. The target is left out: it is often another corpse killed after this one. When the two show
-    -- different corpses of the player's kills, nothing tells which one was opened, and neither is counted.
+    -- A corpse that sparkled but opened empty has no slots to say which corpse it was, so we go by the one under the
+    -- interact key or the mouse. The target is left out because it's often another corpse killed after this one. If
+    -- the two point at different corpses of the player's kills, there's no telling which was opened, so neither counts.
     if count == 0 then
         local chosen, candidates = nil, 0
         for _, unit in ipairs({ "softinteract", "mouseover" }) do

@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- A round button on the minimap edge: left click opens the Loot Finder, right click a menu, drag moves it around.
+-- A round button on the minimap edge. Left click opens the Loot Finder, right click a menu, and dragging moves it.
 local EDGE_OFFSET = 5
 
 local button = CreateFrame("Button", "DropTablesMinimapButton", Minimap)

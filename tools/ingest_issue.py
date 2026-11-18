@@ -1,7 +1,7 @@
 """Takes the export strings out of GitHub issues and saves the valid ones as submissions.
 
-Issues are untrusted: they are read from a JSON file (never from a shell line), every string goes through
-tools/check_export.py, and nothing in them is executed.
+Issues are untrusted, so they're only ever read from a JSON file (never from a shell line), every string goes through
+tools/check_export.py, and nothing in them gets executed.
 
 Usage:
     python tools/ingest_issue.py ISSUES_JSON --replies DIR [--root DIR]

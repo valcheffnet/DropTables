@@ -1,7 +1,7 @@
 name: Merge shared counts
 
-# Every run takes all open issues labelled share or relay, so a run that GitHub drops from the queue loses nothing:
-# the next one picks its issues up. Issue text is only ever read from JSON files by the Python scripts.
+# Every run takes all open issues labelled share or relay, so when GitHub drops a run from the queue nothing is lost
+# and the next run picks those issues up. Only the Python scripts read the issue text, and only from JSON files.
 on:
   issues:
     types: [opened, labeled]

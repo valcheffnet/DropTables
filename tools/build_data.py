@@ -18,19 +18,17 @@ PEER_CAP = 300
 BIG_SOURCE = 30
 MIN_BIG_SOURCES = 3
 OUTLIER_Z = 3
-# Installs that only one exporter ever sent, never exported by themselves: at most this many per submitter.
+# How many installs one submitter may bring that only one exporter ever sent and that never exported themselves.
 UNCONFIRMED_CAP = 50
 CHUNK = 500  # mobs per Lua function, far below the constant limit of one Lua 5.1 function
 
-
-# --- choosing one version per install and mob ------------------------------------------------------------------
 
 def mob_kills(mob):
     return sum(b["kills"] for b in mob["buckets"].values())
 
 
 def complete_buckets(mob):
-    """Buckets with kills; a bucket made only of item records (no counts record) is left out, as in the addon."""
+    """Buckets with kills. A bucket made only of item records (no counts record) is left out, as the addon does."""
     return {b: data for b, data in mob["buckets"].items() if data["kills"] > 0}
 
 
@@ -53,15 +51,15 @@ def versions(submissions):
 
 
 def latest_best(candidates):
-    """The most kills; on a tie the most opened corpses (a corpse can be opened after the kill was counted), then
-    the latest issue."""
+    """The version with the most kills. On a tie it takes the one with more opened corpses, since a corpse can be
+    opened after its kill was counted, and after that the latest issue."""
     return max(candidates, key=lambda v: (v["kills"], sum(b["opened"] for b in v["mob"]["buckets"].values()),
                                           v["issue"]))
 
 
 def choose(origin, candidates):
-    """The install's own export wins. A copy someone else relayed counts when the install never exported itself,
-    and a relayed copy with more kills than the install's own export only when two exporters report that much."""
+    """The install's own export wins. A copy someone else relayed counts when the install never exported itself, and
+    a relayed copy with more kills than the install's own export only wins when two exporters report that much."""
     own = [v for v in candidates if v["exporter"] == origin]
     relayed = [v for v in candidates if v["exporter"] != origin]
     if not own:
@@ -78,25 +76,20 @@ def choose(origin, candidates):
 
 
 def unconfirmed_cut(found):
-    """Origins reported by one exporter only and never exported by themselves are fake install ids as far as
-    anyone can tell; each submitter brings at most UNCONFIRMED_CAP of them, the earliest first."""
-    first_seen = {}
-    for (origin, _npc), candidates in found.items():
-        exporters = {v["exporter"] for v in candidates}
-        if origin in exporters or len(exporters) > 1:
-            continue
-        for v in candidates:
-            seen = first_seen.get(origin)
-            if seen is None or v["issue"] < seen[0]:
-                first_seen[origin] = (v["issue"], v["submitter"])
+    """As far as anyone can tell, origins that only one exporter reported and that never exported themselves are
+    fake install ids. Each submitter can bring at most UNCONFIRMED_CAP of them, the earliest first."""
     # An origin confirmed for one mob is confirmed for all of them.
-    confirmed = set()
+    confirmed, first_seen = set(), {}
     for (origin, _npc), candidates in found.items():
         exporters = {v["exporter"] for v in candidates}
         if origin in exporters or len(exporters) > 1:
             confirmed.add(origin)
+        for v in candidates:
+            seen = first_seen.get(origin)
+            if seen is None or v["issue"] < seen[0]:
+                first_seen[origin] = (v["issue"], v["submitter"])
     per_submitter, cut = {}, set()
-    for origin, (issue, submitter) in sorted(first_seen.items(), key=lambda kv: (kv[1][0], kv[0])):
+    for origin, (_issue, submitter) in sorted(first_seen.items(), key=lambda kv: (kv[1][0], kv[0])):
         if origin in confirmed:
             continue
         count = per_submitter.get(submitter, 0) + 1
@@ -105,8 +98,6 @@ def unconfirmed_cut(found):
             cut.add(origin)
     return cut
 
-
-# --- the checks of Stats.lua ------------------------------------------------------------------------------------
 
 def scaled_sum(mob):
     """One install's counts over all buckets, scaled down to PEER_CAP kills."""
@@ -134,7 +125,8 @@ def z_score(seen1, n1, seen2, n2):
 
 
 def empty_kill_outliers(sums):
-    """lootableSources: the install whose share of lootable corpses is furthest from the rest goes, one at a time."""
+    """lootableSources in the addon. The install whose share of lootable corpses is furthest from the rest goes, one
+    at a time."""
     used = dict(sums)
     out = set()
     while True:
@@ -169,8 +161,8 @@ def plausible(seen, opened, p):
 
 
 def item_outliers(sums):
-    """usedFor: with enough big installs, one whose share of an item is far off their median does not fit. When
-    none fits for an item, nobody is blamed for it."""
+    """usedFor in the addon. With enough big installs, one whose share of an item is far off their median doesn't fit,
+    and when none of them fits for an item, nobody gets blamed for it."""
     big = {o: s for o, s in sums.items() if s["opened"] >= BIG_SOURCE}
     if len(big) < MIN_BIG_SOURCES:
         return set()
@@ -186,8 +178,6 @@ def item_outliers(sums):
             out |= failing
     return out
 
-
-# --- the shared counts of one mob -------------------------------------------------------------------------------
 
 def round_half_up(value):
     return int(math.floor(value + 0.5))
@@ -270,8 +260,8 @@ def shared_mob(chosen):
 
 
 def covered(older, newer):
-    """True when the newer submission has every install and mob of the older one with at least as many kills and
-    opened corpses, from the same exporter: the older one can no longer change the database."""
+    """True when the newer submission comes from the same exporter and has every install and mob of the older one
+    with at least as many kills and opened corpses, so the older one can't change the database any more."""
     if older["result"]["exporter"] != newer["result"]["exporter"]:
         return False
     for origin, source in older["result"]["sources"].items():
@@ -288,7 +278,7 @@ def covered(older, newer):
 
 
 def superseded(submissions):
-    """Submissions that a later submission covers; a player who sends everything each time leaves only the last."""
+    """Submissions a later one covers. A player who sends everything each time ends up leaving only the last."""
     ordered = sorted(submissions, key=lambda s: (s["issue"], s["index"]))
     return [old for i, old in enumerate(ordered) if any(covered(old, new) for new in ordered[i + 1:])]
 
@@ -310,15 +300,13 @@ def build(submissions):
     return {"built": built, "submissions": len(submissions), "mobs": mobs}
 
 
-# --- output -----------------------------------------------------------------------------------------------------
-
 def lua_string(text):
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 def lua_value(value, string_keys=False):
-    """Lua constructor for value. Keys made of digits become numbers (npc, bucket, item and map ids), except under
-    string_keys: install ids are hex text even when they happen to hold only digits."""
+    """Lua constructor for value. Keys made of digits become numbers (npc, bucket, item and map ids), except with
+    string_keys, because install ids are hex text even when they happen to be all digits."""
     if isinstance(value, dict):
         def numeric(k):
             return not string_keys and str(k).isdigit()
@@ -366,7 +354,7 @@ def load_submissions(root):
 
 
 def write_outputs(root, database):
-    """Writes both files; returns True when either changed."""
+    """Writes both files and returns True when either one changed."""
     targets = {
         root / "data" / "shared.json": json.dumps(database, sort_keys=True, indent=1, ensure_ascii=False) + "\n",
         root / "DropTables" / "Data.lua": lua_file(database),

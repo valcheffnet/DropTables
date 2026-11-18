@@ -1,7 +1,7 @@
 """Checks a Drop Tables export string (DT1:...) and prints what it holds.
 
-The string is untrusted input: nothing in it is executed, every size is capped before work is done, and every
-record must match the same grammar and consistency rules as the addon's Wire.lua.
+The string is untrusted input, so nothing in it gets executed, every size is capped before any work is done, and
+every record has to match the same grammar and consistency rules as the addon's Wire.lua.
 
 Usage:
     python tools/check_export.py FILE        (or - / nothing for stdin)
@@ -73,7 +73,7 @@ def decode_record(text):
     kind = text[:1]
     if kind == "N":
         match = NAME_RE.fullmatch(text)
-        # Names come from the game client in its own language; the addon caps them in bytes, not characters.
+        # Names come from the game client in its own language, and the addon caps them in bytes, not characters.
         if not match or len(match.group(2).encode("utf-8")) > MAX_NAME_BYTES:
             raise Invalid("bad name record")
         return {"kind": "N", "npc": decode_number(match.group(1)), "name": match.group(2)}

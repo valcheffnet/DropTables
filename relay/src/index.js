@@ -1,6 +1,6 @@
-// Takes an export string from the web page and opens a GitHub issue for the merge workflow,
-// so players need no GitHub account to share. The string is checked for shape only; tools/check_export.py
-// decodes and validates the issues.
+// Takes an export string from the web page and opens a GitHub issue for the merge workflow, so players don't need a
+// GitHub account to share. The Worker only checks the string's shape, and tools/check_export.py decodes and validates
+// the issues later.
 
 const MAX_BODY = 256 * 1024;
 const EXPORT_PATTERN = /^DT1:[A-Za-z0-9+/]+={0,2}$/;
@@ -30,7 +30,7 @@ async function hashHex(text) {
     return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-// GitHub hands out PKCS#1 keys; the secret must be converted to PKCS#8 once (see SETUP.md).
+// GitHub hands out PKCS#1 keys, so the secret has to be converted to PKCS#8 once (see SETUP.md).
 async function importKey(pem) {
     const body = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
     const der = Uint8Array.from(atob(body), (char) => char.charCodeAt(0));
@@ -46,7 +46,7 @@ async function appJwt(env, now) {
     return `${header}.${payload}.${base64url(new Uint8Array(signature))}`;
 }
 
-// Installation tokens live for an hour; one is reused until five minutes before it runs out.
+// Installation tokens live for an hour, so we reuse one until five minutes before it runs out.
 async function installationToken(env) {
     const now = Math.floor(Date.now() / 1000);
     if (cachedToken && cachedToken.expires - 300 > now) {
@@ -86,7 +86,7 @@ async function turnstileOk(env, token, ip) {
     return result.success === true;
 }
 
-// Same layout GitHub writes for the issue form, so the workflow reads both kinds of issue alike.
+// The same layout GitHub wrote for the old issue form, so the workflow reads either kind of issue.
 function issueBody(data) {
     return `### Export text\n\n\`\`\`text\n${data}\n\`\`\`\n\n_Sent through the web page._\n`;
 }

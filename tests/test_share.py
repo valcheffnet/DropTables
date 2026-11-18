@@ -175,14 +175,14 @@ def main():
     carol.ns.settings.onlyMine = False
     carol.fire("DT_SETTINGS_CHANGED")
 
-    # Friendly NPCs drop nothing: targeting a flight master neither asks about it nor records it.
+    # Friendly NPCs drop nothing, so targeting a flight master neither asks about it nor records it.
     start = len(net.log)
     carol.see(90, "C90", 30, friendly=True)
     net.run(10)
     expect("no question about a flight master", net.sent("Carol", "Q|", start), [])
     expect("flight master not recorded", carol.ns.db.names[90], None)
 
-    # The question lists what the asker holds: Alice has nothing newer for Carol, Bob's own counts are new.
+    # The question lists what the asker holds, so Alice has nothing newer for Carol while Bob's own counts are new.
     loot_mob(bob, 1, "B1", [(100, 1)])
     net.run(600)
     start = len(net.log)
@@ -215,8 +215,8 @@ def main():
     frank_origins = [m[1].split("|")[1] for m in net.sent("Frank", "D|", start)]
     expect("three installs from frank, biggest first", frank_origins, [origin_id(i) for i in (5, 4, 3)])
 
-    # A question ends once the asker holds 100 looted corpses: a big source answers fast and the next one,
-    # still waiting, stays quiet. (Each scenario uses fresh players: one sender brings three new installs a day.)
+    # A question ends once the asker holds 100 looted corpses, so a big source answers fast and the next one, still
+    # waiting, stays quiet. Each scenario uses fresh players, since one sender brings three new installs a day.
     big, medium, tiny, mid = Client("Big"), Client("Medium"), Client("Tiny"), Client("Mid")
     net.add(big, medium, tiny, mid)
     for client, value in ((big, 0), (medium, 0.99), (tiny, 0), (mid, 0.99)):
@@ -246,7 +246,7 @@ def main():
     hold(george, 14, {origin_id(24): (120, [(100, 30)])})
     fresh = Client("Fresh")
     net.add(fresh)
-    # These two ids start differently from origin_id(24): a question names held installs by their first 6 hex.
+    # These two ids start differently from origin_id(24), because a question names held installs by their first 6 hex.
     hold(fresh, 14, {"1a2b3c4d5e6f7081": (50, [(100, 10)]), "9f8e7d6c5b4a3920": (40, [(100, 8)])})
     net.run(6)
     start = len(net.log)
@@ -264,7 +264,7 @@ def main():
     net.run(5)
     expect("asked again the next day", len(net.sent("George", "Q|", start)), 1)
 
-    # The sample is looted corpses: many kills with few opened corpses still need more.
+    # The sample counts looted corpses, so many kills with few opened corpses still need more.
     hold(george, 16, {origin_id(25): (150, [(100, 30)], 60)})
     net.run(6)
     start = len(net.log)
@@ -272,7 +272,7 @@ def main():
     net.run(10)
     expect("kills without corpses still asked about", len(net.sent("George", "Q|", start)), 1)
 
-    # The pause after a question: two minutes when someone answered, longer each time nobody did.
+    # The pause after a question is two minutes when someone answered and longer each time nobody did.
     paula, helper = Client("Paula"), Client("Helper")
     net.add(paula, helper)
     net.run(10)
@@ -297,7 +297,7 @@ def main():
     net.run(112)
     expect("answered: two minutes again", asks(40, "P6", 2), 1)
 
-    # Mobs targeted during the gap wait in line, the newest three; a mob asked about a moment ago does not.
+    # Mobs targeted during the gap wait in line, the newest three of them, but a mob asked about a moment ago doesn't.
     net.run(130)
     begin = len(net.log)
     for npc in (41, 42, 43, 44, 45):
@@ -320,7 +320,7 @@ def main():
     expect("each waiting mob asked once",
            [m[1].split("|")[2] for m in net.sent("Paula", "Q|", begin)], [b36(n) for n in (51, 52, 53, 54)])
 
-    # A mob with many items fits in a few messages: the most frequent items go out, the rarest are left out.
+    # A mob with many items fits in a few messages, with the most frequent items going out and the rarest left out.
     giver, asker = Client("Giver"), Client("Asker")
     net.add(giver, asker)
     hold(giver, 50, {origin_id(140): (99, [(1000 + i, 60 - i) for i in range(60)])})
@@ -367,7 +367,7 @@ def main():
                "CHANNEL", "Pete")
     expect("channel answer ignored", carol.ns.db.peers[5], None)
 
-    # One sender brings at most three installs the player has never seen; known ones may be updated by anyone.
+    # One sender brings at most three installs the player has never seen, while known ones may be updated by anyone.
     for i in range(40, 45):
         whisper(carol, "Mallory", origin_id(i), counts(5, 10, 10, [(100, 5)]))
     expect("three new installs per sender", len(plain(carol.ns.db.peers[5])), 3)
@@ -397,12 +397,12 @@ def main():
            carol.ns.db.peers[35][carol.ns.db.installId] if carol.ns.db.peers[35] else None, None)
     whisper(carol, "Olga", fake, ["Mz.1.a.a.a.0.0.."])
     expect("the same answer, well formed, is taken", carol.ns.db.peers[35][fake] is not None, True)
-    # Numbers have at most six base 36 digits; tonumber would cut longer ones at 2^32.
+    # Numbers have at most six base 36 digits, because tonumber would cut longer ones at 2^32.
     expect("six digits read", carol.ns.Wire.ReadNumber("zzzzzz"), 36 ** 6 - 1)
     expect("seven digits refused", carol.ns.Wire.ReadNumber("1000000"), None)
 
-    # At most twelve other installs per mob; the oldest go first, however big they are. One question takes at most
-    # ten, so the twelve come from two questions.
+    # A mob keeps at most twelve other installs, and the oldest go first however big they are. One question takes at
+    # most ten, so the twelve come from two questions.
     net.run(6)
     carol.see(7, "C7", 5)
     net.run(2)
@@ -420,10 +420,10 @@ def main():
     expect("twelve sources kept", len(kept), 12)
     expect("oldest dropped, not smallest", origin_id(60) in kept or origin_id(61) in kept, False)
 
-    # Big sources are checked against their median: one liar does not move the chances.
+    # Big sources are checked against their median, so one liar doesn't move the chances.
     hold(carol, 9, {origin_id(80 + i): (40, [(100, 12 + 2 * i)]) for i in range(3)})
     hold(carol, 9, {origin_id(90): (3000, [(100, 3000), (555, 3000)])})
-    # A small source is always added: too few corpses to tell a liar from luck.
+    # A small source is always added, since it has too few corpses to tell a liar from luck.
     hold(carol, 9, {origin_id(91): (20, [(100, 20)])})
 
     def rates_of(npc):
@@ -448,12 +448,12 @@ def main():
     whisper(carol, "Small2", origin_id(102), counts(10, 10, 10, [(100, 1)]))
     expect("a third one moves it at once", round(rates_of(10)[100].rate, 3), round(11 / 30, 3))
 
-    # A rare item: a 40-corpse source that saw it three times is noise around 2%, not a liar.
+    # A 40-corpse source that saw a rare item three times is noise around 2%, not a liar.
     hold(carol, 11, {origin_id(110 + i): (100, [(777, 2)]) for i in range(3)})
     hold(carol, 11, {origin_id(113): (40, [(777, 3)])})
     expect("noisy rare source kept", rates_of(11)[777].drops, 2 * 3 + 3)
 
-    # Empty kills are checked as well: one install claiming thousands of kills with no loot does not pull every chance
+    # Empty kills get checked as well. One install claiming thousands of kills with no loot doesn't drag every chance
     # down, while one that found a few more empty corpses than the player still counts.
     carol.lua.execute("""
         local function bucket(kills, lootable, drops)
@@ -503,7 +503,7 @@ def main():
     for i in range(5):
         from_member("Pat Ashwood", origin_id(201 + i), counts(21, 5, 5))
     expect("one install per member", list(plain(quinn.ns.db.peers[21]).keys()), [origin_id(201)])
-    # A member brings at most 30 mobs a day that the player knows nothing of; mobs the player knows keep coming.
+    # A member brings at most 30 mobs a day that the player knows nothing of, and mobs the player knows keep coming.
     for npc in range(300, 340):
         from_member("Rae Ashwood", origin_id(210), counts(npc, 5, 5))
     expect("unknown mobs from one member capped", sum(1 for n in range(300, 340) if quinn.ns.db.peers[n]), 30)
@@ -518,7 +518,7 @@ def main():
     impossible = [e for e in stats.list.values() if e.itemId == 100] if stats else []
     expect("120 drops from 40 corpses not shown", impossible, [])
 
-    # One send carries at most ten messages; the rest goes a minute later.
+    # One send carries at most ten messages and the rest goes a minute later.
     for npc in range(30, 45):
         pat.lua.execute("""
             DropTablesDB.mobs[%d] = { [2] = { kills = 3, lootable = 3, opened = 3,
@@ -531,7 +531,7 @@ def main():
     expect("ten messages, then the rest", [len(f) for f in sends], [10, 5])
     expect("one group message per tick", len({m[4] for m in sends[0]}), 10)
 
-    # Nothing goes out in a lockdown; it follows once the lockdown ends.
+    # Nothing goes out during a lockdown, and it follows once the lockdown ends.
     pat.lua.execute("C_ChatInfo.InChatMessagingLockdown = function() return true end")
     loot_mob(pat, 22, "P2", [(100, 1)])
     start = len(net.log)
@@ -541,7 +541,7 @@ def main():
     net.run(5)
     expect("sent after the lockdown", len(net.sent("Pat", "D|", start)) >= 1, True)
 
-    # A message that cannot go out is dropped, unless the server only asks to wait; the queue keeps moving.
+    # A message that can't go out is dropped unless the server only asks to wait, so the queue keeps moving.
     pat.lua.execute("""
         tries = {}
         realSend = C_ChatInfo.SendAddonMessage
@@ -567,7 +567,7 @@ def main():
     expect("each form tried once", (pat.g.tries["Two Names"], pat.g.tries["Two-Names"]), (1, 1))
     pat.lua.execute("C_ChatInfo.SendAddonMessage = realSend")
 
-    # The channel hands a player their own question back; the addon does not answer it.
+    # The channel hands a player their own question back, and the addon doesn't answer it.
     quinn_id = quinn.ns.db.installId
     start = len(net.log)
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (quinn_id, b36(21)), "CHANNEL", "Quinn Ashwood")
@@ -586,7 +586,7 @@ def main():
         ask_pat("Flood Ashwood", origin_id(1000 + i))
     net.run(15)
     expect("one answer for a flood of questions", len(answers_to("Flood Ashwood", start)), 1)
-    # Many players at once: no more than 40 answers wait, so the queue cannot fill up.
+    # With many players at once no more than 40 answers wait, so the queue can't fill up.
     start = len(net.log)
     for i in range(60):
         ask_pat("Asker%d" % i, origin_id(1400 + i))
@@ -604,7 +604,8 @@ def main():
     net.run(15)
     expect("the asker's call-off taken", answers_to("Real Asker", start), [])
 
-    # Not in the channel at first (a loading screen, the channel limit): the addon keeps trying, then asks.
+    # When the player isn't in the channel at first (a loading screen, the channel limit), the addon keeps trying and
+    # asks once it's in.
     late = Client("Late")
     late.lua.execute("""
         inChannel, joins = false, 0

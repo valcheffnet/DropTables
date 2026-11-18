@@ -1,18 +1,18 @@
 local _, ns = ...
 
--- Sharing between players. A player who targets a mob with little data asks on a hidden channel and says which
--- installs' counts they already hold; players with other or bigger counts whisper them back:
+-- Sharing between players. When a player targets a mob the addon knows little about, it asks on a hidden channel and
+-- says whose counts it already holds, and players with other or bigger counts whisper theirs back:
 --   Q|<asking install id>|<npc>|<held>   held: "<first 6 hex of an install id><its kills>" joined by ","
 --   D|<origin install id>|<records of one mob>   (whisper to the asker)
 --   C|<asking install id>|<npc>                  (channel: the asker has enough, pending answers are dropped)
--- The asker collects until it holds SAMPLE_TARGET looted corpses of the mob, or MAX_ORIGINS_PER_QUESTION installs
--- answered; bigger sources answer sooner, so one or two big ones often end a question before small ones send.
--- Group members also send each other their own counts once a minute, over the group's addon channel:
+-- The asker keeps collecting until it holds SAMPLE_TARGET looted corpses of the mob or MAX_ORIGINS_PER_QUESTION
+-- installs have answered. Bigger sources answer sooner, so one or two big ones often settle a question before the small
+-- ones get to send. Group members also send each other their own counts once a minute, over the group's addon channel:
 --   D|<own install id>|<records of one mob>      (PARTY, RAID or INSTANCE_CHAT)
--- Counts are kept per origin install and replaced, never added, so the same counts arriving twice change nothing.
--- Known trade-off: two members who see the same kill both count it, so each one's rates stay right but the kill
--- totals of party kills ("312 by 7 players") come out too high. Telling the copies apart needs corpse GUIDs that
--- match across clients, which is not confirmed for Forever.
+-- Counts are kept per origin install and replaced rather than added, so the same counts arriving twice change nothing.
+-- One thing we live with: two members who see the same kill both count it, which leaves each one's rates right but
+-- makes the kill totals of party kills ("312 by 7 players") too high. Telling the copies apart would need corpse GUIDs
+-- that match across clients, and that isn't confirmed for Forever.
 local Wire = ns.Wire
 local PREFIX = "DropTables"
 local CHANNEL = "DropTablesShare"
@@ -22,16 +22,16 @@ local JOIN_RETRY = 15       -- seconds between tries while the player is not in 
 local MAX_SOURCES = 12      -- other installs kept per mob
 local SAMPLE_TARGET = 100   -- looted corpses of a mob (own plus other installs') worth asking for
 local MAX_ORIGINS_PER_QUESTION = 10
--- Seconds before the same mob is asked about again: the first step after a question someone answered, one step
--- longer after each question nobody answered.
+-- Seconds before the same mob is asked about again. After a question someone answered it's the first step, and every
+-- question nobody answered moves one step further.
 local PAUSES = { 120, 300, 600, 1800 }
 local REFRESH = 86400       -- a mob with SAMPLE_TARGET corpses or more is asked about once a day
 local QUERY_GAP = 5         -- seconds between any two questions
 local WAITING_QUESTIONS = 3 -- mobs targeted during the gap wait for their turn; only the newest are kept
 local ANSWER_WINDOW = 120   -- whispered counts are taken only this long after asking about that mob
 local ANSWER_ORIGINS = 3    -- installs one player whispers back per question, the biggest first
--- Answer delay: BIG_DELAY for a source with SAMPLE_TARGET corpses or more, growing to BIG_DELAY + SIZE_DELAY for one
--- with almost none, plus up to JITTER so equal sizes do not collide.
+-- How long an answer waits. A source with SAMPLE_TARGET corpses or more waits BIG_DELAY, one with almost none up to
+-- BIG_DELAY + SIZE_DELAY, and up to JITTER is added on top so sources of the same size don't all send at once.
 local BIG_DELAY, SIZE_DELAY, JITTER = 0.3, 3, 0.7
 local NEW_ORIGINS_PER_SENDER = 3 -- installs the player has never seen that one sender may bring per day
 local GROUP_NEW_MOBS = 30   -- mobs the player knows nothing of that one group member may bring per day
@@ -44,7 +44,7 @@ local GROUP_FLUSH_CAP = 10  -- messages per group send; mobs that do not fit wai
 local MOB_MESSAGES = 4      -- messages one install's mob may take; the rarest items are left out past that
 local RESULT = Enum.SendAddonMessageResult or {}
 local SUCCESS = RESULT.Success or 0
--- Results worth sending again later; any other failure (target offline, not in a group, ...) drops the message.
+-- Send results worth trying again later. Any other failure (target offline, not in a group, ...) drops the message.
 local RETRY = {
     [RESULT.AddonMessageThrottle or 3] = true,
     [RESULT.ChannelThrottle or 8] = true,
@@ -59,7 +59,7 @@ local asked = {}
 local lastQuery = -QUERY_GAP
 local waiting = {}   -- npcs targeted while another question had just gone out, oldest first
 local knownOrigins   -- set of every install id the player holds counts of
--- sender -> { day, count } of what that sender brought; this session only, never saved
+-- sender -> { day, count } of what that sender brought, kept for this session only and never saved
 local newBySender = {}      -- installs the player had never seen
 local newMobsBySender = {}  -- mobs the player knew nothing of, from group members
 local groupOrigins = {}     -- group member -> the one install they send; this session only
@@ -67,7 +67,7 @@ local groupDirty = {}  -- npc -> true: the player's own counts changed since the
 local lastGroupSend = 0
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
 
--- The player's own counts of a mob in the same shape as another install's: buckets, levels, kills per map.
+-- The player's own counts of a mob in the same shape as another install's, with buckets, levels and kills per map.
 function ns.OwnSource(npc)
     local own = ns.db.mobs[npc]
     if not own then
@@ -121,7 +121,7 @@ local function pack(header, records)
     return texts
 end
 
--- A message as it can be shown in chat: pipes doubled so the chat frame does not read them as codes.
+-- A message the way it can be shown in chat, with pipes doubled so the chat frame doesn't read them as codes.
 local function shown(text)
     local short = #text > 48 and text:sub(1, 48) .. "..." or text
     return short:gsub("|", "||") .. (" (%d bytes)"):format(#text)
@@ -163,13 +163,13 @@ local function question(npc)
     return text
 end
 
--- The pause after the last question about a mob: short when someone answered it, longer each time nobody did.
+-- The pause after the last question about a mob, short when someone answered it and longer each time nobody did.
 local function pauseAfter(question)
     return question.count > 0 and PAUSES[1] or PAUSES[question.step]
 end
 
--- Why a question about the mob cannot go out yet, or nil when it can. The gap between questions is left out; it only
--- makes the mob wait in line.
+-- Why a question about the mob can't go out yet, or nil when it can. The gap between questions isn't a reason here,
+-- because it only makes the mob wait in line.
 local function notYet(npc, now)
     local last = asked[npc]
     if not channelId then
@@ -216,8 +216,8 @@ local function ask(npc)
     end
 end
 
--- Sends the oldest waiting question once the gap has passed; mobs that became not worth asking about meanwhile drop
--- out of the line.
+-- Sends the oldest waiting question once the gap has passed. Mobs that stopped being worth asking about in the
+-- meantime drop out of the line.
 local function askWaiting(now)
     while waiting[1] and now - lastQuery >= QUERY_GAP do
         local npc = table.remove(waiting, 1)
@@ -227,7 +227,7 @@ local function askWaiting(now)
     end
 end
 
--- Answers in the queue plus installs planned to be sent; a planned install takes at least one whisper.
+-- Answers in the queue plus installs planned to be sent, counting at least one whisper for each planned install.
 local function waitingWhispers()
     local count = 0
     for _, message in ipairs(queue) do
@@ -243,9 +243,9 @@ local function waitingWhispers()
     return count
 end
 
--- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills. One player has one answer planned
--- at a time, the one for their latest question, and nothing is planned while many whispers wait, so a flood of
--- questions cannot hold up the answers to everyone else.
+-- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills. Each player gets one planned answer
+-- at a time, for their latest question, and nothing gets planned while many whispers are waiting, so one player
+-- flooding questions can't hold up the answers to everyone else.
 local function planAnswer(asker, npc, heldText, sender)
     local waiting = waitingWhispers()
     if waiting >= MAX_WAITING_WHISPERS then
@@ -312,7 +312,7 @@ local function rememberItem(itemId)
     end
 end
 
--- Keeps the MAX_SOURCES installs updated most recently. Size plays no part, so big made-up counts do not push
+-- Keeps the MAX_SOURCES installs that were updated most recently. Size plays no part, so big made-up counts can't push
 -- real ones out.
 local function trim(peers)
     local count, oldest = 0, nil
@@ -371,8 +371,8 @@ local function store(origin, npc, records)
     trim(peers)
 end
 
--- Counts one more of something a sender (a name the server vouches for) brought today; false once the limit is
--- reached.
+-- Counts one more of something a sender brought today (the sender is a name the server vouches for), and returns false
+-- once the limit is reached.
 local function withinDailyLimit(counts, sender, limit)
     local day = math.floor(time() / 86400)
     local entry = counts[sender]
@@ -387,8 +387,8 @@ local function withinDailyLimit(counts, sender, limit)
     return true
 end
 
--- A sender may bring only a few installs the player has never seen per day, so one player cannot fill the tables
--- with made-up installs. Updates of known installs are taken from anyone.
+-- A sender may bring only a few installs a day that the player has never seen, so nobody can fill the tables with
+-- made-up installs. Updates of installs we already know are taken from anyone.
 local function allowNewOrigin(sender)
     return withinDailyLimit(newBySender, sender, NEW_ORIGINS_PER_SENDER)
 end
@@ -400,7 +400,7 @@ local function messagingBlocked()
     return IsEncounterInProgress and IsEncounterInProgress()
 end
 
--- The call-off skips the queue: every moment it waits, another player may start whispering.
+-- The call-off skips the queue, because every moment it waits another player may start whispering.
 local function callOff(npc)
     local text = "C|" .. ns.db.installId .. "|" .. Wire.EncodeNumber(npc)
     if not channelId or messagingBlocked()
@@ -467,11 +467,11 @@ local function receive(text, sender)
     ns.Fire("DT_DATA_CHANGED", npc)
 end
 
--- Group members are taken without a question: the server delivers group messages only from members of the group.
--- Each member sends only their own install, so the first one a member sends is the only one taken from them. Mobs
--- the player has no counts of at all are limited per member and day; players in a group mostly kill the same mobs.
--- (Forever names the sender "First Last", which does not match UnitName, so the sender is not checked against the
--- group.)
+-- Counts from group members come in without a question, since the server only delivers group messages from members.
+-- A member only ever sends their own install, so the first install a member sends is the only one we take from them.
+-- Mobs the player has no counts of at all are capped per member and day, because a group mostly kills the same mobs
+-- anyway. Forever names the sender "First Last", which doesn't match UnitName, so the sender isn't checked against
+-- the group.
 local function receiveGroup(text, sender)
     if text:sub(3, 2 + #ns.db.installId) == ns.db.installId then
         ns.Debug("  your own message, back from the group")
@@ -507,8 +507,8 @@ local function groupChatType()
     return IsInRaid() and "RAID" or "PARTY"
 end
 
--- Queues the player's own counts of the mobs that changed since the last group send, up to GROUP_FLUSH_CAP
--- messages. Only the player's own install goes out this way; counts kept from others stay home.
+-- Queues the player's own counts of the mobs that changed since the last group send, up to GROUP_FLUSH_CAP messages.
+-- Only the player's own install goes out this way, and counts kept from others stay home.
 local function flushGroup()
     local chatType, used = groupChatType(), 0
     for npc in pairs(groupDirty) do
@@ -536,8 +536,8 @@ local function refreshChannel()
     return channelId
 end
 
--- Sends up to one channel message, one group message and a few whispers per tick; whispers outside instances have
--- no addon throttle.
+-- Sends up to one channel message, one group message and a few whispers per tick. Whispers outside instances have no
+-- addon throttle, so a few at once are fine.
 local function tick()
     local now = GetTime()
     refreshChannel()
@@ -560,7 +560,7 @@ local function tick()
         if now - message.at > QUEUE_TTL then
             table.remove(queue, i)
         elseif budget[key] > 0 and (message.chatType ~= "CHANNEL" or channelId) then
-            -- The channel number can change while a message waits; the current one is used.
+            -- The channel number can change while a message waits, so this takes the current one.
             local target = message.chatType == "CHANNEL" and channelId or message.target
             local result = C_ChatInfo.SendAddonMessage(PREFIX, message.text, message.chatType, target)
             if result == SUCCESS then
@@ -610,8 +610,8 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
             planAnswer(asker, npc, held, sender)
         end
     elseif chatType == "CHANNEL" and kind == "C|" then
-        -- Only the asker can call off the answers to them: the plan is found by the sender, not by the install id
-        -- in the message, which anyone could copy.
+        -- Only the asker can call off the answers to them. The plan is looked up by the sender rather than by the
+        -- install id in the message, because anyone could copy that id.
         local npc = text:match("^C|%x+|([0-9a-z]+)$")
         npc = npc and Wire.ReadNumber(npc)
         if npc and planned[sender] and planned[sender].npc == npc then
@@ -631,8 +631,8 @@ ns.On("PLAYER_TARGET_CHANGED", function()
     end
 end)
 
--- Joins the hidden channel, and tries again every JOIN_RETRY seconds while the player is not in it (loading
--- screens, a /leave, the channel limit).
+-- Joins the hidden channel and tries again every JOIN_RETRY seconds while the player isn't in it, which happens after
+-- loading screens, a /leave or hitting the channel limit.
 local function joinChannel()
     if refreshChannel() then
         return
@@ -643,7 +643,7 @@ local function joinChannel()
     end)
 end
 
--- Data of the 0.1.0 bridge mode: counts in db.relay (by install) move to db.peers (by mob), the rest goes.
+-- Data from the 0.1.0 bridge mode. Counts in db.relay (by install) move to db.peers (by mob) and the rest is dropped.
 local function migrateRelay(db)
     for origin, entry in pairs(db.relay or {}) do
         for npc, buckets in pairs(entry.mobs or {}) do

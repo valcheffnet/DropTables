@@ -1,14 +1,14 @@
 local _, ns = ...
 
--- Text form of drop counts, used by peer sharing and by the export string. Records are joined with ";" and each
--- one replaces the previous record with the same key, so sending the same counts twice is harmless:
+-- Text form of drop counts, used by peer sharing and by the export string. Records are joined with ";", and a record
+-- replaces any earlier one with the same key, so sending the same counts twice does no harm. The records are:
 --   M<npc>.<bucket>.<kills>.<lootable>.<opened>.<money drops>.<copper>.<money min>.<money max>
 --   I<npc>.<bucket>.<item>.<drops>.<qty>.<min>.<max>
 --   L<npc>.<min level>.<max level>
 --   Z<npc>.<map>.<kills>
 --   P<npc>.<map>.<cell>.<kills>
 --   N<npc>.<mob name>
--- Numbers are base 36; an empty field is a missing value (min/max, unknown level).
+-- Numbers are base 36, and an empty field means the value is missing (min/max, an unknown level).
 local Wire = {}
 ns.Wire = Wire
 
@@ -34,7 +34,7 @@ local function encodeNumber(n)
 end
 Wire.EncodeNumber = encodeNumber
 
--- Six digits stay below 2^32, where tonumber(s, 36) stops.
+-- Six digits keep a number below 2^32, which is as far as tonumber(s, 36) goes.
 local MAX_DIGITS = 6
 
 -- A number from a message field, or nil when it is empty, too long or not base 36.
@@ -76,7 +76,7 @@ function Wire.MapRecord(npc, mapId, kills)
     return "Z" .. encodeNumber(npc) .. "." .. encodeNumber(mapId) .. "." .. encodeNumber(kills)
 end
 
--- Mob names are client text; "|", ";" and control characters never occur in them and are refused.
+-- Mob names are client text and never contain "|", ";" or control characters, so a name with any of them is refused.
 local function validName(name)
     return type(name) == "string" and #name > 0 and #name <= 64 and not name:find("[%c|;]")
 end
@@ -85,8 +85,8 @@ function Wire.NameRecord(npc, name)
     return validName(name) and ("N" .. encodeNumber(npc) .. "." .. name) or nil
 end
 
--- A bucket put together from other players' messages can be half there: items without the counts message, or an
--- older counts message than the items. Such a bucket is not passed on.
+-- A bucket put together from other players' messages can be half there, with items but no counts message yet, or
+-- with a counts message older than the items. Such a bucket isn't passed on.
 function Wire.Complete(data)
     if data.kills == 0 then
         return false
@@ -99,9 +99,9 @@ function Wire.Complete(data)
     return true
 end
 
--- One install's records of a mob: counts per bucket, level range, kills per map and the name, then the items, the
--- most frequent first, so a message list cut short loses the rarest drops (mostly one-off world drops) and keeps the
--- counts and the items that matter. Nothing at all when no bucket is complete.
+-- One install's records of a mob. The counts per bucket, level range, kills per map and name come first, then the
+-- items with the most frequent in front, so a message list that gets cut short loses the rarest drops (mostly one-off
+-- world drops) and keeps what matters. Returns nothing when no bucket is complete.
 -- source is { buckets, minLevel, maxLevel, maps = { [mapId] = kills } }.
 function Wire.SourceRecords(npc, source, name)
     local records, items = {}, {}
@@ -164,8 +164,8 @@ local function range(min, max)
     return min >= 1 and min <= max
 end
 
--- Counts that cannot come from the collector: an opened corpse is a lootable kill, an item or coin drops at most
--- once per opened corpse.
+-- True when the collector could have produced these counts. Every opened corpse is a lootable kill, and an item or
+-- coin drops at most once per opened corpse.
 local function consistent(r)
     if r.kind == "M" then
         return r.lootable <= r.kills and r.opened <= r.lootable and r.moneyDrops <= r.opened

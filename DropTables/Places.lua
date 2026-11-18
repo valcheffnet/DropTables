@@ -1,15 +1,15 @@
 local _, ns = ...
 
--- Where and at what level each mob was met: name and level range from target, mouseover and nameplates,
--- and per map the number of kills plus the kill spots on a GRID x GRID grid (the player's position at the kill).
+-- Where and at what level each mob was met. Name and level range come from the target, mouseover and nameplates, and
+-- each map keeps its number of kills plus the kill spots on a GRID x GRID grid (where the player stood at the kill).
 local GRID = 50
 ns.GRID = GRID
 local MAX_CELLS = 40
 
 local PLACED_TTL = 900
 local placed = {} -- victim GUID -> when its kill was placed; kept a while against a second PARTY_KILL for it
--- Names and levels of mobs without any counts stay in this session only: most of them are never killed (critters,
--- mobs passed on the road). They are saved with the mob's first counts.
+-- Names and levels of mobs without any counts stay in this session only, because most of them never get killed
+-- (critters, mobs passed on the road). They get saved along with the mob's first counts.
 local seen = {}   -- npc -> { name, minLevel, maxLevel, maps = {} }
 
 local function mobInfo(npc)
@@ -25,7 +25,7 @@ function ns.CellCenter(cell)
     return (math.floor(cell / GRID) + 0.5) / GRID, (cell % GRID + 0.5) / GRID
 end
 
--- Returns the player's map and grid cell; the cell is nil where the map gives no position (instances).
+-- Returns the player's map and grid cell. The cell is nil where the map gives no position, as in instances.
 local function playerSpot()
     local mapId = C_Map.GetBestMapForUnit("player")
     if not mapId or ns.IsSecret(mapId) then
@@ -46,7 +46,7 @@ local function hasCounts(npc)
     return ns.db.mobs[npc] or ns.db.info[npc] or ns.db.peers[npc]
 end
 
--- Writes what was seen of the mob into the saved data; true when its level range changed.
+-- Writes what was seen of the mob into the saved data and returns true when its level range changed.
 local function save(npc, sight)
     if sight.name then
         ns.db.names[npc] = sight.name
@@ -145,7 +145,8 @@ ns.On("NAME_PLATE_UNIT_ADDED", function(unit)
     remember(unit)
 end)
 
--- Earlier versions saved the name and level of every creature seen; those without any counts are dropped on login.
+-- Earlier versions saved the name and level of every creature seen, so the ones without any counts are dropped at
+-- login.
 ns.On("DT_READY", function()
     local db = ns.db
     for npc, info in pairs(db.info) do

@@ -5,8 +5,8 @@ function ns.MapName(mapId)
     return info and info.name or ("Map " .. tostring(mapId))
 end
 
--- Items seen in loot windows whose name contains the text (any case) or whose id is the text; all of them for
--- empty text. qualities, when given, is a set of the qualities to keep.
+-- Items seen in loot windows whose name contains the text (in any case) or whose id is the text, or all of them when
+-- the text is empty. qualities, when given, is a set of the qualities to keep.
 function ns.SearchItems(text, qualities)
     text = strtrim(text or ""):lower()
     local id = tonumber(text)
@@ -28,7 +28,7 @@ function ns.SearchItems(text, qualities)
     return results
 end
 
--- Item classes in the auction house order; anything else follows in id order.
+-- Item classes in the auction house order, with anything else after them in id order.
 local CLASS_ORDER = { 2, 4, 1, 3, 8, 0, 16, 7, 9, 17, 12, 15, 5, 6, 11, 13 }
 local CLASS_RANK = {}
 for rank, classId in ipairs(CLASS_ORDER) do
@@ -43,8 +43,8 @@ local function subclassName(classId, subclassId)
     return C_Item.GetItemSubClassInfo(classId, subclassId) or ("Type " .. subclassId)
 end
 
--- Groups items like the auction house: classes in its order, subclasses by name, items by name.
--- A class whose items all share one subclass has no subclass level (subs is nil, items are on the class).
+-- Groups items the way the auction house does, classes in its order and subclasses and items by name. A class whose
+-- items all share one subclass gets no subclass level (subs is nil and the items sit on the class).
 function ns.BuildItemTree(items)
     local byClass = {}
     for _, item in ipairs(items) do
@@ -85,15 +85,15 @@ function ns.BuildItemTree(items)
     return tree
 end
 
--- The droppers of every item, built from one GetStats per mob. A mob's entries are rebuilt only after its counts or
--- info change, all of them after a settings change; the Loot Finder asks for hundreds of items per redraw.
+-- The droppers of every item, built from one GetStats per mob. A mob's entries are only rebuilt after its counts or
+-- info change, and all of them after a settings change, because the Loot Finder asks for hundreds of items per redraw.
 local byNpc = {}      -- npc -> { [itemId] = dropper } from the mob's current chances
 local dirty = {}      -- npcs whose entries are out of date
 local allDirty = true
 local index           -- itemId -> { dropper, ... }, nil while it needs rebuilding
 
--- One dropper per item in the mob's chances. The counts can hold an item while the chances leave it out (an install
--- far off the rest); such an item has no dropper here.
+-- One dropper per item in the mob's chances. The counts can hold an item that the chances leave out, when it came
+-- from an install far off the rest, and such an item gets no dropper here.
 local function droppersOf(npc)
     local stats = ns.GetStats(npc, "all")
     local found = {}
@@ -171,8 +171,8 @@ ns.On("DT_SETTINGS_CHANGED", function()
     allDirty = true
 end)
 
--- Every mob with recorded drops of the item, with its chance over all kills, level range and maps by kill count.
--- The list is new on every call; the droppers in it are shared and must not be changed.
+-- Every mob with recorded drops of the item, with its chance over all kills, its level range and its maps by kill
+-- count. The list is new on every call, but the droppers in it are shared, so don't change them.
 function ns.FindDroppers(itemId)
     local results = {}
     for i, dropper in ipairs(currentIndex()[itemId] or {}) do
@@ -181,9 +181,9 @@ function ns.FindDroppers(itemId)
     return results
 end
 
--- One line per item for a category: how many mobs drop it and which one gives the best chance (on a tie the one with
--- more kills behind it), counting only mobs that pass the zone and level filters. With a filter set, items no listed mob drops are left out.
--- Also returns the maps of all droppers (before filtering), for the zone choice.
+-- One line per item for a category, saying how many mobs drop it and which one gives the best chance (on a tie, the
+-- one with more kills behind it). Only mobs that pass the zone and level filters count, and with a filter set, items
+-- none of those mobs drop are left out. Also returns the maps of all droppers before filtering, for the zone choice.
 function ns.SummarizeItems(items, filters)
     filters = filters or {}
     local active = filters.mapId or filters.minLevel or filters.maxLevel
@@ -217,7 +217,7 @@ function ns.SummarizeItems(items, filters)
     return results, maps
 end
 
--- Sorts by value(entry) in either direction; equal values fall back to entry[idKey] so the order is stable.
+-- Sorts by value(entry) in either direction, falling back to entry[idKey] on equal values so the order stays stable.
 local function sortBy(list, value, descending, idKey)
     table.sort(list, function(a, b)
         local va, vb = value(a), value(b)
@@ -278,7 +278,7 @@ local SORT_VALUES = {
     drops = function(d) return d.drops end,
 }
 
--- filters: mapId, minLevel, maxLevel (all optional). A level filter leaves out mobs whose level is unknown.
+-- filters can hold mapId, minLevel and maxLevel, all optional. A level filter leaves out mobs whose level is unknown.
 function ns.FilterDroppers(droppers, filters, sortKey, descending)
     local results = {}
     for _, dropper in ipairs(droppers) do

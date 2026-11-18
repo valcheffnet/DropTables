@@ -163,8 +163,8 @@ function advance(seconds)
 end
 """
 
-# Lua run before the addon loads, for tests of the windows: any field of a frame is another stub that can also be
-# called, Show and Hide are remembered, GetText returns "" and other Get* methods return 1.
+# Lua run before the addon loads, for tests of the windows. Any field of a frame is another stub that can also be
+# called, Show and Hide are remembered, GetText returns "" and the other Get* methods return 1.
 UI_STUBS = """
 function widget(name)
     local w = { shown = true }
