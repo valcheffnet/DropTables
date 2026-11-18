@@ -24,6 +24,7 @@ MAX_BODY = 1_000_000
 MAX_STRINGS = 10   # parts in one issue
 DAILY_LIMIT = 20   # accepted strings per submitter per UTC day
 STRING_RE = re.compile(r"DT1:[A-Za-z0-9+/]+={0,2}")
+SHARE_PAGE = "https://droptables-relay.valcheffnet.workers.dev"
 
 
 def received_time(issue):
@@ -63,8 +64,9 @@ def ingest(issue, root):
     body = (issue.get("body") or "")[:MAX_BODY]
     strings = STRING_RE.findall(body)
     if not strings:
-        return "rejected", ("There is no export text in this issue. In game, type `/dt export`, press Select and then "
-                            "Ctrl+C, and paste the text into a new issue. It starts with `DT1:`.")
+        return "rejected", ("I couldn't find any export text in this issue. In game, type `/dt export`, press Select "
+                            "and then Ctrl+C, and paste the text on the share page at " + SHARE_PAGE + ". It starts "
+                            "with `DT1:`.")
     if len(strings) > MAX_STRINGS:
         return "rejected", "This issue has %d export texts. Please send at most %d in one issue." % (
             len(strings), MAX_STRINGS)
@@ -99,16 +101,16 @@ def ingest(issue, root):
         path.write_text(json.dumps(sub, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     if not new:
         if problems:
-            return "rejected", "The export text could not be used: %s." % "; ".join(problems)
+            return "rejected", "The export text couldn't be used: %s." % "; ".join(problems)
         return "duplicate", "This export text was sent before, so there was nothing new to add."
     installs = {o for s in new for o in s["result"]["sources"]}
     mobs = {npc for s in new for source in s["result"]["sources"].values() for npc in source["mobs"]}
     kills = sum(b["kills"] for s in new for source in s["result"]["sources"].values()
                 for mob in source["mobs"].values() for b in mob["buckets"].values())
-    reply = ("Thanks, this is in the shared database now: %s, %s, %s. Everyone gets it with the next Drop Tables "
-             "release." % (count(len(installs), "install"), count(len(mobs), "mob"), count(kills, "kill")))
+    reply = ("Thanks! Your counts are in the shared database now (%s, %s, %s), and everyone gets them with the next "
+             "Drop Tables release." % (count(len(installs), "install"), count(len(mobs), "mob"), count(kills, "kill")))
     if problems:
-        reply += " Could not be used: %s." % "; ".join(problems)
+        reply += " Part of it couldn't be used: %s." % "; ".join(problems)
     if duplicates:
         reply += " %s had been sent before." % count(duplicates, "part")
     return "accepted", reply

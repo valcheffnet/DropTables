@@ -5,36 +5,36 @@
 ### Added
 
 - A shared database comes with the addon. It holds the counts from every `/dt export` players send, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
-- A share page for exports: paste the text from `/dt export` there and press Send, no account needed. A bot checks it and adds it to the shared database.
-- The Loot Finder and the drop table window end in a share card: a square button with the number of your mobs the community doesn't have yet. It glows softly while there's something to share and calms down once you've copied your export. The small SHARE link in the title bar is gone.
-- Six colour themes for the Drop Tables windows: Ledger (the old gold), Frost, Fel, Blood, Arcane and Stone. Pick one with the squares next to OPACITY in the Loot Finder's title bar; every window changes at once.
-- The Loot Finder item list has a Kills column: how many kills of the best mob its chance comes from. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
+- A share page for exports. Paste the text from `/dt export` there and press Send, and you don't need an account for it. A bot checks the text and adds it to the shared database.
+- The Loot Finder and the drop table window end in a share card, a square button with the number of your mobs the community doesn't have yet. It glows softly while there's something to share and calms down once you've copied your export. The small SHARE link in the title bar is gone.
+- Six colour themes for the windows, called Ledger (the old gold), Frost, Fel, Blood, Arcane and Stone. You pick one with the squares next to OPACITY in the Loot Finder's title bar, and every window changes at once.
+- The Loot Finder item list has a Kills column with the number of kills behind the best mob's chance. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
 
 ### Changed
 
-- The drop table window has a new top: kills, looted corpses and the share of empty ones as large numbers, and a bar of where the kills come from (you, other players, the shared database). The subtitle gives the level and the zone, and the window can be made as narrow as 300 pixels. The Icons and Tooltip switches moved out of it; they're in the options and in `/dt icons` and `/dt tooltip`.
+- The drop table window has a new top. Kills, looted corpses and the share of empty corpses show as large numbers next to a bar of where the kills come from, whether that's you, other players or the shared database. The subtitle gives the level and the zone, and the window can be made as narrow as 300 pixels. The Icons and Tooltip switches moved to the options, and `/dt icons` and `/dt tooltip` still work.
 - `/dt export` always holds everything of yours that the shared database doesn't have yet, plus what other players sent you. Copying the text and never sending it no longer leaves those counts out of later exports, and the Everything checkbox is gone.
 - Exports leave out kill spots, which the shared database doesn't use, so more mobs fit in one part.
 - A mob the shared database already knows well is asked about once a day, the same as one you've looted 100 times yourself.
 - The Loot Finder stays quick with a big table. It works out each mob's chances once and keeps them until that mob's counts change, and the search waits for you to stop typing.
-- The table window redraws once after several changes in a row, and only for item info it actually shows.
+- The drop table window redraws once after several changes in a row, and only for item info it actually shows.
 - Names and levels of creatures you never killed, and that nobody sent counts of, stay in memory for the session and are not saved. Those saved by earlier versions are dropped at login.
 
 ### Fixed
 
-- The window you open or click comes to the front as a whole, and its frame lights up, instead of parts of two windows showing through each other.
-- Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the details window no longer jumps to it.
+- Two open windows could show through each other in parts. Now the window you open or click comes to the front as a whole, and its frame lights up.
+- Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the drop table window no longer jumps to it.
 - One player can no longer drag all chances of a mob down to zero with made-up empty kills. Another player's counts weigh at most 300 kills, and counts that claim far more empty corpses than everyone else are left out of the chances.
 - A group member's counts are taken only for their own install, and one member can bring at most 30 mobs a day that you have no counts of.
 - Each player gets one answer at a time however many questions they send, and only the player who asked can call off the answers to them.
-- An empty loot window is not put down to the wrong corpse when the interact key and the mouse are on two different ones; then neither counts.
+- An empty loot window is no longer put down to the wrong corpse when the interact key and the mouse are on two different ones. In that case neither one counts.
 - Loot you take right after casting at the next mob counts. Only skinning a corpse that showed no loot is left out.
 - A mob that a guard or another player finished counts when you open its corpse.
 - A corpse that had no loot at first and opens with loot later gives its loot.
 - Restore defaults moves open windows back to the middle, and the Debug messages checkbox opens and closes the DT Debug tab the way /dt debug does.
 - Copying the export text counts when you let go of Ctrl before C, and Cmd+C works on a Mac.
 - /dt on a friendly NPC opens the table without it, and /dt find keeps your capital letters.
-- In the Loot Finder the map button shows only for mobs you killed yourself, a new list starts at the top, and the zone list picks up zones from new kills.
+- In the Loot Finder the map button shows only for mobs you killed yourself, and a new list starts at the top. The zone list also picks up zones from new kills.
 - A long mob name no longer runs under the buttons in the title bar.
 
 ### Removed
