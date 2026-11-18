@@ -22,12 +22,8 @@ frame:SetScript("OnHide", function()
     ns.settings.detailsOpen = false
 end)
 
-local share = CreateFrame("Button", nil, frame)
+local share = Style.ShareButton(frame)
 share:SetPoint("TOPRIGHT", -36, -11)
-share.label = Style.Text(share, "label")
-share.label:SetPoint("RIGHT")
-share.label:SetText("SHARE")
-share:SetSize(share.label:GetStringWidth() + 4, 16)
 
 local function fitTitle()
     frame.title:SetWidth(math.max(40, frame:GetWidth() - 16 - (36 + share:GetWidth() + 12)))
@@ -35,20 +31,6 @@ local function fitTitle()
 end
 frame:HookScript("OnSizeChanged", fitTitle)
 fitTitle()
-share:SetScript("OnClick", function()
-    ns.ToggleExport()
-end)
-share:SetScript("OnEnter", function(self)
-    self.label:SetTextColor(unpack(C.text))
-    GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-    GameTooltip:SetText("Share my tables")
-    GameTooltip:AddLine("Copy your drop counts into the shared database, for every player's tables.", 1, 1, 1, true)
-    GameTooltip:Show()
-end)
-share:SetScript("OnLeave", function(self)
-    self.label:SetTextColor(unpack(C.gold))
-    GameTooltip:Hide()
-end)
 
 local shownNpc
 local shownItems = {} -- itemId -> true for the items the window lists

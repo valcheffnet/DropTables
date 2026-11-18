@@ -31,7 +31,8 @@ local frame = Style.Window("DropTablesFinder", 800, 500, 660, 320, "finderPos", 
 frame:SetPoint("CENTER", 0, 40)
 frame.title:SetText("Loot Finder")
 frame.subtitle:SetText("Which mobs drop an item, and where")
-Style.OpacitySlider(frame)
+local opacity = Style.OpacitySlider(frame)
+Style.ShareButton(frame):SetPoint("RIGHT", opacity.label, "LEFT", -16, 0)
 table.insert(UISpecialFrames, "DropTablesFinder")
 
 -- view is "category" (the items of a category) or "item" (the mobs that drop one item).

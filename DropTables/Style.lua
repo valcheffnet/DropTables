@@ -183,6 +183,7 @@ function Style.OpacitySlider(frame)
     local label = Style.Text(slider, "label")
     label:SetPoint("RIGHT", slider, "LEFT", -8, 0)
     label:SetText("OPACITY")
+    slider.label = label
     slider:SetScript("OnValueChanged", function(_, value, userInput)
         if userInput then
             ns.settings[frame.alphaKey] = value
@@ -198,6 +199,30 @@ function Style.OpacitySlider(frame)
     slider:SetScript("OnLeave", GameTooltip_Hide)
     frame.opacitySlider = slider
     return slider
+end
+
+-- The SHARE link of a title bar: opens the window with the export text. The caller places it.
+function Style.ShareButton(frame)
+    local share = CreateFrame("Button", nil, frame)
+    share.label = Style.Text(share, "label")
+    share.label:SetPoint("RIGHT")
+    share.label:SetText("SHARE")
+    share:SetSize(share.label:GetStringWidth() + 4, 16)
+    share:SetScript("OnClick", function()
+        ns.ToggleExport()
+    end)
+    share:SetScript("OnEnter", function(self)
+        self.label:SetTextColor(unpack(C.text))
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText("Share my tables")
+        GameTooltip:AddLine("Copy your drop counts into the shared database, for every player's tables.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    share:SetScript("OnLeave", function(self)
+        self.label:SetTextColor(unpack(C.gold))
+        GameTooltip:Hide()
+    end)
+    return share
 end
 
 local function syncSliders()

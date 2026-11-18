@@ -6,6 +6,7 @@
 
 - A shared database comes with the addon. It holds the counts from every `/dt export` players send, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
 - A share page for exports: paste the text from `/dt export` there and press Send, no account needed. A bot checks it and adds it to the shared database.
+- The Loot Finder has a SHARE link in its title bar, like the drop table window.
 - The Loot Finder item list has a Kills column: how many kills of the best mob its chance comes from. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
 
 ### Changed
