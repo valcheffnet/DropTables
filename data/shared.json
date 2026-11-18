@@ -1,5 +1,311 @@
 {
- "built": 0,
- "mobs": {},
- "submissions": 0
+ "built": 1794942367,
+ "mobs": {
+  "1529": {
+   "buckets": {
+    "1": {
+     "items": {
+      "118": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1415": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2140": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 9,
+       "max": 2,
+       "min": 1,
+       "qty": 15
+      },
+      "3319": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "4604": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      },
+      "6509": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "6513": {
+       "drops": 1,
+       "qty": 1
+      },
+      "7350": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "774": {
+       "drops": 1,
+       "qty": 1
+      },
+      "9759": {
+       "drops": 1,
+       "qty": 1
+      }
+     },
+     "kills": 39,
+     "lootable": 37,
+     "money": {
+      "copper": 315,
+      "drops": 36,
+      "max": 15,
+      "min": 2
+     },
+     "opened": 36
+    }
+   },
+   "from": {
+    "2750ad299c178787": 39
+   },
+   "maps": {
+    "1420": 14
+   },
+   "maxLevel": 10,
+   "minLevel": 9,
+   "name": "Bleeding Horror"
+  },
+  "1532": {
+   "buckets": {
+    "1": {
+     "items": {
+      "118": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "1181": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1417": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1423": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1430": {
+       "drops": 1,
+       "qty": 1
+      },
+      "1512": {
+       "drops": 1,
+       "qty": 1
+      },
+      "159": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 8,
+       "max": 2,
+       "min": 1,
+       "qty": 13
+      },
+      "3374": {
+       "drops": 1,
+       "qty": 1
+      },
+      "4604": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "6517": {
+       "drops": 1,
+       "qty": 1
+      },
+      "6520": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "774": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "9752": {
+       "drops": 1,
+       "qty": 1
+      }
+     },
+     "kills": 34,
+     "lootable": 33,
+     "money": {
+      "copper": 324,
+      "drops": 32,
+      "max": 17,
+      "min": 2
+     },
+     "opened": 32
+    }
+   },
+   "from": {
+    "2750ad299c178787": 34
+   },
+   "maps": {
+    "1420": 7
+   },
+   "maxLevel": 11,
+   "minLevel": 10,
+   "name": "Wandering Spirit"
+  },
+  "1548": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2672": {
+       "drops": 4,
+       "max": 1,
+       "min": 1,
+       "qty": 4
+      },
+      "3299": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "3300": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 5,
+     "lootable": 5,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 5
+    }
+   },
+   "from": {
+    "2750ad299c178787": 5
+   },
+   "maps": {
+    "1420": 3
+   },
+   "maxLevel": 8,
+   "minLevel": 7,
+   "name": "Cursed Darkhound"
+  },
+  "1554": {
+   "buckets": {
+    "1": {
+     "items": {
+      "12223": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      },
+      "6293": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "6296": {
+       "drops": 4,
+       "max": 1,
+       "min": 1,
+       "qty": 4
+      },
+      "7073": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "7074": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 8,
+     "lootable": 8,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 8
+    }
+   },
+   "from": {
+    "2750ad299c178787": 8
+   },
+   "maps": {
+    "1420": 7
+   },
+   "maxLevel": 9,
+   "minLevel": 8,
+   "name": "Vampiric Duskbat"
+  },
+  "4075": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 3,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 3
+   },
+   "maps": {
+    "1420": 3
+   },
+   "maxLevel": 1,
+   "minLevel": 1,
+   "name": "Rat"
+  }
+ },
+ "submissions": 1
 }
