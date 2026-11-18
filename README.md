@@ -2,7 +2,25 @@
 
 Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game.
 
-This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it from a web page. Everything sent there goes into a shared database that comes with the addon, so a new install already has chances for mobs you've never killed. That part is new and still being tested.
+This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it from a web page. Everything sent there goes into a shared database that comes with the addon, so a new install already has chances for mobs you've never killed.
+
+## Screenshots
+
+Target a mob and its likely drops show up as icons under the target frame, each with its chance.
+
+![Drop icons under the target frame of a Greater Plainstrider](screenshots/TargetedMob.png)
+
+Mouse over a mob and its tooltip lists what it drops and how often.
+
+![The tooltip of a Fleeting Plainstrider with its drop chances](screenshots/tooltip.png)
+
+The drop table window follows your target and shows where the kills behind each chance came from.
+
+![The drop table window for a Greater Plainstrider](screenshots/lootTable.png)
+
+The Loot Finder works the other way round. Pick an item and it shows which mobs drop it, where, and how often.
+
+![The Loot Finder showing the mobs that drop Strider Meat](screenshots/LootFinder.png)
 
 ## Download
 
