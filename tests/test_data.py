@@ -28,8 +28,8 @@ def form_body(*strings):
     return "### Export text\n\n```text\n%s\n```\n" % "\n".join(strings)
 
 
-def export_string(client, everything=True):
-    strings = client.ns.BuildExport(everything).strings
+def export_string(client):
+    strings = client.ns.BuildExport().strings
     return strings[1]
 
 
@@ -194,8 +194,8 @@ def issues_and_game(root):
     bob.fire("DT_DATA_CHANGED", 1)
     stats = bob.ns.GetStats(1, "all")
     expect("another player's counts already in the database count once", (stats.kills, stats.peerKills), (10, 0))
-    export = bob.ns.BuildExport(True)
-    expect("the shared database is never exported", len(list(export.strings.values())), 1)
+    export = bob.ns.BuildExport()
+    expect("neither the database nor counts it holds are exported", len(list(export.strings.values())), 0)
 
     # A mob the database knows well is asked about once a day, like one the player holds 100 corpses of.
     many = {origin(700): {2: mob({1: bucket(150, 150, 150, {100: 30})})}}
@@ -212,6 +212,30 @@ def issues_and_game(root):
     dave.see(2, "D2", 5)
     net.run(10)
     expect("not again the same day", net.sent("Dave", "Q|", start), [])
+
+
+def pruning(root):
+    """A player who sends everything each time leaves only the latest submission; the database stays the same."""
+    a, b = origin(900), origin(901)
+    first = submission(1, a, {a: {7: mob({1: bucket(50, 50, 40, {100: 10})})}, b: {8: mob({1: bucket(5, 5, 5)})}})
+    second = submission(2, a, {a: {7: mob({1: bucket(60, 60, 40, {100: 12})}), 9: mob({1: bucket(3, 3, 3)})},
+                               b: {8: mob({1: bucket(5, 5, 5)})}})
+    fewer_opened = submission(3, a, {a: {7: mob({1: bucket(70, 70, 30, {100: 12})})}, b: {8: mob({1: bucket(5, 5, 5)})}})
+    partial = submission(4, a, {a: {7: mob({1: bucket(80, 80, 80, {100: 16})})}})
+    other = submission(5, b, {a: {7: mob({1: bucket(90, 90, 90, {100: 18})})}, b: {8: mob({1: bucket(6, 6, 6)})}})
+    old = [x["issue"] for x in build_data.superseded([first, second, fewer_opened, partial, other])]
+    expect("only the fully covered submission goes", old, [1])
+    expect("more kills but fewer opened corpses covers nothing", build_data.superseded([first, fewer_opened]), [])
+    folder = root / "data" / "submissions"
+    folder.mkdir(parents=True)
+    for sub in (first, second, fewer_opened, partial, other):
+        (folder / ("%d-1.json" % sub["issue"])).write_text(json.dumps(sub), encoding="utf-8")
+    before = build_data.lua_file(build_data.build(build_data.load_submissions(root)))
+    build_data.main(["--root", str(root)])
+    expect("its file is deleted", sorted(p.name for p in folder.glob("*.json")),
+           ["2-1.json", "3-1.json", "4-1.json", "5-1.json"])
+    after = (root / "DropTables" / "Data.lua").read_text(encoding="utf-8")
+    expect("the database does not change", after, before)
 
 
 def shared_is_trusted():
@@ -291,6 +315,8 @@ def main():
         daily_limit(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:
         issue_list(pathlib.Path(folder))
+    with tempfile.TemporaryDirectory() as folder:
+        pruning(pathlib.Path(folder))
     report("shared data")
 
 

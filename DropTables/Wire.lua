@@ -138,19 +138,6 @@ function Wire.SourceRecords(npc, source, name)
     return records
 end
 
--- Kill spots of one of the player's own mobs.
-function Wire.CellRecords(npc, info)
-    local id = encodeNumber(npc)
-    local records = {}
-    for mapId, place in pairs(info.maps) do
-        local map = encodeNumber(mapId)
-        for cell, kills in pairs(place.cells) do
-            table.insert(records, "P" .. id .. "." .. map .. "." .. encodeNumber(cell) .. "." .. encodeNumber(kills))
-        end
-    end
-    return records
-end
-
 local function split(text, sep)
     local parts = {}
     for part in (text .. sep):gmatch("(.-)" .. sep:gsub("%p", "%%%0")) do

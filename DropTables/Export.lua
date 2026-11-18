@@ -1,7 +1,7 @@
 local _, ns = ...
 
 -- The export string: the player's counts, and the counts other players shared with them, as one line of text to
--- copy into the form for the shared database.
+-- paste on the share page, which files it for the shared database.
 --   DT1:<base64 of the zlib-compressed text below>
 -- The text is a header line, then a line with an install id and one line per mob of that install:
 --   DTX|1|<own install id>|<addon version>|<unix time>|<part>/<parts>
@@ -19,10 +19,19 @@ local REMIND_DELAY = 30     -- seconds after login
 
 local reminded = false
 
-local function changedCount()
+-- True when the shared database lacks the counts of this install: it never got them, or got fewer kills. Counts
+-- only grow, so more kills than the database lists means something new.
+local function missing(npc, origin, buckets)
+    local shared = ns.shared[npc]
+    local known = shared and shared.from[origin]
+    return not known or ns.SumBuckets(buckets, "kills") > known
+end
+
+-- Own mobs whose counts the shared database does not have yet.
+local function newCount()
     local count = 0
-    for npc in pairs(ns.db.export.dirty) do
-        if ns.db.mobs[npc] then
+    for npc, buckets in pairs(ns.db.mobs) do
+        if missing(npc, ns.db.installId, buckets) then
             count = count + 1
         end
     end
@@ -33,40 +42,18 @@ local function remind()
     if reminded or not ns.settings.exportReminder then
         return
     end
-    local count = changedCount()
+    local count = newCount()
     if count >= REMIND_AFTER then
         reminded = true
-        ns.Print(("You have new drop counts for %d mobs. Type /dt export to share them, so they help other players' tables too."):format(count))
+        ns.Print(("You have drop counts for %d mobs that the shared database does not have yet. Type /dt export to share them, so they help other players' tables too."):format(count))
     end
 end
-
-local function markDirty(npc)
-    local export = ns.db.export
-    export.change = export.change + 1
-    export.dirty[npc] = export.change
-end
-
-ns.On("DT_COUNTS_CHANGED", function(npc)
-    markDirty(npc)
-end)
-
-ns.On("DT_INFO_CHANGED", function(npc)
-    if ns.db.mobs[npc] then
-        markDirty(npc)
-    end
-end)
 
 ns.On("DT_DATA_CHANGED", remind)
 
 ns.On("DT_READY", function()
-    local db = ns.db
-    if not db.export then
-        -- First run with export: everything collected so far is new.
-        db.export = { dirty = {}, change = 0, last = 0 }
-        for npc in pairs(db.mobs) do
-            markDirty(npc)
-        end
-    end
+    -- Earlier versions kept track of what was copied; the shared database tells that now.
+    ns.db.export = nil
     C_Timer.After(REMIND_DELAY, remind)
 end)
 
@@ -74,19 +61,11 @@ function ns.CanExport()
     return C_EncodingUtil ~= nil and C_EncodingUtil.CompressString ~= nil and Enum.CompressionMethod ~= nil
 end
 
--- One line per mob, or nil when nothing complete is left to send.
+-- One line per mob, or nil when nothing complete is left to send. Kill spots stay out: the shared database has no use
+-- for them.
 local function ownLine(npc)
     local records = Wire.SourceRecords(npc, ns.OwnSource(npc), ns.db.names[npc])
-    if #records == 0 then
-        return nil
-    end
-    local info = ns.db.info[npc]
-    if info then
-        for _, record in ipairs(Wire.CellRecords(npc, info)) do
-            table.insert(records, record)
-        end
-    end
-    return table.concat(records, ";")
+    return #records > 0 and table.concat(records, ";") or nil
 end
 
 local function peerLine(npc, peer)
@@ -94,22 +73,19 @@ local function peerLine(npc, peer)
     return #records > 0 and table.concat(records, ";") or nil
 end
 
--- Sections { origin, lines } of what goes out: by default only own mobs changed since the last export and other
--- players' counts received since then (a repeat is harmless, counts replace counts); with everything, all of it.
-local function collect(everything)
+-- Sections { origin, lines } of what goes out: the player's own counts and the counts other players sent, of every
+-- mob where the shared database lacks them. Whatever was copied but never sent goes out again next time; a repeat is
+-- harmless, the database keeps one version per install and mob.
+local function collect()
     local db = ns.db
-    local export = db.export
-    local result = { sections = {}, versions = {}, mobs = 0, kills = 0, sources = 0 }
+    local result = { sections = {}, mobs = 0, kills = 0, sources = 0 }
     local own = { origin = db.installId, lines = {} }
     for npc, buckets in pairs(db.mobs) do
-        local line = (everything or export.dirty[npc]) and ownLine(npc)
+        local line = missing(npc, db.installId, buckets) and ownLine(npc)
         if line then
-            result.versions[npc] = export.dirty[npc]
             table.insert(own.lines, line)
             result.mobs = result.mobs + 1
-            for _, data in pairs(buckets) do
-                result.kills = result.kills + data.kills
-            end
+            result.kills = result.kills + ns.SumBuckets(buckets, "kills")
         end
     end
     if #own.lines > 0 then
@@ -118,7 +94,7 @@ local function collect(everything)
     local byOrigin = {}
     for npc, peers in pairs(db.peers) do
         for origin, peer in pairs(peers) do
-            local line = (everything or peer.t >= export.last) and peerLine(npc, peer)
+            local line = missing(npc, origin, peer.buckets) and peerLine(npc, peer)
             if line then
                 local section = byOrigin[origin]
                 if not section then
@@ -169,10 +145,10 @@ local function version()
     return get and get("DropTables", "Version") or "?"
 end
 
--- Builds the export. Returns { strings, mobs, kills, sources, versions, builtAt }; strings is empty when there is
--- nothing to share.
-function ns.BuildExport(everything)
-    local result = collect(everything)
+-- Builds the export. Returns { strings, mobs, kills, sources, builtAt }; strings is empty when there is nothing to
+-- share.
+function ns.BuildExport()
+    local result = collect()
     result.builtAt = time()
     result.strings = {}
     if #result.sections == 0 then
@@ -195,16 +171,5 @@ function ns.BuildExport(everything)
     end
 end
 
--- Called once every part has been copied: the exported counts stop counting as new.
-function ns.MarkExported(result)
-    local export = ns.db.export
-    for npc, change in pairs(result.versions) do
-        if export.dirty[npc] == change then
-            export.dirty[npc] = nil
-        end
-    end
-    export.last = math.max(export.last, result.builtAt)
-end
-
--- Own mobs whose counts changed since the last export.
-ns.ChangedCount = changedCount
+-- Own mobs whose counts the shared database does not have yet.
+ns.NewCount = newCount

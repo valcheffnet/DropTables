@@ -61,7 +61,7 @@ jobs:
       - name: Commit
         run: |
           set -euo pipefail
-          git add data DropTables/Data.lua
+          git add -A data DropTables/Data.lua
           if git diff --cached --quiet; then
             echo "Nothing changed."
             exit 0

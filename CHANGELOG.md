@@ -4,12 +4,14 @@
 
 ### Added
 
-- A shared database comes with the addon. It holds the counts from every `/dt export` sent on GitHub, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
-- Exports sent through the GitHub form are checked and added to the shared database by a bot, which replies in the issue.
+- A shared database comes with the addon. It holds the counts from every `/dt export` players send, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
+- A share page for exports: paste the text from `/dt export` there and press Send, no account needed. A bot checks it and adds it to the shared database.
 - The Loot Finder item list has a Kills column: how many kills of the best mob its chance comes from. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
 
 ### Changed
 
+- `/dt export` always holds everything of yours that the shared database doesn't have yet, plus what other players sent you. Copying the text and never sending it no longer leaves those counts out of later exports, and the Everything checkbox is gone.
+- Exports leave out kill spots, which the shared database doesn't use, so more mobs fit in one part.
 - A mob the shared database already knows well is asked about once a day, the same as one you've looted 100 times yourself.
 - The Loot Finder stays quick with a big table. It works out each mob's chances once and keeps them until that mob's counts change, and the search waits for you to stop typing.
 - The table window redraws once after several changes in a row, and only for item info it actually shows.
@@ -30,6 +32,10 @@
 - /dt on a friendly NPC opens the table without it, and /dt find keeps your capital letters.
 - In the Loot Finder the map button shows only for mobs you killed yourself, a new list starts at the top, and the zone list picks up zones from new kills.
 - A long mob name stops before the SHARE button.
+
+### Removed
+
+- The GitHub form for exports. The share page takes its place.
 
 ## [0.2.7] - 2026-11-18
 

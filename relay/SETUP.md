@@ -1,6 +1,6 @@
 # Share page setup
 
-The share page lets players send their `/dt export` text without a GitHub account. It is a Cloudflare Worker on the free plan: it checks the text, asks Cloudflare Turnstile whether the visitor is a person, and opens the same GitHub issue the share form opens. A GitHub App owned by the valcheffnet organization writes the issue, so nothing depends on one person's token.
+The share page lets players send their `/dt export` text without a GitHub account. It is a Cloudflare Worker on the free plan: it checks the text, asks Cloudflare Turnstile whether the visitor is a person, and opens a GitHub issue with the labels `share` and `relay`. The workflow `.github/workflows/merge-shares.yml` takes the issue in, adds the counts to the shared database and closes it. A GitHub App owned by the valcheffnet organization writes the issue, so nothing depends on one person's token.
 
 Everything below is done once. After that, a push to `main` that touches `relay/` deploys the page through `.github/workflows/deploy-relay.yml`, and anyone who is an owner of the organization can redo any step.
 

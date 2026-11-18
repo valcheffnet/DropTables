@@ -269,6 +269,30 @@ def shared_mob(chosen):
     return record
 
 
+def covered(older, newer):
+    """True when the newer submission has every install and mob of the older one with at least as many kills and
+    opened corpses, from the same exporter: the older one can no longer change the database."""
+    if older["result"]["exporter"] != newer["result"]["exporter"]:
+        return False
+    for origin, source in older["result"]["sources"].items():
+        later = newer["result"]["sources"].get(origin)
+        for npc, mob in source["mobs"].items():
+            other = later and later["mobs"].get(npc)
+            if not other:
+                return False
+            for bucket, data in mob["buckets"].items():
+                again = other["buckets"].get(bucket)
+                if not again or again["kills"] < data["kills"] or again["opened"] < data["opened"]:
+                    return False
+    return True
+
+
+def superseded(submissions):
+    """Submissions that a later submission covers; a player who sends everything each time leaves only the last."""
+    ordered = sorted(submissions, key=lambda s: (s["issue"], s["index"]))
+    return [old for i, old in enumerate(ordered) if any(covered(old, new) for new in ordered[i + 1:])]
+
+
 def build(submissions):
     """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}."""
     found = versions(submissions)
@@ -359,7 +383,11 @@ def write_outputs(root, database):
 
 def main(argv):
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
-    database = build(load_submissions(root))
+    submissions = load_submissions(root)
+    for old in superseded(submissions):
+        (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
+        submissions.remove(old)
+    database = build(submissions)
     changed = write_outputs(root, database)
     print("%d submissions, %d mobs%s" % (database["submissions"], len(database["mobs"]),
                                           "" if changed else ", nothing changed"))

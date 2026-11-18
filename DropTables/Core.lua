@@ -327,7 +327,7 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Print(("%d mobs, %d kills recorded. Empty-corpse check: %s."):format(mobs, kills,
             CanLootUnit and "available" or "not available, rates may read high"))
         ns.Print(ns.ShareStatus())
-        ns.Print(("%d of your mobs have new counts since your last /dt export."):format(ns.ChangedCount()))
+        ns.Print(("%d of your mobs have counts the shared database does not have yet (/dt export)."):format(ns.NewCount()))
     elseif msg == "export" then
         ns.ToggleExport()
     elseif msg == "debug" then

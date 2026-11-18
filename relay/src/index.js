@@ -1,5 +1,5 @@
-// Takes an export string from the web page and opens the same GitHub issue the share form would,
-// so players without a GitHub account can share. The string is checked for shape only; tools/check_export.py
+// Takes an export string from the web page and opens a GitHub issue for the merge workflow,
+// so players need no GitHub account to share. The string is checked for shape only; tools/check_export.py
 // decodes and validates the issues.
 
 const MAX_BODY = 256 * 1024;

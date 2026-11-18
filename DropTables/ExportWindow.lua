@@ -1,10 +1,10 @@
 local _, ns = ...
 
--- Shows the export string to copy and the link of the form to paste it into.
+-- Shows the export string to copy and the address of the share page to paste it on.
 local Style = ns.Style
 local C = Style.colors
 local TOP = Style.HEADER
-local FORM_URL = "https://github.com/valcheffnet/DropTables/issues/new?template=share-tables.yml"
+local PAGE_URL = "https://droptables-relay.valcheffnet.workers.dev"
 
 local frame = Style.Window("DropTablesExport", 520, 440, 420, 360, "exportPos", "exportSize", "detailsAlpha")
 frame.title:SetText("Share my tables")
@@ -12,40 +12,17 @@ table.insert(UISpecialFrames, "DropTablesExport")
 
 local result, part, copied
 
--- The form link carries a title, so the issue says what is in it without the player typing one.
-local function formUrl()
-    if not result or #result.strings == 0 then
-        return FORM_URL
-    end
-    local title = ("Drop tables: %d mobs, %d kills"):format(result.mobs, result.kills)
-    if #result.strings > 1 then
-        title = title .. (", part %d of %d"):format(part, #result.strings)
-    end
-    local encoded = title:gsub("[^%w%-%.]", function(char)
-        return ("%%%02X"):format(char:byte())
-    end)
-    return FORM_URL .. "&title=" .. encoded
-end
-
 local intro = Style.Text(frame, "body")
 intro:SetPoint("TOPLEFT", 16, -(TOP + 12))
 intro:SetPoint("RIGHT", -16, 0)
 intro:SetJustifyH("LEFT")
 intro:SetWordWrap(true)
-intro:SetText("Drop Tables gets better with every table players share. Press Select and then Ctrl+C, open the link "
-    .. "under the text in your browser and paste the text into the form. Your kills then help other players' tables, "
-    .. "the way theirs help yours.")
-
-local everything = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
-everything:SetSize(20, 20)
-everything:SetPoint("TOPLEFT", intro, "BOTTOMLEFT", -4, -8)
-everything.label = Style.Text(everything, "muted")
-everything.label:SetPoint("LEFT", everything, "RIGHT", 1, 0)
-everything.label:SetText("Everything, not only what is new since the last time")
-everything:SetHitRectInsets(0, -everything.label:GetStringWidth() - 4, 0, 0)
+intro:SetText("Drop Tables gets better with every table players share. Press Select and then Ctrl+C, open the page "
+    .. "under the text in your browser, paste the text there and press Send. You don't need an account. Your kills "
+    .. "then help other players' tables, the way theirs help yours.")
 
 local box = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-box:SetPoint("TOPLEFT", everything, "BOTTOMLEFT", 4, -8)
+box:SetPoint("TOPLEFT", intro, "BOTTOMLEFT", 0, -10)
 box:SetPoint("RIGHT", -16, 0)
 box:SetPoint("BOTTOM", 0, 118)
 box:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
@@ -75,11 +52,11 @@ status:SetWordWrap(true)
 
 local linkLabel = Style.Text(frame, "label")
 linkLabel:SetPoint("TOPLEFT", status, "BOTTOMLEFT", 0, -12)
-linkLabel:SetText("FORM")
+linkLabel:SetText("SHARE PAGE")
 local link = Style.Input(frame, 300, "")
 link.box:SetPoint("TOPLEFT", linkLabel, "BOTTOMLEFT", 0, -4)
 link.box:SetPoint("RIGHT", -16, 0)
-link:SetText(FORM_URL)
+link:SetText(PAGE_URL)
 
 local nextPart = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 nextPart:SetSize(110, 22)
@@ -120,7 +97,9 @@ local function readOnly(edit, value)
         frame:Hide()
     end)
 end
-readOnly(link, formUrl)
+readOnly(link, function()
+    return PAGE_URL
+end)
 readOnly(text, function()
     return result and result.strings[part] or ""
 end)
@@ -134,13 +113,12 @@ local function showPart()
     text:SetFocus()
     text:HighlightText()
     copyText:Show()
-    link:SetText(formUrl())
     nextPart:SetShown(count > 1)
     nextPart:SetEnabled(part < count)
     if count > 1 then
-        status:SetText(("Part %d of %d. Press Select, then Ctrl+C, and paste each part into its own form."):format(part, count))
+        status:SetText(("Part %d of %d. Press Select, then Ctrl+C, and send each part on the page by itself."):format(part, count))
     else
-        status:SetText("Press Select, then Ctrl+C, and paste it into the form.")
+        status:SetText("Press Select, then Ctrl+C, and paste it on the page.")
     end
     status:SetTextColor(unpack(C.text))
 end
@@ -155,7 +133,7 @@ local function build()
         status:SetTextColor(unpack(C.muted))
         return
     end
-    result = ns.BuildExport(everything:GetChecked())
+    result = ns.BuildExport()
     part, copied = 1, {}
     local summary = ("%d of your mobs, %d kills"):format(result.mobs, result.kills)
     if result.sources > 0 then
@@ -166,9 +144,8 @@ local function build()
     if #result.strings == 0 then
         text:SetText("")
         copyText:Hide()
-        link:SetText(formUrl())
         nextPart:Hide()
-        status:SetText("Nothing new since your last export. Tick Everything to export all of it again.")
+        status:SetText("Nothing to share: the shared database that came with the addon already has all your counts.")
         status:SetTextColor(unpack(C.muted))
         return
     end
@@ -184,13 +161,12 @@ text:SetScript("OnKeyDown", function(self, key)
     local count = #result.strings
     for i = 1, count do
         if not copied[i] then
-            status:SetText(("Part %d copied. Paste it into the form, then copy part %d."):format(part, i))
+            status:SetText(("Part %d copied. Send it on the page, then copy part %d."):format(part, i))
             status:SetTextColor(unpack(C.gold))
             return
         end
     end
-    ns.MarkExported(result)
-    status:SetText("Copied. Paste it into the form at the link below. Thank you!")
+    status:SetText("Copied. Paste it on the page at the address below and press Send. Thank you!")
     status:SetTextColor(unpack(C.gold))
 end)
 
@@ -199,7 +175,6 @@ nextPart:SetScript("OnClick", function()
     showPart()
 end)
 
-everything:SetScript("OnClick", build)
 frame:SetScript("OnShow", build)
 
 function ns.ToggleExport()

@@ -52,7 +52,7 @@ def main():
     alice.see(1, "A1", 5)
 
     expect("export available", ns.CanExport(), True)
-    result = ns.BuildExport(False)
+    result = ns.BuildExport()
     strings = lua_list(result.strings)
     expect("one part", len(strings), 1)
     parsed = checked(strings[0])
@@ -61,24 +61,21 @@ def main():
     expect("both mobs exported", sorted(mobs), ["1", "2"])
     expect("counts survive", json_view(mobs["1"]["buckets"]["1"]), bucket_view(ns.db.mobs[1][1]))
     expect("level and name", (mobs["1"]["levels"], mobs["1"]["name"]), ([5, 5], "Test Mob"))
-    expect("kill spots", mobs["1"]["cells"], {"1429": {str(k): v for k, v in plain(ns.db.info[1].maps[1429].cells).items()}})
+    expect("kill spots stay home", mobs["1"]["cells"], {})
     expect("summary counts", (result.mobs, result.kills, result.sources), (2, 3, 0))
 
-    # After copying, only what changes later goes out.
-    ns.MarkExported(result)
-    expect("nothing new", len(lua_list(ns.BuildExport(False).strings)), 0)
-    expect("nothing changed", ns.ChangedCount(), 0)
-    loot_mob(alice, 2, "B2", [(101, 1)])
-    parsed = checked(lua_list(ns.BuildExport(False).strings)[0])
-    expect("only the changed mob", sorted(parsed["sources"][own]["mobs"]), ["2"])
-    expect("everything on request", sorted(checked(lua_list(ns.BuildExport(True).strings)[0])["sources"][own]["mobs"]),
+    # Copying is no promise that it was sent: the same counts go out again until the shared database has them.
+    expect("everything again", sorted(checked(lua_list(ns.BuildExport().strings)[0])["sources"][own]["mobs"]),
            ["1", "2"])
-
-    # A kill between building and copying stays new.
-    pending = ns.BuildExport(False)
-    loot_mob(alice, 2, "B3", [(101, 1)])
-    ns.MarkExported(pending)
-    expect("kill after building still new", ns.ChangedCount(), 1)
+    expect("all mobs new", ns.NewCount(), 2)
+    ns.shared[1] = alice.lua.table_from({"from": alice.lua.table_from({own: 2}), "buckets": alice.lua.table()})
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
+    expect("a mob the database has is left out", sorted(parsed["sources"][own]["mobs"]), ["2"])
+    expect("one mob new", ns.NewCount(), 1)
+    loot_mob(alice, 1, "A4", [(100, 1)])
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
+    expect("more kills than the database has go out", sorted(parsed["sources"][own]["mobs"]), ["1", "2"])
+    ns.shared[1] = None
 
     # Counts other players whispered back go out in their own section (answers count only after asking).
     peer = "0123456789abcdef"
@@ -86,9 +83,13 @@ def main():
     alice.see(5, "P1", 2)
     alice.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|M5.1.a.a.a.0.0..;I5.1.2s.3.3.1.1;L5.2.3" % peer,
                "WHISPER", "Bob")
-    parsed = checked(lua_list(ns.BuildExport(False).strings)[0])
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("peer section", parsed["sources"][peer]["mobs"]["5"]["buckets"]["1"]["kills"], 10)
     expect("peer levels", parsed["sources"][peer]["mobs"]["5"]["levels"], [2, 3])
+    ns.shared[5] = alice.lua.table_from({"from": alice.lua.table_from({peer: 10}), "buckets": alice.lua.table()})
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
+    expect("another player's counts the database has stay out", peer in parsed["sources"], False)
+    ns.shared[5] = None
 
     # A half-received bucket of another player (items counted above its corpses) stays out of the export.
     other = "fedcba9876543210"
@@ -96,13 +97,13 @@ def main():
     alice.see(6, "P2", 2)
     alice.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|M6.1.2.2.2.0.0.." % other, "WHISPER", "Bob")
     alice.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|I6.1.2s.3.3.1.1" % other, "WHISPER", "Bob")
-    parsed = checked(lua_list(ns.BuildExport(True).strings)[0])
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("export with a half bucket still valid", isinstance(parsed, dict), True)
     expect("half bucket left out", isinstance(parsed, dict) and other in parsed["sources"], False)
 
     # Mob names come in the language of the game client.
     ns.db.names[2] = "Пещерен вълк"
-    parsed = checked(lua_list(ns.BuildExport(True).strings)[0])
+    parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("name in another language", isinstance(parsed, dict) and parsed["sources"][own]["mobs"]["2"]["name"],
            "Пещерен вълк")
 
@@ -120,7 +121,7 @@ def main():
                 money = { drops = 40, copper = math.random(1, 900000), min = 20, max = 200 } } }
         end
     """)
-    big = lua_list(ns.BuildExport(True).strings)
+    big = lua_list(ns.BuildExport().strings)
     expect("several parts", len(big) > 1, True)
     expect("every part fits", max(len(s) for s in big) <= 60000, True)
     seen = set()
