@@ -54,8 +54,9 @@ function ns.Print(msg)
     print("|cff66ccffDrop Tables|r " .. msg)
 end
 
--- /dt debug: a chat line for every sharing message in and out, for testing between players. The lines go to a chat
--- tab named "DT Debug", which /dt debug opens and closes again; without a free tab they go to the main window.
+-- /dt debug: a chat line for every sharing message in and out and every loot window, for testing between players.
+-- The lines go to a chat tab named "DT Debug", which /dt debug opens and closes again; without a free tab they go to
+-- the main window.
 local DEBUG_TAB = "DT Debug"
 
 local function findDebugFrame()
@@ -199,7 +200,6 @@ function ns.SumBuckets(buckets, field)
     return total
 end
 
--- "1-3" when the stack size varies, "2" when it never does; data recorded before ranges existed shows the average.
 -- Puts every setting back to its default and forgets window places and sizes; recorded drops are not touched.
 -- The same table stays in use, because the options panel holds on to it.
 function ns.RestoreDefaults()
@@ -212,6 +212,7 @@ function ns.RestoreDefaults()
     ns.Fire("DT_SETTINGS_CHANGED")
 end
 
+-- "1-3" when the stack size varies, "2" when it never does; data recorded before ranges existed shows the average.
 function ns.FormatStack(entry)
     if entry.min and entry.max then
         return entry.min == entry.max and tostring(entry.min) or (entry.min .. "-" .. entry.max)

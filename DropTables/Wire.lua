@@ -98,11 +98,10 @@ function Wire.Complete(data)
     return true
 end
 
--- One install's records of a mob: counts per bucket, level range, kills per map and the name; nothing at all when
--- no bucket is complete.
+-- One install's records of a mob: counts per bucket, level range, kills per map and the name, then the items, the
+-- most frequent first, so a message list cut short loses the rarest drops (mostly one-off world drops) and keeps the
+-- counts and the items that matter. Nothing at all when no bucket is complete.
 -- source is { buckets, minLevel, maxLevel, maps = { [mapId] = kills } }.
--- All records of one install's mob. Items come last, the most frequent first, so a message list cut short
--- loses the rarest drops (mostly one-off world drops) and keeps the counts and the items that matter.
 function Wire.SourceRecords(npc, source, name)
     local records, items = {}, {}
     for bucket, data in pairs(source.buckets) do
@@ -169,8 +168,6 @@ local FIELDS = {
 local REQUIRED = { npc = true, bucket = true, kills = true, lootable = true, opened = true, moneyDrops = true,
     copper = true, item = true, drops = true, qty = true, map = true, cell = true }
 
--- Counts that cannot come from the collector: an opened corpse is a lootable kill, an item or coin drops at most
--- once per opened corpse.
 -- A stack range is either missing or 1 <= min <= max.
 local function range(min, max)
     if min == nil or max == nil then
@@ -179,6 +176,8 @@ local function range(min, max)
     return min >= 1 and min <= max
 end
 
+-- Counts that cannot come from the collector: an opened corpse is a lootable kill, an item or coin drops at most
+-- once per opened corpse.
 local function consistent(r)
     if r.kind == "M" then
         return r.lootable <= r.kills and r.opened <= r.lootable and r.moneyDrops <= r.opened

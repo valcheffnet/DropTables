@@ -52,7 +52,8 @@ local RETRY = {
 local channelId
 local queue = {}     -- { text, at, chatType, target } waiting to go out
 local planned = {}   -- "<asker>:<npc>" -> { npc, target, due = { [origin] = time } } answers waiting to go out
-local asked = {}     -- npc -> { at, origins = { [origin] = true }, count, calledOff } of the player's last question
+-- npc -> { at, origins = { [origin] = true }, count, step, refresh, calledOff } of the player's last question
+local asked = {}
 local lastQuery = -QUERY_GAP
 local waiting = {}   -- npcs targeted while another question had just gone out, oldest first
 local knownOrigins   -- set of every install id the player holds counts of
@@ -480,14 +481,14 @@ end
 
 local BUDGET_KEY = { CHANNEL = "CHANNEL", WHISPER = "WHISPER", PARTY = "GROUP", RAID = "GROUP", INSTANCE_CHAT = "GROUP" }
 
--- Sends up to one channel message, one group message and a few whispers per tick; whispers outside instances have
--- no addon throttle.
 local function refreshChannel()
     local id = GetChannelName(CHANNEL)
     channelId = id and id > 0 and id or nil
     return channelId
 end
 
+-- Sends up to one channel message, one group message and a few whispers per tick; whispers outside instances have
+-- no addon throttle.
 local function tick()
     local now = GetTime()
     refreshChannel()
