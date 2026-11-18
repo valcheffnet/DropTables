@@ -28,6 +28,13 @@ share.label = Style.Text(share, "label")
 share.label:SetPoint("RIGHT")
 share.label:SetText("SHARE")
 share:SetSize(share.label:GetStringWidth() + 4, 16)
+
+local function fitTitle()
+    frame.title:SetWidth(math.max(40, frame:GetWidth() - 16 - (36 + share:GetWidth() + 12)))
+    frame.subtitle:SetWidth(math.max(40, frame:GetWidth() - 33))
+end
+frame:HookScript("OnSizeChanged", fitTitle)
+fitTitle()
 share:SetScript("OnClick", function()
     ns.ToggleExport()
 end)
@@ -44,6 +51,7 @@ share:SetScript("OnLeave", function(self)
 end)
 
 local shownNpc
+local shownItems = {} -- itemId -> true for the items the window lists
 local mode = "all"
 local tabs = {}
 local render
@@ -116,11 +124,13 @@ local itemHeader = Style.Header(frame, "Item")
 itemHeader:SetPoint("TOPLEFT", 16, headerY)
 itemHeader:SetPoint("RIGHT", frame, "RIGHT", -(SCROLLBAR_GAP + nameRight), 0)
 itemHeader:SetSorted(false)
+itemHeader:EnableMouse(false)
 for i, column in ipairs(COLUMNS) do
     local header = Style.Header(frame, column.label, "RIGHT")
     header:SetWidth(column.width)
     header:SetPoint("TOPRIGHT", -(SCROLLBAR_GAP + offsets[i]), headerY)
     header:SetSorted(i == 1, true)
+    header:EnableMouse(false)
 end
 
 local scroll, content = Style.ScrollList(frame)
@@ -240,6 +250,12 @@ function render()
     end
     frame.title:SetText(shownNpc and ns.MobName(shownNpc) or "Drop Tables")
     local stats = shownNpc and ns.GetStats(shownNpc, mode)
+    shownItems = {}
+    for _, entry in ipairs(stats and stats.list or {}) do
+        if entry.itemId then
+            shownItems[entry.itemId] = true
+        end
+    end
     local used = 0
     if not shownNpc then
         frame.subtitle:SetText("Drop chances of the mobs you meet")
@@ -333,11 +349,26 @@ ns.On("DT_READY", function()
     end
 end)
 
+-- A kill, a loot window and an answer from another player each change the counts, often within the same moment, and
+-- an options slider changes the settings on every step; one redraw a little later covers them all.
+local REDRAW_DELAY = 0.1
+local redrawPending = false
+local function redrawSoon()
+    if redrawPending or not frame:IsShown() then
+        return
+    end
+    redrawPending = true
+    C_Timer.After(REDRAW_DELAY, function()
+        redrawPending = false
+        if frame:IsShown() then
+            render()
+        end
+    end)
+end
+
 ns.On("DT_SETTINGS_CHANGED", function()
     syncToggles()
-    if frame:IsShown() then
-        render()
-    end
+    redrawSoon()
 end)
 
 ns.On("PLAYER_TARGET_CHANGED", function()
@@ -352,16 +383,17 @@ ns.On("PLAYER_TARGET_CHANGED", function()
 end)
 
 local function refresh(npc)
-    if frame:IsShown() and npc == shownNpc then
-        render()
+    if npc == shownNpc then
+        redrawSoon()
     end
 end
 ns.On("DT_DATA_CHANGED", refresh)
 ns.On("DT_INFO_CHANGED", refresh)
 
--- Item names arrive from the server after the first request; redraw once they do.
-ns.On("GET_ITEM_INFO_RECEIVED", function()
-    if frame:IsShown() then
-        render()
+-- Item names arrive from the server after the first request; redraw once they do. Items of other windows (bags,
+-- vendors, chat links) do not concern this one.
+ns.On("GET_ITEM_INFO_RECEIVED", function(itemId)
+    if shownItems[itemId] then
+        redrawSoon()
     end
 end)

@@ -135,6 +135,7 @@ def hold(client, npc, sources):
             peers["%s"] = { t = 1, maps = {}, buckets = { [1] = { kills = %d, lootable = %d, opened = %d,
                 items = { %s }, money = { drops = 0, copper = 0 } } } }
         """ % (npc, npc, origin, kills, kills, opened, item_table))
+        client.fire("DT_DATA_CHANGED", npc)
 
 
 def main():
@@ -169,8 +170,10 @@ def main():
     expect("peer kills counted", (stats.kills, stats.ownKills, stats.sources), (3, 0, 1))
     expect("another player's three corpses give chances at once", len(list(stats.list.values())) > 0, True)
     carol.ns.settings.onlyMine = True
+    carol.fire("DT_SETTINGS_CHANGED")
     expect("only mine hides peer counts", carol.ns.GetStats(1, "all"), None)
     carol.ns.settings.onlyMine = False
+    carol.fire("DT_SETTINGS_CHANGED")
 
     # Friendly NPCs drop nothing: targeting a flight master neither asks about it nor records it.
     start = len(net.log)
@@ -394,6 +397,9 @@ def main():
            carol.ns.db.peers[35][carol.ns.db.installId] if carol.ns.db.peers[35] else None, None)
     whisper(carol, "Olga", fake, ["Mz.1.a.a.a.0.0.."])
     expect("the same answer, well formed, is taken", carol.ns.db.peers[35][fake] is not None, True)
+    # Numbers have at most six base 36 digits; tonumber would cut longer ones at 2^32.
+    expect("six digits read", carol.ns.Wire.ReadNumber("zzzzzz"), 36 ** 6 - 1)
+    expect("seven digits refused", carol.ns.Wire.ReadNumber("1000000"), None)
 
     # At most twelve other installs per mob; the oldest go first, however big they are. One question takes at most
     # ten, so the twelve come from two questions.
@@ -447,6 +453,30 @@ def main():
     hold(carol, 11, {origin_id(113): (40, [(777, 3)])})
     expect("noisy rare source kept", rates_of(11)[777].drops, 2 * 3 + 3)
 
+    # Empty kills are checked as well: one install claiming thousands of kills with no loot does not pull every chance
+    # down, while one that found a few more empty corpses than the player still counts.
+    carol.lua.execute("""
+        local function bucket(kills, lootable, drops)
+            return { [1] = { kills = kills, lootable = lootable, opened = lootable,
+                items = drops > 0 and { [100] = { drops = drops, qty = drops } } or {},
+                money = { drops = 0, copper = 0 } } }
+        end
+        DropTablesDB.mobs[12] = bucket(20, 20, 10)
+        DropTablesDB.peers[12] = { ["%s"] = { t = 1, maps = {}, buckets = bucket(5000, 0, 0) } }
+    """ % origin_id(120))
+    carol.fire("DT_DATA_CHANGED", 12)
+    expect("fake empty kills left out", (round(rates_of(12)[100].rate, 3), carol.ns.GetStats(12, "all").kills),
+           (0.5, 20))
+    carol.lua.execute("""
+        DropTablesDB.peers[12]["%s"] = { t = 1, maps = {}, buckets = { [1] = { kills = 40, lootable = 36,
+            opened = 36, items = { [100] = { drops = 18, qty = 18 } }, money = { drops = 0, copper = 0 } } } }
+    """ % origin_id(121))
+    carol.fire("DT_DATA_CHANGED", 12)
+    expect("honest empty kills counted", round(rates_of(12)[100].rate, 3), round(56 / 60 * 28 / 56, 3))
+    # Another install counts as at most 300 kills, however few of its corpses it opened.
+    hold(carol, 13, {origin_id(130): (3000, [(100, 15)], 30)})
+    expect("kills of another install capped", carol.ns.GetStats(13, "all").kills, 300)
+
 
     # Party members send each other their own changed counts once a minute, without being asked.
     pat, quinn = Client("Pat"), Client("Quinn")
@@ -465,18 +495,24 @@ def main():
     net.run(130)
     expect("nothing changed, nothing sent", net.sent("Pat", "D|", start), [])
 
-    # Group members are taken under whatever name the server gives them ("First Last" on Forever), and bring as
-    # many installs as they have.
+    # Group members are taken under whatever name the server gives them ("First Last" on Forever). A member sends
+    # only their own install, so other installs from the same member are refused.
+    def from_member(sender, origin, records):
+        quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin, ";".join(records)), "PARTY", sender)
+
     for i in range(5):
-        quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(201 + i), ";".join(counts(21, 5, 5))),
-                   "PARTY", "Pat Ashwood")
-    expect("member not held to three new installs", len(plain(quinn.ns.db.peers[21])), 5)
+        from_member("Pat Ashwood", origin_id(201 + i), counts(21, 5, 5))
+    expect("one install per member", list(plain(quinn.ns.db.peers[21]).keys()), [origin_id(201)])
+    # A member brings at most 30 mobs a day that the player knows nothing of; mobs the player knows keep coming.
+    for npc in range(300, 340):
+        from_member("Rae Ashwood", origin_id(210), counts(npc, 5, 5))
+    expect("unknown mobs from one member capped", sum(1 for n in range(300, 340) if quinn.ns.db.peers[n]), 30)
+    from_member("Rae Ashwood", origin_id(210), counts(21, 7, 7))
+    expect("known mob still taken", quinn.ns.db.peers[21][origin_id(210)] is not None, True)
 
     # Counts split over two messages that claim more drops than looted corpses stay out of the chances.
-    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(230), ";".join(counts(27, 40, 40))),
-               "PARTY", "Pat Ashwood")
-    quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|I%s.1.%s.%s.%s.1.1" % (origin_id(230), b36(27), b36(100),
-               b36(120), b36(120)), "PARTY", "Pat Ashwood")
+    from_member("Sam Ashwood", origin_id(230), counts(27, 40, 40))
+    from_member("Sam Ashwood", origin_id(230), ["I%s.1.%s.%s.%s.1.1" % (b36(27), b36(100), b36(120), b36(120))])
     expect("both messages kept", quinn.ns.db.peers[27][origin_id(230)].buckets[1]["items"][100].drops, 120)
     stats = quinn.ns.GetStats(27, "all")
     impossible = [e for e in stats.list.values() if e.itemId == 100] if stats else []
@@ -537,6 +573,36 @@ def main():
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (quinn_id, b36(21)), "CHANNEL", "Quinn Ashwood")
     net.run(15)
     expect("own question not answered", [m for m in net.sent("Quinn", None, start) if m[2] == "WHISPER"], [])
+
+    def ask_pat(sender, asker=origin_id(250)):
+        pat.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (asker, b36(20)), "CHANNEL", sender)
+
+    def answers_to(sender, start):
+        return [m for m in net.sent("Pat", "D|", start) if m[3] == sender]
+
+    # A flood of questions from one player gets one answer, for the latest question.
+    start = len(net.log)
+    for i in range(300):
+        ask_pat("Flood Ashwood", origin_id(1000 + i))
+    net.run(15)
+    expect("one answer for a flood of questions", len(answers_to("Flood Ashwood", start)), 1)
+    # Many players at once: no more than 40 answers wait, so the queue cannot fill up.
+    start = len(net.log)
+    for i in range(60):
+        ask_pat("Asker%d" % i, origin_id(1400 + i))
+    net.run(40)
+    expect("answers capped while many wait", len(net.sent("Pat", "D|", start)), 40)
+    # Only the asker can call off the answers to them.
+    start = len(net.log)
+    ask_pat("Real Asker")
+    pat.fire("CHAT_MSG_ADDON", "DropTables", "C|%s|%s" % (origin_id(250), b36(20)), "CHANNEL", "Mallory")
+    net.run(15)
+    expect("someone else's call-off ignored", len(answers_to("Real Asker", start)), 1)
+    start = len(net.log)
+    ask_pat("Real Asker")
+    pat.fire("CHAT_MSG_ADDON", "DropTables", "C|%s|%s" % (origin_id(250), b36(20)), "CHANNEL", "Real Asker")
+    net.run(15)
+    expect("the asker's call-off taken", answers_to("Real Asker", start), [])
 
     # Not in the channel at first (a loading screen, the channel limit): the addon keeps trying, then asks.
     late = Client("Late")

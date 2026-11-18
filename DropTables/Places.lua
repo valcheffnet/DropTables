@@ -3,9 +3,14 @@ local _, ns = ...
 -- Where and at what level each mob was met: name and level range from target, mouseover and nameplates,
 -- and per map the number of kills plus the kill spots on a GRID x GRID grid (the player's position at the kill).
 local GRID = 50
+ns.GRID = GRID
 local MAX_CELLS = 40
 
-local placed = {} -- victim GUIDs already counted this session
+local PLACED_TTL = 900
+local placed = {} -- victim GUID -> when its kill was placed; kept a while against a second PARTY_KILL for it
+-- Names and levels of mobs without any counts stay in this session only: most of them are never killed (critters,
+-- mobs passed on the road). They are saved with the mob's first counts.
+local seen = {}   -- npc -> { name, minLevel, maxLevel, maps = {} }
 
 local function mobInfo(npc)
     local info = ns.db.info[npc]
@@ -37,12 +42,50 @@ local function playerSpot()
     return mapId, math.floor(x * GRID) * GRID + math.floor(y * GRID)
 end
 
+local function hasCounts(npc)
+    return ns.db.mobs[npc] or ns.db.info[npc] or ns.db.peers[npc]
+end
+
+-- Writes what was seen of the mob into the saved data; true when its level range changed.
+local function save(npc, sight)
+    if sight.name then
+        ns.db.names[npc] = sight.name
+    end
+    local info = mobInfo(npc)
+    local changed = false
+    if sight.minLevel and (not info.minLevel or sight.minLevel < info.minLevel) then
+        info.minLevel, changed = sight.minLevel, true
+    end
+    if sight.maxLevel and (not info.maxLevel or sight.maxLevel > info.maxLevel) then
+        info.maxLevel, changed = sight.maxLevel, true
+    end
+    return changed
+end
+
+-- Name and level range of a mob seen this session that has no saved data, or nil.
+function ns.SeenMob(npc)
+    return seen[npc]
+end
+
+local function forgetOldKills(now)
+    for guid, at in pairs(placed) do
+        if now - at > PLACED_TTL then
+            placed[guid] = nil
+        end
+    end
+end
+
 ns.On("PARTY_KILL", function(_, victim)
     local npc = ns.NpcFromGuid(victim)
     if not npc or placed[victim] then
         return
     end
-    placed[victim] = true
+    local now = GetTime()
+    forgetOldKills(now)
+    placed[victim] = now
+    if seen[npc] then
+        save(npc, seen[npc])
+    end
     local mapId, cell = playerSpot()
     if not mapId then
         return
@@ -71,25 +114,21 @@ local function remember(unit)
     if not npc then
         return
     end
+    local sight = seen[npc]
+    if not sight then
+        sight = { maps = {} }
+        seen[npc] = sight
+    end
     local name = UnitName(unit)
     if name and not ns.IsSecret(name) then
-        ns.db.names[npc] = name
+        sight.name = name
     end
     local level = UnitLevel(unit)
-    if not level or ns.IsSecret(level) or level <= 0 then
-        return
+    if level and not ns.IsSecret(level) and level > 0 then
+        sight.minLevel = math.min(sight.minLevel or level, level)
+        sight.maxLevel = math.max(sight.maxLevel or level, level)
     end
-    local info = mobInfo(npc)
-    local changed = false
-    if not info.minLevel or level < info.minLevel then
-        info.minLevel = level
-        changed = true
-    end
-    if not info.maxLevel or level > info.maxLevel then
-        info.maxLevel = level
-        changed = true
-    end
-    if changed then
+    if hasCounts(npc) and save(npc, sight) then
         ns.Fire("DT_INFO_CHANGED", npc)
     end
 end
@@ -104,4 +143,19 @@ end)
 
 ns.On("NAME_PLATE_UNIT_ADDED", function(unit)
     remember(unit)
+end)
+
+-- Earlier versions saved the name and level of every creature seen; those without any counts are dropped on login.
+ns.On("DT_READY", function()
+    local db = ns.db
+    for npc, info in pairs(db.info) do
+        if not db.mobs[npc] and not db.peers[npc] and not next(info.maps or {}) then
+            db.info[npc] = nil
+        end
+    end
+    for npc in pairs(db.names) do
+        if not db.mobs[npc] and not db.peers[npc] and not db.info[npc] then
+            db.names[npc] = nil
+        end
+    end
 end)

@@ -24,11 +24,14 @@ ns.SMALL_SAMPLE = 10
 
 local listeners = {}
 
--- Modules subscribe to game events and to the addon's own messages through ns.On / ns.Fire.
-function ns.On(event, callback)
+-- Modules subscribe to game events and to the addon's own messages through ns.On / ns.Fire. With unit, a unit event
+-- comes only for that unit: spell casts of every nameplate and raid member would otherwise arrive by the hundred.
+function ns.On(event, callback, unit)
     if not listeners[event] then
         listeners[event] = {}
-        if not event:find("^DT_") then
+        if unit then
+            ns.frame:RegisterUnitEvent(event, unit)
+        elseif not event:find("^DT_") then
             ns.frame:RegisterEvent(event)
         end
     end
@@ -93,6 +96,20 @@ local function closeDebugTab()
         FCF_Close(frame)
     end
 end
+
+-- The tab follows the setting, whoever changes it: /dt debug, the options checkbox or Restore defaults.
+local debugShown
+ns.On("DT_SETTINGS_CHANGED", function()
+    if ns.settings.debug == debugShown then
+        return
+    end
+    debugShown = ns.settings.debug
+    if debugShown then
+        openDebugTab()
+    else
+        closeDebugTab()
+    end
+end)
 
 function ns.Debug(text, ...)
     if ns.settings and ns.settings.debug then
@@ -273,7 +290,8 @@ end)
 SLASH_DROPTABLES1 = "/dt"
 SLASH_DROPTABLES2 = "/droptables"
 SlashCmdList.DROPTABLES = function(msg)
-    msg = strtrim(msg or ""):lower()
+    local text = strtrim(msg or "")
+    msg = text:lower()
     if msg == "options" or msg == "config" then
         ns.OpenOptions()
     elseif msg == "unlock" or msg == "lock" then
@@ -281,8 +299,8 @@ SlashCmdList.DROPTABLES = function(msg)
     elseif msg == "reset" then
         ns.ResetStripPosition()
     elseif msg == "find" or msg:find("^find ") then
-        local text = strtrim(msg:sub(5))
-        ns.ToggleFinder(text ~= "" and text or nil)
+        local search = strtrim(text:sub(5))
+        ns.ToggleFinder(search ~= "" and search or nil)
     elseif msg == "icons" or msg == "tooltip" or msg == "minimap" then
         local key = ({ icons = "showStrip", tooltip = "showTooltip", minimap = "showMinimap" })[msg]
         ns.settings[key] = not ns.settings[key]
@@ -306,15 +324,13 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.settings.debug = not ns.settings.debug
         ns.Fire("DT_SETTINGS_CHANGED")
         if ns.settings.debug then
-            openDebugTab()
             ns.Print("debug messages on, in the DT Debug chat tab. /dt debug again turns them off.")
             ns.Debug("%s", ns.ShareDebugState())
         else
-            closeDebugTab()
             ns.Print("debug messages off.")
         end
     else
-        ns.ToggleDetails(ns.UnitNpc("target"))
+        ns.ToggleDetails(ns.UnitMob("target"))
     end
 end
 
@@ -322,6 +338,6 @@ function DropTables_OnCompartmentClick(_, button)
     if button == "RightButton" then
         ns.OpenOptions()
     else
-        ns.ToggleDetails(ns.UnitNpc("target"))
+        ns.ToggleDetails(ns.UnitMob("target"))
     end
 end

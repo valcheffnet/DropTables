@@ -20,8 +20,13 @@ units = {}         -- unit token -> guid
 outbox = {}        -- addon messages sent: { prefix, text, chatType, target }
 sendResult = 0
 
+registeredEvents = {}  -- event -> true, or the unit it was registered for
 function CreateFrame()
-    return { RegisterEvent = function() end, SetScript = function() end }
+    return {
+        RegisterEvent = function(_, event) registeredEvents[event] = true end,
+        RegisterUnitEvent = function(_, event, unit) registeredEvents[event] = unit end,
+        SetScript = function() end,
+    }
 end
 function strsplit(sep, s)
     local out = {}
@@ -57,7 +62,8 @@ function IsEncounterInProgress() return false end
 function CanLootUnit(guid) return lootable[guid] end
 function UnitGUID(unit) return units[unit] end
 friendly = {}      -- unit token -> true for a living creature the player cannot attack (flight master, vendor)
-function UnitIsDead(unit) return units[unit] ~= nil and not friendly[unit] end
+alive = {}         -- unit token -> true for a living hostile creature (a pickpocket target)
+function UnitIsDead(unit) return units[unit] ~= nil and not friendly[unit] and not alive[unit] end
 function UnitCanAttack(_, unit) return units[unit] ~= nil and not friendly[unit] end
 function UnitName(unit)
     local index = tonumber(unit:match("^party(%d+)$") or "")
@@ -155,6 +161,28 @@ function advance(seconds)
         end
     end
 end
+"""
+
+# Lua run before the addon loads, for tests of the windows: any field of a frame is another stub that can also be
+# called, Show and Hide are remembered, GetText returns "" and other Get* methods return 1.
+UI_STUBS = """
+function widget(name)
+    local w = { shown = true }
+    if name then _G[name] = w end
+    return setmetatable(w, { __index = function(_, key)
+        if key == "Show" then return function(self) self.shown = true end end
+        if key == "Hide" then return function(self) self.shown = false end end
+        if key == "SetShown" then return function(self, value) self.shown = value and true or false end end
+        if key == "IsShown" then return function(self) return self.shown end end
+        if key == "GetText" then return function() return "" end end
+        if key:find("^Get") then return function() return 1 end end
+        return widget()
+    end, __call = function() return widget() end })
+end
+function CreateFrame(_, name) return widget(name) end
+UIParent, GameTooltip, EventRegistry = widget(), widget(), widget()
+function CreateFont() return widget() end
+function CreateColor() return widget() end
 """
 
 ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua", "Export.lua", "Stats.lua",

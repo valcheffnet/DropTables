@@ -33,7 +33,9 @@ def main():
     c.see(1, "a", 5)
     c.see(1, "b", 7, unit="mouseover")
     c.see(1, "c", -1)
-    expect("level range", (ns.db.info[1].minLevel, ns.db.info[1].maxLevel), (5, 7))
+    expect("level range", (ns.MobInfo(1).minLevel, ns.MobInfo(1).maxLevel), (5, 7))
+    expect("name known", ns.MobName(1), "Test Mob")
+    expect("not saved before the first counts", (ns.db.info[1], ns.db.names[1]), (None, None))
 
     # Mob 1 (levels 5-7) in zone 12: three kills, two at one spot.
     c.stand(12, 0.411, 0.302)
@@ -41,6 +43,8 @@ def main():
     kill_and_loot(c, 1, "k2", [cloth])
     c.stand(12, 0.8, 0.8)
     kill_and_loot(c, 1, "k3", [fang])
+    expect("saved with the first kill", (ns.db.info[1].minLevel, ns.db.info[1].maxLevel, ns.db.names[1]),
+           (5, 7, "Test Mob"))
     place = ns.db.info[1].maps[12]
     expect("zone kills", place.kills, 3)
     cell = 20 * 50 + 15
@@ -141,6 +145,36 @@ def main():
     expect("sorted by mobs", [s.itemId for s in lua_list(ns.SortSummaries(ordered, "mobs", True))], [2589, 100])
     expect("sorted by chance ascending", [s.itemId for s in lua_list(ns.SortSummaries(ordered, "rate", False))],
            [100, 2589])
+
+    # The droppers are kept between calls and follow new loot, new mobs and new levels.
+    kill_and_loot(c, 2, "k5", [cloth])
+    after = {d.npc: d for d in lua_list(ns.FindDroppers(2589))}
+    expect("new loot moves the chance", round(after[2].rate, 4), 0.4)
+    kill_and_loot(c, 5, "k1", [fang])
+    expect("a new mob shows up", sorted(d.npc for d in lua_list(ns.FindDroppers(100))), [1, 5])
+    c.see(5, "a", 20)
+    expect("a new level shows up", [d.minLevel for d in lua_list(ns.FindDroppers(100)) if d.npc == 5], [20])
+    # Counts from other players come with DT_DATA_CHANGED alone.
+    c.lua.execute("""
+        DropTablesDB.peers[6] = { other = { t = 1, maps = {}, buckets = { [1] = { kills = 4, lootable = 4, opened = 4,
+            items = { [100] = { drops = 2, qty = 2 } }, money = { drops = 0, copper = 0 } } } } }
+    """)
+    c.fire("DT_DATA_CHANGED", 6)
+    expect("a mob from other players shows up", sorted(d.npc for d in lua_list(ns.FindDroppers(100))), [1, 5, 6])
+    ns.settings.onlyMine = True
+    c.fire("DT_SETTINGS_CHANGED")
+    expect("a settings change rebuilds them", sorted(d.npc for d in lua_list(ns.FindDroppers(100))), [1, 5])
+    ns.settings.onlyMine = False
+    c.fire("DT_SETTINGS_CHANGED")
+
+    # Names and levels saved by earlier versions for creatures without any counts are dropped on login.
+    old = Client("Old", saved="""DropTablesDB = {
+        mobs = { [1] = { [1] = { kills = 1, lootable = 0, opened = 0, items = {}, money = { drops = 0, copper = 0 } } } },
+        names = { [1] = "Wolf", [2] = "Rabbit" },
+        info = { [1] = { minLevel = 5, maxLevel = 5, maps = {} }, [2] = { minLevel = 1, maxLevel = 1, maps = {} } },
+    }""")
+    expect("sightings without counts dropped", (old.ns.db.names[2], old.ns.db.info[2]), (None, None))
+    expect("mobs with counts kept", (old.ns.db.names[1], old.ns.db.info[1].minLevel), ("Wolf", 5))
 
     report("finder")
 

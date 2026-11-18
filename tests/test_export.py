@@ -146,6 +146,7 @@ def main():
         "too long": "DT1:" + "A" * 200001,
         "bomb": pack(header + "\n".join(["M1.1.a.a.a.0.0.."] * 200_000)),
         "number too long": pack(header + "M1.1.123456789.a.a.0.0.."),
+        "seven-digit number": pack(header + "M1.1.1000000.a.a.0.0.."),
         "item above opened": pack(header + "M1.1.5.5.5.0.0..;I1.1.2s.6.6.1.1"),
         "stack size 0": pack(header + "M1.1.5.5.5.0.0..;I1.1.2s.1.1.0.3"),
         "lua in place of records": pack(header + "os.execute('rm -rf /')"),

@@ -130,15 +130,16 @@ function Style.Window(name, width, height, minWidth, minHeight, positionKey, siz
     end)
     grip:SetScript("OnMouseUp", savePlacement)
 
-    -- Restores the saved place and size once settings exist.
+    -- Puts the window at its saved place and size, or at the default ones when none is saved (first start,
+    -- Restore defaults).
     function frame:RestorePlacement()
         local size, pos = ns.settings[sizeKey], ns.settings[positionKey]
-        if size then
-            self:SetSize(size[1], size[2])
-        end
+        self:SetSize(size and size[1] or width, size and size[2] or height)
+        self:ClearAllPoints()
         if pos then
-            self:ClearAllPoints()
             self:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4])
+        else
+            self:SetPoint("CENTER")
         end
     end
 
@@ -348,8 +349,11 @@ function Style.Header(parent, label, justify)
         self.arrow:SetShown(active)
         self.arrow:SetTexture(descending and "Interface\\Buttons\\Arrow-Down-Up" or "Interface\\Buttons\\Arrow-Up-Up")
         self.arrow:ClearAllPoints()
-        if self.text:GetJustifyH() == "RIGHT" then
+        local justify = self.text:GetJustifyH()
+        if justify == "RIGHT" then
             self.arrow:SetPoint("RIGHT", self.text, "RIGHT", -self.text:GetStringWidth() - 2, 1)
+        elseif justify == "CENTER" then
+            self.arrow:SetPoint("LEFT", self.text, "CENTER", self.text:GetStringWidth() / 2 + 2, 1)
         else
             self.arrow:SetPoint("LEFT", self.text, "LEFT", self.text:GetStringWidth() + 2, 1)
         end
@@ -380,6 +384,13 @@ local function applyAll()
     Style.ApplyOpacity()
     syncSliders()
 end
+
+-- After Restore defaults the saved places are gone; open windows move back at once.
+ns.On("DT_SETTINGS_CHANGED", function()
+    for _, frame in ipairs(windows) do
+        frame:RestorePlacement()
+    end
+end)
 
 ns.On("DT_READY", applyAll)
 ns.On("DT_SETTINGS_CHANGED", applyAll)

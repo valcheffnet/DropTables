@@ -67,11 +67,21 @@ end
 -- Sidebar: search, quality switches and the category tree.
 search = Style.Input(frame, SIDEBAR - 24, "Search looted items", "Interface\\Common\\UI-Searchbox-Icon")
 search.box:SetPoint("TOPLEFT", 12, -(TOP + 12))
+-- Typing redraws once the keys pause, not on every letter.
+local SEARCH_DELAY = 0.25
+local searchPending = false
 search:HookScript("OnTextChanged", function(self, userInput)
     if userInput then
         category, view = "all", "category"
     end
-    selectCategory(category)
+    if searchPending then
+        return
+    end
+    searchPending = true
+    C_Timer.After(SEARCH_DELAY, function()
+        searchPending = false
+        selectCategory(category)
+    end)
 end)
 
 local qualityLabel = Style.Text(frame, "label")
@@ -455,7 +465,7 @@ local function mobRow(index)
         self.icon:SetAlpha(1)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("Show on map")
-        GameTooltip:AddLine("Marks where this mob was killed and sets a waypoint.", 1, 1, 1, true)
+        GameTooltip:AddLine("Marks where you killed this mob and sets a waypoint.", 1, 1, 1, true)
         GameTooltip:Show()
     end)
     row.map:SetScript("OnLeave", function(self)
@@ -552,7 +562,8 @@ local function renderMobs()
         row.cells.rate:SetAlpha(dropper.small and 0.6 or 1)
         row.bar:SetChance(dropper.rate, MOB_COLUMNS[4].width)
         row.cells.drops:SetText(dropper.drops .. "/" .. dropper.opened)
-        row.map:SetShown(#dropper.maps > 0)
+        local own = ns.db.info[dropper.npc]
+        row.map:SetShown(own ~= nil and next(own.maps) ~= nil)
         row:Show()
     end
     mobTable:Finish(#list, "No mob matches", "Widen the zone or level filter.")
@@ -596,9 +607,20 @@ function renderMain()
     end
 end
 
+local function checkCategory()
+    local _, _, fallback = categoryContents(category)
+    if fallback and category ~= "all" then
+        category = "all"
+        ns.settings.finderCategory = category
+    end
+end
+
+-- A new list starts at its top.
 function selectCategory(key)
     view, category = "category", key
     ns.settings.finderCategory = key
+    checkCategory()
+    itemTable.scroll:SetVerticalScroll(0)
     renderTree()
     renderMain()
 end
@@ -607,6 +629,7 @@ function selectItem(itemId)
     view, selectedItem = "item", itemId
     droppers = ns.FindDroppers(itemId)
     setupZones(ns.DropperMaps(droppers))
+    mobTable.scroll:SetVerticalScroll(0)
     renderTree()
     renderMain()
 end
@@ -658,6 +681,9 @@ local function redraw()
     end
     if view == "item" then
         droppers = ns.FindDroppers(selectedItem)
+        setupZones(ns.DropperMaps(droppers))
+    else
+        checkCategory()
     end
     renderTree()
     renderMain()

@@ -2,9 +2,27 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The Loot Finder stays quick with a big table. It works out each mob's chances once and keeps them until that mob's counts change, and the search waits for you to stop typing.
+- The table window redraws once after several changes in a row, and only for item info it actually shows.
+- Names and levels of creatures you never killed, and that nobody sent counts of, stay in memory for the session and are not saved. Those saved by earlier versions are dropped at login.
+
 ### Fixed
 
 - Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the details window no longer jumps to it.
+- One player can no longer drag all chances of a mob down to zero with made-up empty kills. Another player's counts weigh at most 300 kills, and counts that claim far more empty corpses than everyone else are left out of the chances.
+- A group member's counts are taken only for their own install, and one member can bring at most 30 mobs a day that you have no counts of.
+- Each player gets one answer at a time however many questions they send, and only the player who asked can call off the answers to them.
+- An empty loot window is not put down to the wrong corpse when the interact key and the mouse are on two different ones; then neither counts.
+- Loot you take right after casting at the next mob counts. Only skinning a corpse that showed no loot is left out.
+- A mob that a guard or another player finished counts when you open its corpse.
+- A corpse that had no loot at first and opens with loot later gives its loot.
+- Restore defaults moves open windows back to the middle, and the Debug messages checkbox opens and closes the DT Debug tab the way /dt debug does.
+- Copying the export text counts when you let go of Ctrl before C, and Cmd+C works on a Mac.
+- /dt on a friendly NPC opens the table without it, and /dt find keeps your capital letters.
+- In the Loot Finder the map button shows only for mobs you killed yourself, a new list starts at the top, and the zone list picks up zones from new kills.
+- A long mob name stops before the SHARE button.
 
 ## [0.2.7] - 2026-11-18
 

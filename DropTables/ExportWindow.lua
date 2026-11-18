@@ -175,8 +175,9 @@ local function build()
     showPart()
 end
 
-text:SetScript("OnKeyUp", function(self, key)
-    if key ~= "C" or not IsControlKeyDown() or not result or not result.strings[part] then
+text:SetScript("OnKeyDown", function(self, key)
+    local copyKey = IsControlKeyDown() or (IsMetaKeyDown and IsMetaKeyDown())
+    if key ~= "C" or not copyKey or not result or not result.strings[part] then
         return
     end
     copied[part] = true

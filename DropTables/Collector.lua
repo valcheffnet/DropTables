@@ -6,13 +6,18 @@ local MONEY_SLOT = 2
 local FIRST_CHECK = 1.5
 local FINAL_CHECK = 4
 local PENDING_TTL = 900
--- Skinning, mining, herbs and chests are spells with a cast time and open the loot window as they finish; plain
--- corpse loot needs no cast. Loot opened this soon after such a cast is profession loot.
+-- Skinning is a spell with a cast time and opens the loot window of the corpse as it finishes; plain corpse loot
+-- needs no cast. Loot opened this soon after such a cast is profession loot, unless the corpse was known to hold loot:
+-- a caster may loot one corpse right after a cast at the next mob.
 local CAST_LOOT_WINDOW = 1
+-- Units that can show the corpse whose loot window is open.
+local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 
 -- Kills waiting for their corpse to be checked or looted, by victim GUID. States:
 -- checking: loot state not known yet; lootable: has loot, kill counted; unknown: CanLootUnit gave no answer;
--- done: empty kill counted or corpse already recorded.
+-- empty: no loot at the last check, kill counted (opened later with loot after all, the loot still counts);
+-- unclaimed: in a group, no loot for the player at the last check, often someone else's corpse, nothing counted;
+-- done: the corpse is recorded.
 local pending = {}
 local casting, lastCastEnd = false, -math.huge
 
@@ -68,11 +73,11 @@ local function check(guid, final)
     elseif final then
         if loot == false and kill.bucket > 1 then
             -- In a group a corpse can be someone else's to loot, which looks the same as an empty one.
-            kill.state = "done"
+            kill.state = "unclaimed"
         elseif loot == false then
             local data = bucketData(kill.npc, kill.bucket)
             data.kills = data.kills + 1
-            kill.state = "done"
+            kill.state = "empty"
             ns.Fire("DT_DATA_CHANGED", kill.npc)
         else
             kill.state = "unknown"
@@ -113,7 +118,9 @@ local function claim(guid)
     end
     local data = bucketData(kill.npc, kill.bucket)
     if kill.state ~= "lootable" then
-        data.kills = data.kills + 1
+        if kill.state ~= "empty" then
+            data.kills = data.kills + 1
+        end
         data.lootable = data.lootable + 1
     end
     data.opened = data.opened + 1
@@ -121,10 +128,14 @@ local function claim(guid)
     return kill, data
 end
 
+local function emptyCandidate(kill)
+    return kill and kill.state ~= "done" and kill.state ~= "empty"
+end
+
 -- A corpse that sparkled but opened with nothing in it is an empty corpse: the kill counts, the loot does not.
 local function claimEmpty(guid)
     local kill = pending[guid]
-    if not kill or kill.state == "done" then
+    if not emptyCandidate(kill) then
         return nil
     end
     local data = bucketData(kill.npc, kill.bucket)
@@ -135,6 +146,32 @@ local function claimEmpty(guid)
     end
     kill.state = "done"
     return kill
+end
+
+-- The GUID of a dead creature under one of the units, or nil. Unreadable values count as no answer.
+local function deadUnitGuid(unit)
+    local guid, dead = UnitGUID(unit), UnitIsDead(unit)
+    if type(guid) ~= "string" or ns.IsSecret(guid) or ns.IsSecret(dead) or not dead then
+        return nil
+    end
+    return guid
+end
+
+-- A corpse of a mob that no one in the group finished (a guard, another player or a damage over time effect after
+-- leaving the group) has no PARTY_KILL. Its kill is taken when the player opens it while it is under the interact
+-- key, the mouse or the target. A living mob (pickpocketing) is not a corpse.
+local function lateKill(guid)
+    local npc = ns.NpcFromGuid(guid)
+    if not npc then
+        return
+    end
+    for _, unit in ipairs(CORPSE_UNITS) do
+        if deadUnitGuid(unit) == guid then
+            pending[guid] = { npc = npc, bucket = groupBucket(), at = GetTime(), state = "checking" }
+            ns.Debug("  %s was finished by someone else, counted from its corpse", ns.MobName(npc))
+            return
+        end
+    end
 end
 
 local function isQuestItem(itemId, questFlag)
@@ -148,31 +185,28 @@ local function addStack(entry, totalKey, amount)
     entry.max = math.max(entry.max or amount, amount)
 end
 
-ns.On("UNIT_SPELLCAST_START", function(unit)
-    if unit == "player" then
-        casting = true
-    end
-end)
+ns.On("UNIT_SPELLCAST_START", function()
+    casting = true
+end, "player")
 
-ns.On("UNIT_SPELLCAST_SUCCEEDED", function(unit)
-    if unit == "player" and casting then
+ns.On("UNIT_SPELLCAST_SUCCEEDED", function()
+    if casting then
         casting, lastCastEnd = false, GetTime()
     end
-end)
+end, "player")
 
-local function castEnded(unit)
-    if unit == "player" then
-        casting = false
-    end
+local function castEnded()
+    casting = false
 end
-ns.On("UNIT_SPELLCAST_INTERRUPTED", castEnded)
-ns.On("UNIT_SPELLCAST_FAILED", castEnded)
+ns.On("UNIT_SPELLCAST_INTERRUPTED", castEnded, "player")
+ns.On("UNIT_SPELLCAST_FAILED", castEnded, "player")
 
 ns.On("LOOT_OPENED", function(_, fromItem)
-    if fromItem or GetTime() - lastCastEnd < CAST_LOOT_WINDOW then
-        ns.Debug("loot window skipped: %s", fromItem and "from an item" or "right after a cast (skinning, herbs, ore, chest)")
+    if fromItem then
+        ns.Debug("loot window skipped: from an item")
         return
     end
+    local afterCast = GetTime() - lastCastEnd < CAST_LOOT_WINDOW
     -- found[guid] collects one corpse's items and money across all slots before they are counted,
     -- so an item split over two slots still counts as one drop with its full stack.
     local claims, found, changed = {}, {}, {}
@@ -182,11 +216,20 @@ ns.On("LOOT_OPENED", function(_, fromItem)
             return nil
         end
         if claims[guid] == nil then
-            local kill, data = claim(guid)
+            local kill = pending[guid]
+            if afterCast and not (kill and kill.state == "lootable") then
+                claims[guid] = false
+                ns.Debug("  loot right after a cast (skinning) left out")
+                return nil
+            end
+            if not kill then
+                lateKill(guid)
+            end
+            local claimed, data = claim(guid)
             claims[guid] = data or false
-            if kill then
+            if claimed then
                 found[guid] = { items = {}, money = 0 }
-                changed[kill.npc] = true
+                changed[claimed.npc] = true
             end
         end
         return claims[guid] or nil
@@ -236,16 +279,22 @@ ns.On("LOOT_OPENED", function(_, fromItem)
     end
 
     -- A corpse that sparkled but opened empty has no slots to name it; the corpse the interact key or the mouse
-    -- is on does. The target is left out: it is often another corpse killed after this one.
+    -- is on does. The target is left out: it is often another corpse killed after this one. When the two show
+    -- different corpses of the player's kills, nothing tells which one was opened, and neither is counted.
     if count == 0 then
+        local chosen, candidates = nil, 0
         for _, unit in ipairs({ "softinteract", "mouseover" }) do
-            local guid = UnitGUID(unit)
-            local kill = UnitIsDead(unit) and type(guid) == "string" and not ns.IsSecret(guid) and claimEmpty(guid)
-            if kill then
-                changed[kill.npc] = true
-                ns.Debug("loot window empty: %s counted as a corpse that left nothing", ns.MobName(kill.npc))
-                break
+            local guid = deadUnitGuid(unit)
+            if guid and guid ~= chosen and emptyCandidate(pending[guid]) then
+                chosen, candidates = guid, candidates + 1
             end
+        end
+        local kill = candidates == 1 and claimEmpty(chosen)
+        if kill then
+            changed[kill.npc] = true
+            ns.Debug("loot window empty: %s counted as a corpse that left nothing", ns.MobName(kill.npc))
+        elseif candidates > 1 then
+            ns.Debug("loot window empty: the interact key and the mouse are on two corpses, neither counted")
         end
     elseif not next(found) then
         ns.Debug("loot window with %d slots from no kill of yours", count)

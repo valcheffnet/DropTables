@@ -85,53 +85,35 @@ function ns.BuildItemTree(items)
     return tree
 end
 
-local function bucketsDrop(buckets, itemId)
-    for _, data in pairs(buckets) do
-        if data.items[itemId] then
-            return true
-        end
-    end
-    return false
-end
+-- The droppers of every item, built from one GetStats per mob. A mob's entries are rebuilt only after its counts or
+-- info change, all of them after a settings change; the Loot Finder asks for hundreds of items per redraw.
+local byNpc = {}      -- npc -> { [itemId] = dropper } from the mob's current chances
+local dirty = {}      -- npcs whose entries are out of date
+local allDirty = true
+local index           -- itemId -> { dropper, ... }, nil while it needs rebuilding
 
-local function dropsItem(npc, itemId)
-    if ns.db.mobs[npc] and bucketsDrop(ns.db.mobs[npc], itemId) then
-        return true
+-- One dropper per item in the mob's chances. The counts can hold an item while the chances leave it out (an install
+-- far off the rest); such an item has no dropper here.
+local function droppersOf(npc)
+    local stats = ns.GetStats(npc, "all")
+    local found = {}
+    if not stats then
+        return found
     end
-    if not ns.settings.onlyMine then
-        for _, peer in pairs(ns.db.peers[npc] or {}) do
-            if bucketsDrop(peer.buckets, itemId) then
-                return true
-            end
-        end
+    local info = ns.MobInfo(npc)
+    local maps = {}
+    for mapId, place in pairs(info and info.maps or {}) do
+        table.insert(maps, { mapId = mapId, kills = place.kills })
     end
-    return false
-end
-
--- Every mob with recorded drops of the item, with its chance over all kills, level range and maps by kill count.
-function ns.FindDroppers(itemId)
-    local results = {}
-    for npc in pairs(ns.KnownNpcs()) do
-        local stats = dropsItem(npc, itemId) and ns.GetStats(npc, "all")
-        local entry
-        for _, candidate in ipairs(stats and stats.list or {}) do
-            if candidate.itemId == itemId then
-                entry = candidate
-            end
-        end
-        -- The counts can hold the item while the rates leave it out: too few corpses, or an install far off the rest.
-        if entry then
-            local info = ns.MobInfo(npc)
-            local maps = {}
-            for mapId, place in pairs(info and info.maps or {}) do
-                table.insert(maps, { mapId = mapId, kills = place.kills })
-            end
-            table.sort(maps, function(a, b)
-                return a.kills > b.kills
-            end)
-            table.insert(results, {
+    table.sort(maps, function(a, b)
+        return a.kills > b.kills
+    end)
+    local name, zone = ns.MobName(npc), maps[1] and ns.MapName(maps[1].mapId) or ""
+    for _, entry in ipairs(stats.list) do
+        if entry.itemId then
+            found[entry.itemId] = {
                 npc = npc,
-                name = ns.MobName(npc),
+                name = name,
                 rate = entry.rate,
                 drops = entry.drops,
                 opened = stats.opened,
@@ -140,9 +122,61 @@ function ns.FindDroppers(itemId)
                 minLevel = info and info.minLevel,
                 maxLevel = info and info.maxLevel,
                 maps = maps,
-                zone = maps[1] and ns.MapName(maps[1].mapId) or "",
-            })
+                zone = zone,
+            }
         end
+    end
+    return found
+end
+
+local function currentIndex()
+    if index and not allDirty and not next(dirty) then
+        return index
+    end
+    if allDirty then
+        byNpc = {}
+        for npc in pairs(ns.KnownNpcs()) do
+            byNpc[npc] = droppersOf(npc)
+        end
+    else
+        local known = ns.KnownNpcs()
+        for npc in pairs(dirty) do
+            byNpc[npc] = known[npc] and droppersOf(npc) or nil
+        end
+    end
+    allDirty, dirty, index = false, {}, {}
+    for _, found in pairs(byNpc) do
+        for itemId, dropper in pairs(found) do
+            local list = index[itemId]
+            if not list then
+                list = {}
+                index[itemId] = list
+            end
+            table.insert(list, dropper)
+        end
+    end
+    return index
+end
+
+local function mobChanged(npc)
+    if npc then
+        dirty[npc] = true
+    else
+        allDirty = true
+    end
+end
+ns.On("DT_DATA_CHANGED", mobChanged)
+ns.On("DT_INFO_CHANGED", mobChanged)
+ns.On("DT_SETTINGS_CHANGED", function()
+    allDirty = true
+end)
+
+-- Every mob with recorded drops of the item, with its chance over all kills, level range and maps by kill count.
+-- The list is new on every call; the droppers in it are shared and must not be changed.
+function ns.FindDroppers(itemId)
+    local results = {}
+    for i, dropper in ipairs(currentIndex()[itemId] or {}) do
+        results[i] = dropper
     end
     return results
 end

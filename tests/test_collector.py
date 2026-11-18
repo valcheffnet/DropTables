@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import ALL_FILES, Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
 
 
 def guid(npc, spawn):
@@ -107,17 +107,39 @@ def main():
     gear = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 200)
     expect("grey gear at 5% is a world drop", gear.world, True)
     gear_mob[3][1]["items"][200].drops = 8
+    client.fire("DT_DATA_CHANGED", 3)
     gear = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 200)
     expect("gear at 40% of 20 corpses is the mob's own", gear.world, False)
     ns.settings.collapseWorldDrops = True
     visible, world_count, _ = ns.VisibleEntries(ns.GetStats(3, "all"))
     expect("own gear stays visible", (len(list(visible.values())), world_count), (1, 0))
     gear_mob[3][1]["items"][200].drops = 1
+    client.fire("DT_DATA_CHANGED", 3)
     visible, world_count, _ = ns.VisibleEntries(ns.GetStats(3, "all"))
     expect("world drop left out of icons", (len(list(visible.values())), world_count), (0, 1))
     expect("group mode empty", ns.GetStats(1, "group"), None)
+
+    # Stats are kept between calls until the mob's counts change or item info arrives.
+    same = lua.eval("function(a, b) return rawequal(a, b) end")
+    first = ns.GetStats(1, "all")
+    expect("stats kept between calls", same(first, ns.GetStats(1, "all")), True)
+    ns.db["items"][100].quality = 3
+    client.fire("GET_ITEM_INFO_RECEIVED", 100)
+    fang = next(e for e in ns.GetStats(1, "all").list.values() if e.itemId == 100)
+    expect("item info arriving updates the stats", fang.quality, 3)
+    second = ns.GetStats(3, "all")
+    kill("Z", False, npc=3)
+    g.advance(5)
+    expect("a new kill updates the stats", (same(second, ns.GetStats(3, "all")), ns.GetStats(3, "all").kills),
+           (False, 21))
     expect("rate format", ns.FormatRate(0.514), "51%")
     expect("rate format small", ns.FormatRate(0.0123), "1.2%")
+
+    # Spell casts are registered for the player only, not for every nameplate and raid member.
+    cast_events = ("UNIT_SPELLCAST_START", "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_INTERRUPTED",
+                   "UNIT_SPELLCAST_FAILED")
+    expect("casts of the player only", [g.registeredEvents[e] for e in cast_events], ["player"] * 4)
+    expect("other events for everyone", g.registeredEvents["LOOT_OPENED"], True)
 
     # Skinning an empty corpse right after the kill is profession loot, not the mob's drop.
     skinner = Client("Skinner")
@@ -154,6 +176,51 @@ def main():
     lurker = skinner.ns.db.mobs[5][1]
     expect("empty window is a corpse that left nothing", (lurker.kills, lurker.lootable, lurker.opened), (2, 1, 1))
     expect("the target's own loot counted", skinner.ns.db.mobs[5][1]["items"][100].drops, 1)
+    skinner.g.units["target"] = None
+
+    def counts_of(client, npc):
+        data = client.ns.db.mobs[npc][1]
+        return data.kills, data.lootable, data.opened, data["items"][100] and data["items"][100].drops
+
+    # The interact key and the mouse on two different corpses: nothing tells which one opened empty.
+    p1, p2 = skinner.kill(7, "P1", True), skinner.kill(7, "P2", True)
+    skinner.advance(5)
+    skinner.g.units["softinteract"], skinner.g.units["mouseover"] = p1, p2
+    skinner.loot([])
+    skinner.g.units["softinteract"], skinner.g.units["mouseover"] = None, None
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [p2, 1]}])
+    expect("two corpses under the cursor, neither counted empty", counts_of(skinner, 7), (2, 2, 1, 1))
+
+    # A corpse with no loot at the last check that opens with loot later still gives its loot.
+    late = skinner.kill(9, "L1", False)
+    skinner.advance(5)
+    skinner.g.lootable[late] = True
+    skinner.advance(30)
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [late, 1]}])
+    expect("late loot counted once", counts_of(skinner, 9), (1, 1, 1, 1))
+
+    # A cast at the next mob just before looting a corpse known to hold loot does not hide the loot.
+    caster = skinner.kill(10, "F1", True)
+    skinner.advance(5)
+    skinner.fire("UNIT_SPELLCAST_START", "player")
+    skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player")
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [caster, 1]}])
+    expect("loot right after a cast at another mob counted", counts_of(skinner, 10), (1, 1, 1, 1))
+
+    # A mob finished by someone outside the group (a guard) counts when its corpse is opened under the mouse.
+    skinner.advance(2)
+    guarded = "Creature-0-1-0-1-11-G1"
+    skinner.g.lootable[guarded] = True
+    skinner.g.units["mouseover"] = guarded
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [guarded, 1]}])
+    skinner.g.units["mouseover"] = None
+    expect("kill finished by someone else counted from the corpse", counts_of(skinner, 11), (1, 1, 1, 1))
+    # Pickpocketing the living target is not a kill.
+    living = "Creature-0-1-0-1-12-A1"
+    skinner.g.units["target"], skinner.g.alive["target"] = living, True
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [living, 1]}])
+    skinner.g.units["target"], skinner.g.alive["target"] = None, None
+    expect("pickpocketed living target not counted", skinner.ns.db.mobs[12], None)
 
     # In a party, a corpse the player may not loot is someone else's, not an empty kill.
     party = Client("Partner")
@@ -178,6 +245,26 @@ def main():
     expect("debug off closes the tab", (tester.ns.settings.debug, tester.g.chatWindowNames[4]), (False, None))
     tester.g.SlashCmdList.DROPTABLES("debug")
     expect("debug on opens it again", tester.g.chatWindowNames[4], "DT Debug")
+    # The options checkbox and Restore defaults open and close the tab too.
+    tester.ns.RestoreDefaults()
+    expect("restore defaults closes the tab", tester.g.chatWindowNames[4], None)
+    tester.ns.settings.debug = True
+    tester.fire("DT_SETTINGS_CHANGED")
+    expect("the options checkbox opens it", tester.g.chatWindowNames[4], "DT Debug")
+
+    # /dt find keeps the case of the text; /dt on a friendly NPC opens the table without it.
+    tester.lua.eval("""function(ns)
+        ns.ToggleFinder = function(text) finderText = text end
+        ns.ToggleDetails = function(npc) detailsNpc = npc or "none" end
+    end""")(tester.ns)
+    tester.g.SlashCmdList.DROPTABLES("FIND Linen Cloth")
+    expect("search text keeps its case", tester.g.finderText, "Linen Cloth")
+    tester.see(90, "C90", 30, friendly=True)
+    tester.g.SlashCmdList.DROPTABLES("")
+    expect("no table for a friendly NPC", tester.g.detailsNpc, "none")
+    tester.see(91, "M91", 30)
+    tester.g.SlashCmdList.DROPTABLES("")
+    expect("the table of a hostile target", tester.g.detailsNpc, 91)
     reloaded = Client("Reloaded", saved="DropTablesDB = { settings = { debug = true } }")
     reloaded.ns.Debug("after a reload")
     expect("debug still on after a reload", len(reloaded.g.ChatFrame1.lines), 1)
@@ -193,27 +280,34 @@ def main():
     expect("recorded drops kept", ns.db.mobs[1][1].kills, 8)
 
     # The icons under the target: a mob without data gets the question mark, a friendly NPC gets nothing.
-    viewer = Client("Viewer", files=ALL_FILES + ("Strip.lua",), saved="""
-        -- Any frame method works; Show and Hide are remembered.
-        function widget(name)
-            local w = { shown = true }
-            if name then _G[name] = w end
-            return setmetatable(w, { __index = function(_, key)
-                if key == "Show" then return function(self) self.shown = true end end
-                if key == "Hide" then return function(self) self.shown = false end end
-                if key == "SetShown" then return function(self, value) self.shown = value and true or false end end
-                if key == "IsShown" then return function(self) return self.shown end end
-                if key:find("^Get") then return function() return 1 end end
-                return function() return widget() end
-            end })
-        end
-        function CreateFrame(_, name) return widget(name) end
-        UIParent, GameTooltip, EventRegistry = widget(), widget(), widget()
-    """)
+    viewer = Client("Viewer", files=ALL_FILES + ("Strip.lua",), saved=UI_STUBS)
     viewer.see(7, "M7", 10)
     expect("icons for a mob without data", viewer.g.DropTablesStrip.shown, True)
     viewer.see(90, "C90", 30, friendly=True)
     expect("no icons for a friendly NPC", viewer.g.DropTablesStrip.shown, False)
+
+    # The details window redraws once for several changes in a row, and not for items it does not list.
+    reader = Client("Reader", files=ALL_FILES + ("Style.lua", "Details.lua"), saved=UI_STUBS)
+    wolf = reader.kill(8, "W1", True)
+    reader.advance(5)
+    reader.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [wolf, 1]}])
+    reader.ns.ShowDetails(8)
+    reader.advance(1)
+    reader.lua.eval("""function(ns)
+        local getStats = ns.GetStats
+        renders = 0
+        ns.GetStats = function(...) renders = renders + 1 return getStats(...) end
+    end""")(reader.ns)
+    for _ in range(3):
+        reader.fire("DT_DATA_CHANGED", 8)
+    reader.advance(1)
+    expect("one redraw for three changes", reader.g.renders, 1)
+    reader.fire("GET_ITEM_INFO_RECEIVED", 555)
+    reader.advance(1)
+    expect("no redraw for an item it does not list", reader.g.renders, 1)
+    reader.fire("GET_ITEM_INFO_RECEIVED", 100)
+    reader.advance(1)
+    expect("a redraw for an item it lists", reader.g.renders, 2)
 
     report("collector")
 

@@ -4,7 +4,7 @@ local _, ns = ...
 -- unless a well-sampled mob drops one often enough to make it part of its own table.
 local WORLD_DROP_CLASSES = { [2] = true, [4] = true, [9] = true }
 local OWN_DROP_MIN_RATE = 0.2
--- Another install with more looted corpses than this counts as this many in the kill and corpse totals.
+-- Another install with more kills than this counts as this many: all its counts are scaled down by the same factor.
 local PEER_CAP = 300
 -- Installs with at least this many looted corpses of a mob are checked against each other; smaller ones are too
 -- noisy to tell a liar from bad luck, so they are always counted.
@@ -81,7 +81,8 @@ local function plausible(seen, opened, p)
     local z2 = OUTLIER_Z * OUTLIER_Z
     local center = (seen + z2 / (2 * opened)) / (1 + z2 / opened)
     local half = OUTLIER_Z * math.sqrt(seen * (1 - seen) / opened + z2 / (4 * opened * opened)) / (1 + z2 / opened)
-    return math.abs(p - center) <= half
+    -- At a share of 0 or 1 the interval ends exactly there; the tolerance keeps rounding from pushing p outside.
+    return math.abs(p - center) <= half + 1e-9
 end
 
 local function dropShare(sum, key)
@@ -120,20 +121,61 @@ local function usedFor(key, own, small, big)
     return used
 end
 
--- One chance from the counts of several installs added together:
--- rate = (lootable / kills) * (drops / opened). Kills that leave an empty corpse lower every rate, while corpses
--- nobody opened do not.
-local function pooledRate(key, used)
-    local kills, lootable, opened, drops = 0, 0, 0, 0
+-- How far apart two shares (seen out of n) are, in standard errors of their difference.
+local function zScore(seen1, n1, seen2, n2)
+    local p1, p2 = seen1 / n1, seen2 / n2
+    local pooled = (seen1 + seen2) / (n1 + n2)
+    local se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))
+    if se == 0 then
+        return p1 == p2 and 0 or math.huge
+    end
+    return math.abs(p1 - p2) / se
+end
+
+-- The installs whose kills say how many corpses have loot. Empty kills lower every chance of the mob, so an install
+-- claiming hundreds of them must not pull all chances down, even when it is the only other one. The install whose
+-- share of lootable corpses is furthest from all the others together goes out, one at a time, until the rest fit.
+-- The player's own kills and installs with fewer than BIG_SOURCE kills always count.
+local function lootableSources(all)
+    local used = {}
+    for _, sum in ipairs(all) do
+        table.insert(used, sum)
+    end
+    while true do
+        local kills, lootable = 0, 0
+        for _, sum in ipairs(used) do
+            kills, lootable = kills + sum.kills, lootable + sum.lootable
+        end
+        local worst, worstZ = nil, OUTLIER_Z
+        for i, sum in ipairs(used) do
+            local restKills = kills - sum.kills
+            if not sum.own and sum.kills >= BIG_SOURCE and restKills > 0 then
+                local z = zScore(sum.lootable, sum.kills, lootable - sum.lootable, restKills)
+                if z > worstZ then
+                    worst, worstZ = i, z
+                end
+            end
+        end
+        if not worst then
+            return used
+        end
+        table.remove(used, worst)
+    end
+end
+
+-- One chance from the counts of several installs added together: the share of kills with a lootable corpse times
+-- drops / opened. Kills that leave an empty corpse lower every rate, while corpses nobody opened do not.
+local function pooledRate(key, used, lootableShare)
+    local opened, drops = 0, 0
     for _, sum in ipairs(used) do
-        kills, lootable, opened = kills + sum.kills, lootable + sum.lootable, opened + sum.opened
+        opened = opened + sum.opened
         local entry = sum.entries[key]
         drops = drops + (entry and entry.drops or 0)
     end
-    if kills == 0 or opened == 0 then
+    if opened == 0 then
         return 0, 0
     end
-    return lootable / kills * drops / opened, opened
+    return lootableShare * drops / opened, opened
 end
 
 -- The list entry of an item or of money, with drop counts, stack sizes and ranges summed over the given installs.
@@ -169,19 +211,20 @@ local function newEntry(key, rate, sums, opened)
 end
 
 -- Drop rates for one mob. mode is "all", "solo" or "group".
--- Each chance comes from the player's counts and other players' counts added together (see usedFor), so every kill
--- and every message moves it at once. Kill and corpse totals count every install, each scaled down to PEER_CAP;
--- scaling leaves fractions, so the totals on screen are rounded.
-function ns.GetStats(npc, mode)
-    if not npc then
-        return nil
-    end
+-- Each chance comes from the player's counts and other players' counts added together (see usedFor and
+-- lootableSources), so every kill and every message moves it at once. Each other install is scaled down to PEER_CAP
+-- kills; scaling leaves fractions, so the totals on screen are rounded. The kill totals leave out installs whose
+-- empty kills do not fit the rest.
+local function computeStats(npc, mode)
     local own = ns.db.mobs[npc] and aggregate(ns.db.mobs[npc], mode, 1) or nil
+    if own then
+        own.own = true
+    end
     local peers = {}
     if not ns.settings.onlyMine then
         for _, peer in pairs(ns.db.peers[npc] or {}) do
-            local opened = ns.SumBuckets(peer.buckets, "opened")
-            local sum = aggregate(peer.buckets, mode, opened > PEER_CAP and PEER_CAP / opened or 1)
+            local kills = ns.SumBuckets(peer.buckets, "kills")
+            local sum = aggregate(peer.buckets, mode, kills > PEER_CAP and PEER_CAP / kills or 1)
             if sum then
                 table.insert(peers, sum)
             end
@@ -194,13 +237,18 @@ function ns.GetStats(npc, mode)
     for _, sum in ipairs(peers) do
         table.insert(all, sum)
     end
-    local kills, lootable, opened, keys = 0, 0, 0, {}
+    local opened, keys = 0, {}
     for _, sum in ipairs(all) do
-        kills, lootable, opened = kills + sum.kills, lootable + sum.lootable, opened + sum.opened
+        opened = opened + sum.opened
         for key in pairs(sum.entries) do
             keys[key] = true
         end
     end
+    local kills, lootable = 0, 0
+    for _, sum in ipairs(lootableSources(all)) do
+        kills, lootable = kills + sum.kills, lootable + sum.lootable
+    end
+    local lootableShare = lootable / kills
     local stats = {
         npc = npc,
         kills = round(kills),
@@ -217,7 +265,7 @@ function ns.GetStats(npc, mode)
     end
     for key in pairs(keys) do
         local used = usedFor(key, own, small, big)
-        local rate, usedOpened = pooledRate(key, used)
+        local rate, usedOpened = pooledRate(key, used, lootableShare)
         if rate > 0 then
             local entry = newEntry(key, rate, used, usedOpened)
             if entry then
@@ -237,6 +285,40 @@ function ns.GetStats(npc, mode)
     return stats
 end
 
+-- Stats are kept per mob and mode until something they come from changes: the mob's counts (own or other players'),
+-- the settings, or item info arriving (the quality of an entry). The tooltip, the icons, the details window and the
+-- Loot Finder ask for the same mob again and again. Callers only read what they get.
+local cache = {}  -- npc -> { [mode] = stats or false }
+
+local function forget(npc)
+    cache[npc] = nil
+end
+ns.On("DT_DATA_CHANGED", forget)
+ns.On("DT_COUNTS_CHANGED", forget)
+ns.On("DT_SETTINGS_CHANGED", function()
+    cache = {}
+end)
+ns.On("GET_ITEM_INFO_RECEIVED", function()
+    cache = {}
+end)
+
+function ns.GetStats(npc, mode)
+    if not npc then
+        return nil
+    end
+    local byMode = cache[npc]
+    if not byMode then
+        byMode = {}
+        cache[npc] = byMode
+    end
+    local stats = byMode[mode]
+    if stats == nil then
+        stats = computeStats(npc, mode) or false
+        byMode[mode] = stats
+    end
+    return stats or nil
+end
+
 -- Entries for the icons and the mob tooltip, plus how many world drops and how many items below the minimum
 -- quality were left out of them. Money always stays.
 function ns.VisibleEntries(stats)
@@ -254,7 +336,8 @@ function ns.VisibleEntries(stats)
 end
 
 function ns.MobName(npc)
-    return ns.db.names[npc] or ("NPC " .. npc)
+    local sight = ns.SeenMob(npc)
+    return ns.db.names[npc] or (sight and sight.name) or ("NPC " .. npc)
 end
 
 -- Every mob with counts, the player's own and, unless only those are wanted, other players'.
@@ -274,7 +357,7 @@ end
 -- Level range and kills per map: the player's own records, completed by what other players sent.
 -- Kill spots (cells) come only from the player's own kills.
 function ns.MobInfo(npc)
-    local own = ns.db.info[npc]
+    local own = ns.db.info[npc] or ns.SeenMob(npc)
     local peers = not ns.settings.onlyMine and ns.db.peers[npc]
     if not peers or not next(peers) then
         return own

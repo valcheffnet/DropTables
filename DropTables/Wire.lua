@@ -34,7 +34,8 @@ local function encodeNumber(n)
 end
 Wire.EncodeNumber = encodeNumber
 
-local MAX_DIGITS = 8
+-- Six digits stay below 2^32, where tonumber(s, 36) stops.
+local MAX_DIGITS = 6
 
 -- A number from a message field, or nil when it is empty, too long or not base 36.
 function Wire.ReadNumber(s)

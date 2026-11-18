@@ -3,7 +3,7 @@ local _, ns = ...
 -- Kill spots of one mob drawn on the world map as soft round spots, stronger where more kills happened.
 -- The marks follow the player around the map: every zone the mob was killed in shows its spots,
 -- and a line at the top names the mob and its other zones. Closing the map ends the marking.
-local GRID = 50
+local GRID = ns.GRID
 
 local overlay, banner
 local pins = {}

@@ -47,11 +47,12 @@ StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS = {
     button1 = YES,
     button2 = NO,
     OnAccept = function()
-        ns.RestoreDefaults()
-        -- The controls in the open panel show the new values only through their settings.
+        -- The controls in the open panel show new values only through their settings, and a setting that already
+        -- holds the value does not tell them; so the settings go first, then the rest of the table.
         for key, setting in pairs(registered) do
             setting:SetValue(ns.DEFAULTS[key])
         end
+        ns.RestoreDefaults()
     end,
     timeout = 0,
     whileDead = true,

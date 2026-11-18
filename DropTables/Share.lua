@@ -34,8 +34,10 @@ local ANSWER_ORIGINS = 3    -- installs one player whispers back per question, t
 -- with almost none, plus up to JITTER so equal sizes do not collide.
 local BIG_DELAY, SIZE_DELAY, JITTER = 0.3, 3, 0.7
 local NEW_ORIGINS_PER_SENDER = 3 -- installs the player has never seen that one sender may bring per day
+local GROUP_NEW_MOBS = 30   -- mobs the player knows nothing of that one group member may bring per day
 local HELD_PREFIX = 6
 local QUEUE_TTL = 60
+local MAX_WAITING_WHISPERS = 40 -- no new answers are planned while this many whispers wait
 local CHANNEL_PER_TICK, WHISPERS_PER_TICK, GROUP_PER_TICK = 1, 4, 1
 local GROUP_INTERVAL = 60   -- seconds between two sends of the player's changed counts to the group
 local GROUP_FLUSH_CAP = 10  -- messages per group send; mobs that do not fit wait for the next one
@@ -51,13 +53,16 @@ local RETRY = {
 
 local channelId
 local queue = {}     -- { text, at, chatType, target } waiting to go out
-local planned = {}   -- "<asker>:<npc>" -> { npc, target, due = { [origin] = time } } answers waiting to go out
+local planned = {}   -- asking player -> { npc, target, due = { [origin] = time } }, the answer waiting to go out
 -- npc -> { at, origins = { [origin] = true }, count, step, refresh, calledOff } of the player's last question
 local asked = {}
 local lastQuery = -QUERY_GAP
 local waiting = {}   -- npcs targeted while another question had just gone out, oldest first
 local knownOrigins   -- set of every install id the player holds counts of
-local newBySender = {} -- sender -> { day, count } of installs that sender brought; this session only, never saved
+-- sender -> { day, count } of what that sender brought; this session only, never saved
+local newBySender = {}      -- installs the player had never seen
+local newMobsBySender = {}  -- mobs the player knew nothing of, from group members
+local groupOrigins = {}     -- group member -> the one install they send; this session only
 local groupDirty = {}  -- npc -> true: the player's own counts changed since the last group send
 local lastGroupSend = 0
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
@@ -221,8 +226,31 @@ local function askWaiting(now)
     end
 end
 
--- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills.
+-- Answers in the queue plus installs planned to be sent; a planned install takes at least one whisper.
+local function waitingWhispers()
+    local count = 0
+    for _, message in ipairs(queue) do
+        if message.chatType == "WHISPER" then
+            count = count + 1
+        end
+    end
+    for _, plan in pairs(planned) do
+        for _ in pairs(plan.due) do
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Picks up to ANSWER_ORIGINS installs the asker lacks or holds with fewer kills. One player has one answer planned
+-- at a time, the one for their latest question, and nothing is planned while many whispers wait, so a flood of
+-- questions cannot hold up the answers to everyone else.
 local function planAnswer(asker, npc, heldText, sender)
+    local waiting = waitingWhispers()
+    if waiting >= MAX_WAITING_WHISPERS then
+        ns.Debug("%s asks about mob %d: not answering, %d whispers still waiting", sender, npc, waiting)
+        return
+    end
     local held = {}
     for entry in heldText:gmatch("[^,]+") do
         local prefix, kills = entry:match("^(%x%x%x%x%x%x)([0-9a-z]+)$")
@@ -244,7 +272,7 @@ local function planAnswer(asker, npc, heldText, sender)
         end
     end
     if count > 0 then
-        planned[asker .. ":" .. npc] = { npc = npc, target = sender, due = due }
+        planned[sender] = { npc = npc, target = sender, due = due }
     end
     ns.Debug("%s asks about mob %d: answering with %d installs", sender, npc, count)
 end
@@ -342,20 +370,26 @@ local function store(origin, npc, records)
     trim(peers)
 end
 
--- A sender (a name the server vouches for) may bring only a few installs the player has never seen per day, so
--- one player cannot fill the tables with made-up installs. Updates of known installs are taken from anyone.
-local function allowNewOrigin(sender)
+-- Counts one more of something a sender (a name the server vouches for) brought today; false once the limit is
+-- reached.
+local function withinDailyLimit(counts, sender, limit)
     local day = math.floor(time() / 86400)
-    local entry = newBySender[sender]
+    local entry = counts[sender]
     if not entry or entry.day ~= day then
         entry = { day = day, count = 0 }
-        newBySender[sender] = entry
+        counts[sender] = entry
     end
-    if entry.count >= NEW_ORIGINS_PER_SENDER then
+    if entry.count >= limit then
         return false
     end
     entry.count = entry.count + 1
     return true
+end
+
+-- A sender may bring only a few installs the player has never seen per day, so one player cannot fill the tables
+-- with made-up installs. Updates of known installs are taken from anyone.
+local function allowNewOrigin(sender)
+    return withinDailyLimit(newBySender, sender, NEW_ORIGINS_PER_SENDER)
 end
 
 local function messagingBlocked()
@@ -432,9 +466,11 @@ local function receive(text, sender)
     ns.Fire("DT_DATA_CHANGED", npc)
 end
 
--- Group members are taken without a question and without the limit on new installs: the server delivers group
--- messages only from members of the group, and one group brings only a handful of installs. (Forever names the
--- sender "First Last", which does not match UnitName, so the sender is not checked against the group.)
+-- Group members are taken without a question: the server delivers group messages only from members of the group.
+-- Each member sends only their own install, so the first one a member sends is the only one taken from them. Mobs
+-- the player has no counts of at all are limited per member and day; players in a group mostly kill the same mobs.
+-- (Forever names the sender "First Last", which does not match UnitName, so the sender is not checked against the
+-- group.)
 local function receiveGroup(text, sender)
     if text:sub(3, 2 + #ns.db.installId) == ns.db.installId then
         ns.Debug("  your own message, back from the group")
@@ -443,6 +479,18 @@ local function receiveGroup(text, sender)
     local origin, npc, records = decodeAnswer(text)
     if not origin then
         ns.Debug("  ignored: malformed or impossible counts")
+        return
+    end
+    groupOrigins[sender] = groupOrigins[sender] or origin
+    if groupOrigins[sender] ~= origin then
+        ns.Debug("  refused: %s already sent counts of another install", sender)
+        session.refused = session.refused + 1
+        return
+    end
+    local known = ns.db.mobs[npc] or ns.db.peers[npc] or asked[npc]
+    if not known and not withinDailyLimit(newMobsBySender, sender, GROUP_NEW_MOBS) then
+        ns.Debug("  refused: %s brought too many mobs you have no counts of today", sender)
+        session.refused = session.refused + 1
         return
     end
     ns.Debug("  stored: mob %d from group member %s", npc, sender)
@@ -561,10 +609,12 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
             planAnswer(asker, npc, held, sender)
         end
     elseif chatType == "CHANNEL" and kind == "C|" then
-        local asker, npc = text:match("^C|(%x+)|([0-9a-z]+)$")
+        -- Only the asker can call off the answers to them: the plan is found by the sender, not by the install id
+        -- in the message, which anyone could copy.
+        local npc = text:match("^C|%x+|([0-9a-z]+)$")
         npc = npc and Wire.ReadNumber(npc)
-        if npc then
-            planned[asker .. ":" .. npc] = nil
+        if npc and planned[sender] and planned[sender].npc == npc then
+            planned[sender] = nil
         end
     elseif chatType == "WHISPER" and kind == "D|" then
         receive(text, sender)

@@ -17,7 +17,7 @@ import zlib
 
 MAX_STRING = 200_000
 MAX_TEXT = 2_000_000
-MAX_NUMBER_DIGITS = 8
+MAX_NUMBER_DIGITS = 6  # as Wire.lua: below 2^32
 STRING_RE = re.compile(r"DT1:([A-Za-z0-9+/]+={0,2})")
 HEADER_RE = re.compile(r"DTX\|1\|([0-9a-f]{16})\|([0-9A-Za-z.\-]{1,20}|\?)\|(\d{1,12})\|(\d{1,3})/(\d{1,3})")
 SECTION_RE = re.compile(r"@([0-9a-f]{16})")
