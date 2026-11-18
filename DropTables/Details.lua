@@ -16,7 +16,7 @@ local COLUMNS = {
 
 local SOURCE_COLORS = { own = C.gold, peer = { 0.52, 0.66, 0.74 }, shared = { 0.78, 0.5, 0.16 } }
 
-local frame = Style.Window("DropTablesDetails", 430, 540, 340, 380, "detailsPos", "detailsSize", "detailsAlpha")
+local frame = Style.Window("DropTablesDetails", 430, 540, 300, 320, "detailsPos", "detailsSize", "detailsAlpha")
 frame:HookScript("OnShow", function()
     ns.settings.detailsOpen = true
 end)
