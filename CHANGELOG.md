@@ -6,11 +6,13 @@
 
 - A shared database comes with the addon. It holds the counts from every `/dt export` players send, so mobs you've never killed have chances too, and they show in the Loot Finder. Your own kills that are already in it don't count twice. The drop table window says how many kills come from it, and Only mine hides it.
 - A share page for exports: paste the text from `/dt export` there and press Send, no account needed. A bot checks it and adds it to the shared database.
-- The Loot Finder has a SHARE link in its title bar, like the drop table window.
+- The Loot Finder and the drop table window end in a share card: a square button with the number of your mobs the community doesn't have yet. It glows softly while there's something to share and calms down once you've copied your export. The small SHARE link in the title bar is gone.
+- Six colour themes for the Drop Tables windows: Ledger (the old gold), Frost, Fel, Blood, Arcane and Stone. Pick one with the squares next to OPACITY in the Loot Finder's title bar; every window changes at once.
 - The Loot Finder item list has a Kills column: how many kills of the best mob its chance comes from. When two mobs give the same chance, the one with more kills is shown, and chances from fewer than 10 looted corpses are grey like in the mob list.
 
 ### Changed
 
+- The drop table window has a new top: kills, looted corpses and the share of empty ones as large numbers, and a bar of where the kills come from (you, other players, the shared database). The subtitle gives the level and the zone. The Icons and Tooltip switches moved out of it; they're in the options and in `/dt icons` and `/dt tooltip`.
 - `/dt export` always holds everything of yours that the shared database doesn't have yet, plus what other players sent you. Copying the text and never sending it no longer leaves those counts out of later exports, and the Everything checkbox is gone.
 - Exports leave out kill spots, which the shared database doesn't use, so more mobs fit in one part.
 - A mob the shared database already knows well is asked about once a day, the same as one you've looted 100 times yourself.
@@ -20,6 +22,7 @@
 
 ### Fixed
 
+- The window you open or click comes to the front as a whole, and its frame turns gold, instead of parts of two windows showing through each other.
 - Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the details window no longer jumps to it.
 - One player can no longer drag all chances of a mob down to zero with made-up empty kills. Another player's counts weigh at most 300 kills, and counts that claim far more empty corpses than everyone else are left out of the chances.
 - A group member's counts are taken only for their own install, and one member can bring at most 30 mobs a day that you have no counts of.

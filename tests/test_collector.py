@@ -34,9 +34,9 @@ def main():
     loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 2, "sources": [a, 2]},
           {"type": 1, "item": 102, "name": "Quest Paw", "qty": 1, "quest": True, "sources": [a, 1]},
           {"type": 2, "name": "10 Copper", "qty": 0, "sources": [a, 10]}])
-    # Skinning D reopens the same corpse: must be ignored.
+    # Skinning D reopens the same corpse, which has to be ignored.
     loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "sources": [d, 1]}])
-    # Pickpocket: a living mob that was never killed.
+    # Pickpocketing a living mob that was never killed.
     loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [guid(2, "P"), 1]}])
     # A sparkling corpse that opens empty is found through the mouseover and counts as one that left nothing.
     e = kill("E", True)
@@ -182,7 +182,7 @@ def main():
         data = client.ns.db.mobs[npc][1]
         return data.kills, data.lootable, data.opened, data["items"][100] and data["items"][100].drops
 
-    # The interact key and the mouse on two different corpses: nothing tells which one opened empty.
+    # With the interact key and the mouse on two different corpses there's no telling which one opened empty.
     p1, p2 = skinner.kill(7, "P1", True), skinner.kill(7, "P2", True)
     skinner.advance(5)
     skinner.g.units["softinteract"], skinner.g.units["mouseover"] = p1, p2
@@ -252,7 +252,7 @@ def main():
     tester.fire("DT_SETTINGS_CHANGED")
     expect("the options checkbox opens it", tester.g.chatWindowNames[4], "DT Debug")
 
-    # /dt find keeps the case of the text; /dt on a friendly NPC opens the table without it.
+    # /dt find keeps the case of the text, and /dt on a friendly NPC opens the table without it.
     tester.lua.eval("""function(ns)
         ns.ToggleFinder = function(text) finderText = text end
         ns.ToggleDetails = function(npc) detailsNpc = npc or "none" end
@@ -279,7 +279,7 @@ def main():
                                          ns.settings.finderCategory), (0, False, None, None))
     expect("recorded drops kept", ns.db.mobs[1][1].kills, 8)
 
-    # The icons under the target: a mob without data gets the question mark, a friendly NPC gets nothing.
+    # Under the target, a mob without data gets the question mark and a friendly NPC gets nothing.
     viewer = Client("Viewer", files=ALL_FILES + ("Strip.lua",), saved=UI_STUBS)
     viewer.see(7, "M7", 10)
     expect("icons for a mob without data", viewer.g.DropTablesStrip.shown, True)
@@ -308,6 +308,29 @@ def main():
     reader.fire("GET_ITEM_INFO_RECEIVED", 100)
     reader.advance(1)
     expect("a redraw for an item it lists", reader.g.renders, 2)
+
+    # A theme rewrites the shared colours in place and runs every painter again, and Restore defaults goes back.
+    ns = reader.ns
+    colors = ns.Style.colors
+    ledger_gold = tuple(colors.gold[i] for i in (1, 2, 3))
+    reader.lua.execute("paints = 0")
+    reader.lua.eval("function(Style) Style.Paint(function() paints = paints + 1 end) end")(ns.Style)
+    ns.settings.theme = "frost"
+    reader.fire("DT_SETTINGS_CHANGED")
+    frost = next(t for t in ns.Style.THEMES.values() if t.key == "frost")
+    expect("the theme's accent is in use", tuple(colors.gold[i] for i in (1, 2, 3)),
+           tuple(frost.gold[i] for i in (1, 2, 3)))
+    expect("painters ran again", (reader.g.paints, ns.Style.CurrentTheme()), (2, "frost"))
+    reader.fire("DT_SETTINGS_CHANGED")
+    expect("the same theme paints nothing", reader.g.paints, 2)
+    ns.settings.theme = "no such theme"
+    reader.fire("DT_SETTINGS_CHANGED")
+    expect("an unknown theme falls back to the first", ns.Style.CurrentTheme(), "ledger")
+    ns.settings.theme = "frost"
+    reader.fire("DT_SETTINGS_CHANGED")
+    ns.RestoreDefaults()
+    expect("restore defaults brings the first theme back", (ns.Style.CurrentTheme(),
+           tuple(colors.gold[i] for i in (1, 2, 3))), ("ledger", ledger_gold))
 
     report("collector")
 

@@ -4,10 +4,10 @@ local _, ns = ...
 -- unless a well-sampled mob drops one often enough to make it part of its own table.
 local WORLD_DROP_CLASSES = { [2] = true, [4] = true, [9] = true }
 local OWN_DROP_MIN_RATE = 0.2
--- Another install with more kills than this counts as this many: all its counts are scaled down by the same factor.
+-- Another install with more kills than this counts as this many, with all its counts scaled down by the same factor.
 local PEER_CAP = 300
--- Installs with at least this many looted corpses of a mob are checked against each other; smaller ones are too
--- noisy to tell a liar from bad luck, so they are always counted.
+-- Installs with at least this many looted corpses of a mob are checked against each other. Smaller ones are too noisy
+-- to tell a liar from bad luck, so they always count.
 local BIG_SOURCE = 30
 -- The check needs this many big installs, so that the median says what most of them saw.
 local MIN_BIG_SOURCES = 3
@@ -30,7 +30,7 @@ local function round(n)
     return math.floor(n + 0.5)
 end
 
--- Sums one install's buckets that fall in the mode, scaled by factor. Money is the entry MONEY, with copper as
+-- Sums one install's buckets that fall in the mode, scaled by factor. Money goes in as the entry MONEY with copper as
 -- its quantity. Returns nil when the install has no kills in the mode.
 local function aggregate(buckets, mode, factor)
     local sum = { kills = 0, lootable = 0, opened = 0, entries = {} }
@@ -45,7 +45,7 @@ local function aggregate(buckets, mode, factor)
         mergeRange(entry, from)
     end
     for bucket, data in pairs(buckets) do
-        -- A bucket put together from several messages can claim more drops than opened corpses; it waits.
+        -- A bucket put together from several messages can claim more drops than opened corpses, so it waits.
         if inMode(bucket, mode) and ns.Wire.Complete(data) then
             sum.kills = sum.kills + data.kills * factor
             sum.lootable = sum.lootable + data.lootable * factor
@@ -74,14 +74,14 @@ local function median(values)
     return (sorted[middle] + sorted[middle + 1]) / 2
 end
 
--- True when a drop chance of p fits what an install saw (a share seen of its opened corpses): p lies within the
--- Wilson score interval at OUTLIER_Z. The interval widens for small samples and rare items, so noise is not taken
--- for lying.
+-- True when a drop chance of p fits what an install saw (seen is its share of opened corpses), meaning p lies within
+-- the Wilson score interval at OUTLIER_Z. The interval widens for small samples and rare items, so plain noise doesn't
+-- get taken for lying.
 local function plausible(seen, opened, p)
     local z2 = OUTLIER_Z * OUTLIER_Z
     local center = (seen + z2 / (2 * opened)) / (1 + z2 / opened)
     local half = OUTLIER_Z * math.sqrt(seen * (1 - seen) / opened + z2 / (4 * opened * opened)) / (1 + z2 / opened)
-    -- At a share of 0 or 1 the interval ends exactly there; the tolerance keeps rounding from pushing p outside.
+    -- At a share of 0 or 1 the interval ends exactly there, and the tolerance keeps rounding from pushing p outside.
     return math.abs(p - center) <= half + 1e-9
 end
 
@@ -90,9 +90,9 @@ local function dropShare(sum, key)
     return math.min(1, (entry and entry.drops or 0) / sum.opened)
 end
 
--- The counts that make one entry's chance: the player's own, the shared database and every small install always,
--- big installs only when their share of drops fits the median of the big ones. Installs too far apart to tell which
--- one is off (none fits) all count.
+-- The counts that make up one entry's chance. The player's own, the shared database and every small install always
+-- go in, and big installs only when their share of drops fits the median of the big ones. If they're all too far
+-- apart to tell which one is off, so that none fits, they all count.
 local function usedFor(key, always, small, big)
     local used = {}
     for _, sum in ipairs(always) do
@@ -135,10 +135,10 @@ local function zScore(seen1, n1, seen2, n2)
     return math.abs(p1 - p2) / se
 end
 
--- The installs whose kills say how many corpses have loot. Empty kills lower every chance of the mob, so an install
--- claiming hundreds of them must not pull all chances down, even when it is the only other one. The install whose
--- share of lootable corpses is furthest from all the others together goes out, one at a time, until the rest fit.
--- The player's own kills, the shared database and installs with fewer than BIG_SOURCE kills always count.
+-- The installs whose kills decide how many corpses have loot. Empty kills lower every chance of the mob, so an install
+-- claiming hundreds of them mustn't drag all the chances down, even when it's the only other one. We drop the install
+-- whose share of lootable corpses is furthest from all the others together, one at a time, until the rest fit. The
+-- player's own kills, the shared database and installs with fewer than BIG_SOURCE kills always count.
 local function lootableSources(all)
     local used = {}
     for _, sum in ipairs(all) do
@@ -166,8 +166,8 @@ local function lootableSources(all)
     end
 end
 
--- One chance from the counts of several installs added together: the share of kills with a lootable corpse times
--- drops / opened. Kills that leave an empty corpse lower every rate, while corpses nobody opened do not.
+-- One chance from the counts of several installs added together, worked out as the share of kills with a lootable
+-- corpse times drops / opened. Kills that leave an empty corpse lower every rate, while corpses nobody opened don't.
 local function pooledRate(key, used, lootableShare)
     local opened, drops = 0, 0
     for _, sum in ipairs(used) do
@@ -213,8 +213,8 @@ local function newEntry(key, rate, sums, opened)
     }
 end
 
--- The part of an install's counts the shared database does not hold yet. The database lists the installs it was
--- built from with their kills at the time; counts only grow, so whatever came after is the new part.
+-- The part of an install's counts the shared database doesn't hold yet. The database lists the installs it was built
+-- from with their kills at the time, and since counts only grow, whatever came after that is the new part.
 local function newShare(shared, origin, buckets)
     local before = shared and shared.from[origin]
     if not before then
@@ -225,10 +225,10 @@ local function newShare(shared, origin, buckets)
 end
 
 -- Drop rates for one mob. mode is "all", "solo" or "group".
--- Each chance comes from the player's counts and other players' counts added together (see usedFor and
--- lootableSources), so every kill and every message moves it at once. Each other install is scaled down to PEER_CAP
--- kills; scaling leaves fractions, so the totals on screen are rounded. The kill totals leave out installs whose
--- empty kills do not fit the rest.
+-- Each chance comes from the player's counts, other players' counts and the shared database added together (see
+-- usedFor and lootableSources), so every kill and every message moves it right away. Other installs are scaled down
+-- to PEER_CAP kills, which leaves fractions, so the totals on screen are rounded. The kill totals leave out installs
+-- whose empty kills don't fit the rest.
 local function computeStats(npc, mode)
     local shared = not ns.settings.onlyMine and ns.shared[npc] or nil
     local ownBuckets = ns.db.mobs[npc]
@@ -284,6 +284,7 @@ local function computeStats(npc, mode)
         opened = round(opened),
         empty = round(kills - lootable),
         ownKills = ownTotal and round(ownTotal.kills) or 0,
+        ownCounted = round(byKind.own),
         peerKills = round(byKind.peer),
         sharedKills = round(byKind.shared),
         sources = #peers,
@@ -316,9 +317,9 @@ local function computeStats(npc, mode)
     return stats
 end
 
--- Stats are kept per mob and mode until something they come from changes: the mob's counts (own or other players'),
--- the settings, or item info arriving (the quality of an entry). The tooltip, the icons, the details window and the
--- Loot Finder ask for the same mob again and again. Callers only read what they get.
+-- Stats are kept per mob and mode until something they come from changes, which is the mob's counts (own or other
+-- players'), the settings, or item info arriving with the quality of an entry. The tooltip, the icons, the details
+-- window and the Loot Finder ask for the same mob over and over. Callers only read what they get.
 local cache = {}  -- npc -> { [mode] = stats or false }
 
 local function forget(npc)
@@ -350,8 +351,8 @@ function ns.GetStats(npc, mode)
     return stats or nil
 end
 
--- Entries for the icons and the mob tooltip, plus how many world drops and how many items below the minimum
--- quality were left out of them. Money always stays.
+-- Entries for the icons and the mob tooltip, plus how many world drops and how many items below the minimum quality
+-- were left out. Money always stays in.
 function ns.VisibleEntries(stats)
     local entries, worldCount, lowCount = {}, 0, 0
     for _, entry in ipairs(stats.list) do
@@ -389,8 +390,8 @@ function ns.KnownNpcs()
     return npcs
 end
 
--- Level range and kills per map: the player's own records, completed by what other players sent and by the shared
--- database. Kill spots (cells) come only from the player's own kills.
+-- Level range and kills per map from the player's own records, filled in with what other players sent and with the
+-- shared database. Kill spots (cells) only ever come from the player's own kills.
 function ns.MobInfo(npc)
     local own = ns.db.info[npc] or ns.SeenMob(npc)
     local peers = not ns.settings.onlyMine and ns.db.peers[npc] or {}

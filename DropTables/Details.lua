@@ -1,7 +1,7 @@
 local _, ns = ...
 
--- The drop table of one mob. The window stays open until closed with its X button or /dt,
--- so Escape does not close it.
+-- The drop table of one mob. The window stays open until it's closed with its X button or /dt, so Escape leaves it
+-- alone.
 local Style = ns.Style
 local C = Style.colors
 local TOP = Style.HEADER
@@ -14,20 +14,26 @@ local COLUMNS = {
     { key = "qty", label = "Count", width = 44 },
 }
 
-local frame = Style.Window("DropTablesDetails", 430, 500, 360, 280, "detailsPos", "detailsSize", "detailsAlpha")
-frame:SetScript("OnShow", function()
+local SOURCE_COLORS = { own = C.gold, peer = { 0.52, 0.66, 0.74 }, shared = { 0.78, 0.5, 0.16 } }
+
+local frame = Style.Window("DropTablesDetails", 430, 540, 340, 380, "detailsPos", "detailsSize", "detailsAlpha")
+frame:HookScript("OnShow", function()
     ns.settings.detailsOpen = true
 end)
-frame:SetScript("OnHide", function()
+frame:HookScript("OnHide", function()
     ns.settings.detailsOpen = false
 end)
 
-local share = Style.ShareButton(frame)
-share:SetPoint("TOPRIGHT", -36, -11)
+local opacity = Style.OpacitySlider(frame)
+opacity:SetWidth(60)
+opacity:ClearAllPoints()
+opacity:SetPoint("TOPRIGHT", -16, -39)
+frame.title:SetJustifyH("LEFT")
+frame.subtitle:SetJustifyH("LEFT")
 
 local function fitTitle()
-    frame.title:SetWidth(math.max(40, frame:GetWidth() - 16 - (36 + share:GetWidth() + 12)))
-    frame.subtitle:SetWidth(math.max(40, frame:GetWidth() - 33))
+    frame.title:SetWidth(math.max(40, frame:GetWidth() - 52))
+    frame.subtitle:SetWidth(math.max(40, frame:GetWidth() - 33 - (opacity:GetWidth() + opacity.label:GetStringWidth() + 28)))
 end
 frame:HookScript("OnSizeChanged", fitTitle)
 fitTitle()
@@ -38,13 +44,111 @@ local mode = "all"
 local tabs = {}
 local render
 
+-- The ledger line under the title, with three totals and a bar showing where the kills come from (the player, other
+-- players or the shared database) above its legend.
+local STATS_Y = -(TOP + 10)
+local TOTAL_WIDTH = 42
+local function total(label, index)
+    local value = Style.Text(frame, "heading")
+    value:SetWidth(TOTAL_WIDTH)
+    value:SetJustifyH("CENTER")
+    value:SetPoint("TOPLEFT", 10 + (index - 1) * (TOTAL_WIDTH + 2), STATS_Y)
+    local caption = Style.Text(frame, "label")
+    caption:SetWidth(TOTAL_WIDTH + 4)
+    caption:SetJustifyH("CENTER")
+    caption:SetPoint("TOP", value, "BOTTOM", 0, -3)
+    caption:SetText(label)
+    return value
+end
+local killsTotal = total("KILLS", 1)
+local lootedTotal = total("LOOTED", 2)
+local emptyTotal = total("EMPTY", 3)
+local SOURCES_X = 10 + 3 * (TOTAL_WIDTH + 2) + 12
+
+local sourceCaption = Style.Text(frame, "label")
+sourceCaption:SetPoint("TOPLEFT", SOURCES_X, STATS_Y - 1)
+sourceCaption:SetText("KILL SOURCES")
+local sourceBar = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+sourceBar:SetHeight(4)
+sourceBar:SetPoint("TOPLEFT", sourceCaption, "BOTTOMLEFT", 0, -5)
+local function fitBar()
+    sourceBar:SetWidth(math.max(40, (frame:GetWidth() - SOURCES_X - 16) * 2 / 3))
+end
+frame:HookScript("OnSizeChanged", fitBar)
+fitBar()
+sourceBar:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8" })
+Style.Paint(function()
+    sourceBar:SetBackdropColor(C.raised[1], C.raised[2], C.raised[3], 1)
+end)
+local segments = {}
+for i, kind in ipairs({ "own", "peer", "shared" }) do
+    local segment = sourceBar:CreateTexture(nil, "ARTWORK")
+    Style.Paint(function()
+        segment:SetColorTexture(unpack(SOURCE_COLORS[kind]))
+    end)
+    segment:SetPoint("TOP")
+    segment:SetPoint("BOTTOM")
+    segments[i] = { kind = kind, texture = segment }
+end
+local sourceLegend = Style.Text(frame, "muted")
+sourceLegend:SetPoint("TOPLEFT", sourceBar, "BOTTOMLEFT", 0, -5)
+sourceLegend:SetPoint("RIGHT", -16, 0)
+sourceLegend:SetJustifyH("LEFT")
+
+local function colored(kind, text)
+    local color = SOURCE_COLORS[kind]
+    return ("|cff%02x%02x%02x%s|r"):format(color[1] * 255, color[2] * 255, color[3] * 255, text)
+end
+
+-- Fills the totals and the bar. The bar splits up the kills that went into the chances, while the legend gives the
+-- player's own kills in full, even though the shared database may already hold part of them.
+local function showSources(stats)
+    if not stats then
+        killsTotal:SetText("-")
+        lootedTotal:SetText("-")
+        emptyTotal:SetText("-")
+        sourceBar:Hide()
+        sourceLegend:SetText("")
+        return
+    end
+    killsTotal:SetText(stats.kills)
+    lootedTotal:SetText(stats.opened)
+    emptyTotal:SetText(stats.kills > 0 and ("%d%%"):format(math.floor(stats.empty / stats.kills * 100 + 0.5)) or "-")
+    local counts = { own = stats.ownCounted, peer = stats.peerKills, shared = stats.sharedKills }
+    local sum = counts.own + counts.peer + counts.shared
+    sourceBar:Show()
+    local width, left = sourceBar:GetWidth(), 0
+    for _, segment in ipairs(segments) do
+        local part = sum > 0 and width * counts[segment.kind] / sum or 0
+        segment.texture:SetShown(part >= 1)
+        segment.texture:SetPoint("LEFT", left, 0)
+        segment.texture:SetWidth(math.max(part, 1))
+        left = left + part
+    end
+    local legend = { colored("own", ("You %d"):format(stats.ownKills)) }
+    if stats.sources > 0 then
+        table.insert(legend, colored("peer", ("Players %d"):format(stats.peerKills)))
+    end
+    if stats.sharedKills > 0 then
+        table.insert(legend, colored("shared", ("Shared %d"):format(stats.sharedKills)))
+    end
+    sourceLegend:SetText(table.concat(legend, "   "))
+end
+sourceBar:SetScript("OnSizeChanged", function()
+    if frame:IsShown() and render then
+        render()
+    end
+end)
+
+local TOGGLES_Y = -(TOP + 50)
+local CONTROLS_Y = -(TOP + 76)
 local previous
 for _, info in ipairs(MODES) do
     local tab = Style.Tab(frame, info.label)
     if previous then
         tab:SetPoint("LEFT", previous, "RIGHT", 2, 0)
     else
-        tab:SetPoint("TOPLEFT", 10, -(TOP + 8))
+        tab:SetPoint("TOPLEFT", 10, CONTROLS_Y)
     end
     tab:SetScript("OnClick", function()
         mode = info.key
@@ -56,19 +160,20 @@ end
 
 local toggles = {}
 
--- A checkbox bound to a setting; the icons and tooltip toggles share their settings with the options panel.
-local function toggle(key, label, tooltip, anchor)
+-- A checkbox bound to a setting, placed left to right. It returns the checkbox so the next one can go after it.
+local function toggle(key, label, tooltip, after)
     local check = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
     check:SetSize(20, 20)
-    if anchor then
-        check:SetPoint("LEFT", anchor, "RIGHT", 10, 0)
-    else
-        check:SetPoint("TOPLEFT", 10, -(TOP + 32))
-    end
     check.label = Style.Text(check, "muted")
     check.label:SetPoint("LEFT", check, "RIGHT", 1, 0)
     check.label:SetText(label)
-    check:SetHitRectInsets(0, -check.label:GetStringWidth() - 4, 0, 0)
+    local labelWidth = check.label:GetStringWidth()
+    if after then
+        check:SetPoint("LEFT", after, "RIGHT", after.label:GetStringWidth() + 14, 0)
+    else
+        check:SetPoint("TOPLEFT", 8, TOGGLES_Y)
+    end
+    check:SetHitRectInsets(0, -labelWidth - 4, 0, 0)
     check:SetScript("OnClick", function(self)
         ns.settings[key] = self:GetChecked()
         ns.Fire("DT_SETTINGS_CHANGED")
@@ -81,15 +186,14 @@ local function toggle(key, label, tooltip, anchor)
     end)
     check:SetScript("OnLeave", GameTooltip_Hide)
     toggles[key] = check
-    return check.label
+    return check
 end
 
-local last = toggle("detailsFollow", "Follow target", "Switch to each mob you target. Off keeps the current mob.")
-last = toggle("showStrip", "Icons", "Show the likely drops of your target as icons.", last)
-last = toggle("showTooltip", "Tooltip", "Add the likely drops to the mob tooltip.", last)
-toggle("onlyMine", "Only mine", "Count only your own kills, without the drop counts other players shared.", last)
+local follow = toggle("detailsFollow", "Follow target", "Switch to each mob you target. Off keeps the current mob.")
+toggle("onlyMine", "Only mine", "Count only your own kills, without what other players and the shared database add.",
+    follow)
 
-local headerY = -(TOP + 62)
+local headerY = -(TOP + 110)
 local rule = Style.Line(frame, C.faint)
 rule:SetHeight(1)
 rule:SetPoint("TOPLEFT", 10, headerY + 6)
@@ -117,11 +221,17 @@ end
 
 local scroll, content = Style.ScrollList(frame)
 scroll:SetPoint("TOPLEFT", 8, headerY - 20)
-scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_GAP, 12)
+scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_GAP, 12 + Style.SHARE_CARD + 8)
+
+local shareCard = Style.ShareCard(frame)
+shareCard:SetPoint("BOTTOMLEFT", 10, 12)
+shareCard:SetPoint("RIGHT", -10, 0)
 
 local emptyTitle = Style.Text(content, "heading")
 emptyTitle:SetPoint("TOP", 0, -36)
-emptyTitle:SetTextColor(unpack(C.muted))
+Style.Paint(function()
+    emptyTitle:SetTextColor(unpack(C.muted))
+end)
 local emptyText = Style.Text(content, "muted")
 emptyText:SetPoint("TOP", emptyTitle, "BOTTOM", 0, -6)
 
@@ -239,6 +349,8 @@ function render()
         end
     end
     local used = 0
+    showSources(stats)
+    shareCard:Refresh()
     if not shownNpc then
         frame.subtitle:SetText("Drop chances of the mobs you meet")
         emptyTitle:SetText("Target a mob")
@@ -248,26 +360,22 @@ function render()
         emptyTitle:SetText(mode == "all" and "No data yet" or ("No " .. mode .. " kills yet"))
         emptyText:SetText(mode == "all" and "Kill and loot this mob to start its table." or "Switch to All to see every kill.")
     else
-        local text
-        if stats.sources > 0 or stats.sharedKills > 0 then
-            local parts = { ("%d kills by you"):format(stats.ownKills) }
-            if stats.peerKills > 0 then
-                table.insert(parts, ("%d by %d %s"):format(stats.peerKills, stats.sources,
-                    stats.sources == 1 and "player" or "players"))
-            end
-            if stats.sharedKills > 0 then
-                table.insert(parts, ("%d shared"):format(stats.sharedKills))
-            end
-            text = ("%s  |  %d looted"):format(table.concat(parts, ", "), stats.opened)
-        else
-            text = ("%d kills  |  %d looted  |  %d left nothing"):format(stats.kills, stats.opened, stats.empty)
-        end
+        local parts = {}
         local info = ns.MobInfo(shownNpc)
         if info and info.minLevel then
             local level = info.minLevel == info.maxLevel and info.minLevel or (info.minLevel .. "-" .. info.maxLevel)
-            text = ("Level %s  |  "):format(level) .. text
+            table.insert(parts, "Level " .. level)
         end
-        frame.subtitle:SetText(text)
+        local bestMap, bestKills
+        for mapId, place in pairs(info and info.maps or {}) do
+            if not bestKills or place.kills > bestKills then
+                bestMap, bestKills = mapId, place.kills
+            end
+        end
+        if bestMap then
+            table.insert(parts, ns.MapName(bestMap))
+        end
+        frame.subtitle:SetText(table.concat(parts, "  |  "))
         local world = {}
         for _, entry in ipairs(stats.list) do
             if entry.world then
@@ -307,7 +415,7 @@ local function setNpc(npc)
     ns.settings.detailsNpc = npc
 end
 
--- Shows the window, on the given mob or the last one; with neither it waits for a target.
+-- Shows the window on the given mob or the last one, and with neither it waits for a target.
 function ns.ShowDetails(npc)
     if npc then
         setNpc(npc)
@@ -338,8 +446,8 @@ ns.On("DT_READY", function()
     end
 end)
 
--- A kill, a loot window and an answer from another player each change the counts, often within the same moment, and
--- an options slider changes the settings on every step; one redraw a little later covers them all.
+-- A kill, a loot window and an answer from another player each change the counts, often in the same moment, and an
+-- options slider changes the settings on every step, so one redraw a little later covers them all.
 local REDRAW_DELAY = 0.1
 local redrawPending = false
 local function redrawSoon()
@@ -379,8 +487,8 @@ end
 ns.On("DT_DATA_CHANGED", refresh)
 ns.On("DT_INFO_CHANGED", refresh)
 
--- Item names arrive from the server after the first request; redraw once they do. Items of other windows (bags,
--- vendors, chat links) do not concern this one.
+-- Item names arrive from the server after the first request, so we redraw once they do. Items of other windows (bags,
+-- vendors, chat links) don't concern this one.
 ns.On("GET_ITEM_INFO_RECEIVED", function(itemId)
     if shownItems[itemId] then
         redrawSoon()

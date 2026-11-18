@@ -37,8 +37,6 @@ def shared_lua(root):
     return build_data.lua_file(build_data.build(build_data.load_submissions(root)))
 
 
-# --- synthetic submissions for the merge rules ------------------------------------------------------------------
-
 def bucket(kills, lootable, opened, items=None, money=0):
     return {"kills": kills, "lootable": lootable, "opened": opened,
             "money": {"drops": money, "copper": money * 10, "min": 10 if money else None, "max": 10 if money else None},
@@ -101,7 +99,7 @@ def merge_rules():
     expect("one install counts at most 300 kills", db["mobs"]["9"]["buckets"]["1"]["kills"], 300)
     expect("its drops scale with it", db["mobs"]["9"]["buckets"]["1"]["items"]["100"]["drops"], 30)
 
-    # One submitter relaying 60 install ids nobody else ever sent: 50 count.
+    # One submitter relays 60 install ids nobody else ever sent, and only 50 of them count.
     fakes = {origin(100 + i): {10 + i: mob({1: bucket(5, 5, 5)})} for i in range(60)}
     db = build_data.build([submission(40, origin(99), fakes, submitter="spammer")])
     expect("unconfirmed installs per submitter are capped", len(db["mobs"]), build_data.UNCONFIRMED_CAP)
@@ -124,8 +122,6 @@ def merge_rules():
     client = Client("Many", data=lua)
     expect("all mobs loaded", sum(1 for _ in client.ns.shared.keys()), 3000)
 
-
-# --- issues, in-game export and the shared data in the addon ----------------------------------------------------
 
 def issues_and_game(root):
     alice = Client("Alice")
@@ -170,17 +166,17 @@ def issues_and_game(root):
     carol.ns.settings.onlyMine = False
     carol.fire("DT_SETTINGS_CHANGED")
 
-    # Alice's own kills are in the database already; they count once, and new kills count on top.
+    # Alice's own kills are in the database already, so they count once and her new kills count on top.
     alice2 = Client("Alice", saved=_saved_db(alice), data=lua)
     expect("same install", alice2.ns.db.installId, alice_id)
     stats = alice2.ns.GetStats(1, "all")
-    expect("own kills in the database count once", (stats.kills, stats.ownKills), (10, 10))
+    expect("own kills in the database count once", (stats.kills, stats.ownKills, stats.ownCounted), (10, 10, 0))
     for i in range(10, 14):
         loot_mob(alice2, 1, "A%d" % i, [(100, 1)])
     stats = alice2.ns.GetStats(1, "all")
-    expect("new kills after the export count", (stats.kills, stats.ownKills), (14, 14))
+    expect("new kills after the export count", (stats.kills, stats.ownKills, stats.ownCounted), (14, 14, 4))
     rates = {e.itemId: round(e.rate, 4) for e in stats.list.values() if e.itemId}
-    # The new part is alice's counts times 4/14: what changed since the export is not kept, only how much.
+    # The new part is Alice's counts times 4/14, because we know how much changed since the export but not what.
     expect("the new part moves the chance", rates[100], round((5 + 9 * 4 / 14) / 14, 4))
 
     # Counts of alice that bob got over the channel are in the database too.
@@ -294,16 +290,13 @@ def issue_list(root):
 
 
 def daily_limit(root):
-    for i in range(ingest_issue.DAILY_LIMIT):
+    outcomes = []
+    for i in range(ingest_issue.DAILY_LIMIT + 1):
         sub = Client("Spam%d" % i)
         loot_mob(sub, 5, "S", [(100, 1)])
-        expect_ok = ingest_issue.ingest(issue(100 + i, form_body(export_string(sub)), login="busy"), root)[0]
-        if expect_ok != "accepted":
-            expect("accepted under the daily limit", expect_ok, "accepted")
-    sub = Client("SpamLast")
-    loot_mob(sub, 5, "S", [(100, 1)])
-    outcome, reply = ingest_issue.ingest(issue(200, form_body(export_string(sub)), login="busy"), root)
-    expect("past the daily limit", outcome, "rejected")
+        outcomes.append(ingest_issue.ingest(issue(100 + i, form_body(export_string(sub)), login="busy"), root)[0])
+    expect("accepted up to the daily limit, refused past it", outcomes,
+           ["accepted"] * ingest_issue.DAILY_LIMIT + ["rejected"])
 
 
 def main():

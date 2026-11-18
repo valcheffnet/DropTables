@@ -12,6 +12,7 @@ ns.DEFAULTS = {
     detailsOpen = true,
     detailsAlpha = 1,
     finderAlpha = 1,
+    theme = "ledger",
     onlyMine = false,
     exportReminder = true,
     showMinimap = true,
@@ -24,8 +25,8 @@ ns.SMALL_SAMPLE = 10
 
 local listeners = {}
 
--- Modules subscribe to game events and to the addon's own messages through ns.On / ns.Fire. With unit, a unit event
--- comes only for that unit: spell casts of every nameplate and raid member would otherwise arrive by the hundred.
+-- Modules listen to game events and to the addon's own messages through ns.On / ns.Fire. Passing a unit registers a
+-- unit event for just that unit, because otherwise the casts of every nameplate and raid member come in by the hundred.
 function ns.On(event, callback, unit)
     if not listeners[event] then
         listeners[event] = {}
@@ -38,7 +39,7 @@ function ns.On(event, callback, unit)
     table.insert(listeners[event], callback)
 end
 
--- Each listener runs on its own: an error in one goes to the error frame and the others still get the event.
+-- Each listener runs separately, so an error in one goes to the error frame while the others still get the event.
 function ns.Fire(event, ...)
     local count, args = select("#", ...), { ... }
     for _, callback in ipairs(listeners[event] or {}) do
@@ -57,9 +58,9 @@ function ns.Print(msg)
     print("|cff66ccffDrop Tables|r " .. msg)
 end
 
--- /dt debug: a chat line for every sharing message in and out and every loot window, for testing between players.
--- The lines go to a chat tab named "DT Debug", which /dt debug opens and closes again; without a free tab they go to
--- the main window.
+-- /dt debug writes a chat line for every sharing message in and out and for every loot window, which helps when testing
+-- with another player. The lines go to a chat tab called "DT Debug" that /dt debug opens and closes again, or to the
+-- main window when there's no free tab.
 local DEBUG_TAB = "DT Debug"
 
 local function findDebugFrame()
@@ -75,8 +76,8 @@ local function debugFrame()
     return findDebugFrame() or DEFAULT_CHAT_FRAME
 end
 
--- Opens the DT Debug tab with no other messages in it. Blizzard's chat functions are optional: a client without
--- them keeps the lines in the main window.
+-- Opens the DT Debug tab with no other messages in it. If the client lacks Blizzard's chat functions, the lines just
+-- stay in the main window.
 local function openDebugTab()
     if findDebugFrame() or not FCF_OpenNewWindow then
         return
@@ -97,7 +98,7 @@ local function closeDebugTab()
     end
 end
 
--- The tab follows the setting, whoever changes it: /dt debug, the options checkbox or Restore defaults.
+-- The tab follows the setting no matter what changed it, be it /dt debug, the options checkbox or Restore defaults.
 local debugShown
 ns.On("DT_SETTINGS_CHANGED", function()
     if ns.settings.debug == debugShown then
@@ -139,8 +140,8 @@ function ns.UnitNpc(unit)
     return ns.NpcFromGuid(guid), guid
 end
 
--- Like UnitNpc, but nil for creatures the player cannot fight, such as flight masters, vendors and trainers, which
--- drop nothing. Corpses count, and so does a unit whose state the client hides.
+-- Like UnitNpc, but nil for creatures the player can't fight. Flight masters, vendors and trainers drop nothing, so
+-- there's no point counting them. Corpses still count, and so does a unit whose state the client hides.
 function ns.UnitMob(unit)
     local npc, guid = ns.UnitNpc(unit)
     if not npc then
@@ -179,7 +180,7 @@ function ns.QualityColor(quality)
     return ("|cff%02x%02x%02x"):format(r * 255, g * 255, b * 255)
 end
 
--- Midnight moved several old globals into namespaces; these pick whichever the client has.
+-- Midnight moved several old globals into namespaces, so these use whichever one the client has.
 local coinText = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 function ns.CoinText(copper)
     return coinText(math.floor(copper + 0.5))
@@ -222,8 +223,8 @@ function ns.FormatRate(rate)
     return ("%.2f%%"):format(rate * 100)
 end
 
--- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name }, in the shape of the
--- player's own counts. It ships with the addon and is never saved, sent or exported.
+-- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name }, kept in the same shape
+-- as the player's own counts. It comes with the addon, and nothing ever saves, sends or exports it.
 ns.shared = {}
 
 function ns.AddSharedData(chunk)
@@ -241,8 +242,8 @@ function ns.SumBuckets(buckets, field)
     return total
 end
 
--- Puts every setting back to its default and forgets window places and sizes; recorded drops are not touched.
--- The same table stays in use, because the options panel holds on to it.
+-- Puts every setting back to its default and forgets where the windows were and how big they were, while recorded
+-- drops stay. It refills the same table because the options panel holds on to it.
 function ns.RestoreDefaults()
     for key in pairs(ns.settings) do
         ns.settings[key] = nil
@@ -253,7 +254,7 @@ function ns.RestoreDefaults()
     ns.Fire("DT_SETTINGS_CHANGED")
 end
 
--- "1-3" when the stack size varies, "2" when it never does; data recorded before ranges existed shows the average.
+-- "1-3" when the stack size varies and "2" when it doesn't. Data recorded before ranges existed shows the average.
 function ns.FormatStack(entry)
     if entry.min and entry.max then
         return entry.min == entry.max and tostring(entry.min) or (entry.min .. "-" .. entry.max)
@@ -327,7 +328,7 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Print(("%d mobs, %d kills recorded. Empty-corpse check: %s."):format(mobs, kills,
             CanLootUnit and "available" or "not available, rates may read high"))
         ns.Print(ns.ShareStatus())
-        ns.Print(("%d of your mobs have counts the shared database does not have yet (/dt export)."):format(ns.NewCount()))
+        ns.Print(("%d of your mobs have new counts to share (/dt export)."):format(ns.NewCount()))
     elseif msg == "export" then
         ns.ToggleExport()
     elseif msg == "debug" then

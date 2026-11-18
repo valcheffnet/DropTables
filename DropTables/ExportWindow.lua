@@ -26,8 +26,10 @@ box:SetPoint("TOPLEFT", intro, "BOTTOMLEFT", 0, -10)
 box:SetPoint("RIGHT", -16, 0)
 box:SetPoint("BOTTOM", 0, 118)
 box:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
-box:SetBackdropColor(C.raised[1], C.raised[2], C.raised[3], 0.9)
-box:SetBackdropBorderColor(unpack(C.faint))
+Style.Paint(function()
+    box:SetBackdropColor(C.raised[1], C.raised[2], C.raised[3], 0.9)
+    box:SetBackdropBorderColor(unpack(C.faint))
+end)
 
 local scroll = CreateFrame("ScrollFrame", nil, box, "UIPanelScrollFrameTemplate")
 scroll:SetPoint("TOPLEFT", 6, -6)
@@ -78,7 +80,7 @@ local function copyButton(anchor, edit, hint)
     return button
 end
 
--- Both boxes are for copying only: typing puts the text back and selects it again.
+-- Both boxes are only for copying, so typing puts the text back and selects it again.
 local function readOnly(edit, value)
     edit:SetScript("OnTextChanged", function(self, userInput)
         if userInput then
@@ -166,6 +168,7 @@ text:SetScript("OnKeyDown", function(self, key)
             return
         end
     end
+    ns.MarkCopied(result)
     status:SetText("Copied. Paste it on the page at the address below and press Send. Thank you!")
     status:SetTextColor(unpack(C.gold))
 end)
@@ -175,7 +178,7 @@ nextPart:SetScript("OnClick", function()
     showPart()
 end)
 
-frame:SetScript("OnShow", build)
+frame:HookScript("OnShow", build)
 
 function ns.ToggleExport()
     if frame:IsShown() then

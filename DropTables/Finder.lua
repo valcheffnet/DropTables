@@ -1,7 +1,7 @@
 local _, ns = ...
 
--- Loot finder, laid out like the auction house: categories on the left, the items of the chosen category on the
--- right, and for one item the mobs that drop it. Zone and level filters apply to both lists.
+-- Loot finder, laid out like the auction house with categories on the left and the items of the chosen category on
+-- the right, which turn into the mobs that drop an item once one is picked. Zone and level filters work on both lists.
 local Style = ns.Style
 local C = Style.colors
 local TOP = Style.HEADER
@@ -32,8 +32,59 @@ frame:SetPoint("CENTER", 0, 40)
 frame.title:SetText("Loot Finder")
 frame.subtitle:SetText("Which mobs drop an item, and where")
 local opacity = Style.OpacitySlider(frame)
-Style.ShareButton(frame):SetPoint("RIGHT", opacity.label, "LEFT", -16, 0)
 table.insert(UISpecialFrames, "DropTablesFinder")
+
+-- Theme swatches in the title bar, left of the opacity slider. Each square is drawn in its own theme's colours, so it
+-- looks the same whatever theme is on, and the chosen one gets a bright frame and a bigger gem.
+local SWATCH = 14
+local WHITE = "Interface\\Buttons\\WHITE8x8"
+local swatches = {}
+local leftmost
+for i = #Style.THEMES, 1, -1 do
+    local entry = Style.THEMES[i]
+    local swatch = CreateFrame("Button", nil, frame, "BackdropTemplate")
+    swatch:SetSize(SWATCH, SWATCH)
+    if leftmost then
+        swatch:SetPoint("RIGHT", leftmost, "LEFT", -4, 0)
+    else
+        swatch:SetPoint("RIGHT", opacity.label, "LEFT", -20, 0)
+    end
+    swatch:SetBackdrop({ bgFile = WHITE, edgeFile = WHITE, edgeSize = 1 })
+    swatch:SetBackdropColor(entry.raised[1], entry.raised[2], entry.raised[3], 1)
+    swatch.gem = swatch:CreateTexture(nil, "ARTWORK")
+    swatch.gem:SetPoint("CENTER")
+    swatch.gem:SetColorTexture(entry.gold[1], entry.gold[2], entry.gold[3], 1)
+    function swatch:Refresh()
+        local chosen = Style.CurrentTheme() == entry.key
+        local edge = chosen and entry.text or entry.line
+        self:SetBackdropBorderColor(edge[1], edge[2], edge[3], chosen and 1 or 0.8)
+        self.gem:SetSize(chosen and 8 or 6, chosen and 8 or 6)
+    end
+    swatch:SetScript("OnClick", function()
+        ns.settings.theme = entry.key
+        ns.Fire("DT_SETTINGS_CHANGED")
+    end)
+    swatch:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(entry.name)
+        GameTooltip:AddLine("Colours for every Drop Tables window.", 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    swatch:SetScript("OnLeave", GameTooltip_Hide)
+    swatches[i] = swatch
+    leftmost = swatch
+end
+local themeLabel = Style.Text(frame, "label")
+themeLabel:SetPoint("RIGHT", leftmost, "LEFT", -8, 0)
+themeLabel:SetText("THEME")
+
+local function refreshSwatches()
+    for _, swatch in pairs(swatches) do
+        swatch:Refresh()
+    end
+end
+ns.On("DT_READY", refreshSwatches)
+ns.On("DT_SETTINGS_CHANGED", refreshSwatches)
 
 -- view is "category" (the items of a category) or "item" (the mobs that drop one item).
 -- category is "all" or a tree key: "c<class>" or "s<class>:<subclass>".
@@ -52,7 +103,7 @@ local function createList(left, top)
     return scroll, content
 end
 
--- Columns of fixed width are packed from the right edge (after "reserved"); the first column takes the rest.
+-- Columns of fixed width are packed from the right edge (after "reserved"), and the first column takes what's left.
 local function columnOffsets(columns, reserved)
     local offsets, right = {}, reserved
     for i = #columns, 2, -1 do
@@ -66,7 +117,7 @@ local function currentItems()
     return ns.SearchItems(search:GetText(), ns.settings.finderQualities)
 end
 
--- Sidebar: search, quality switches and the category tree.
+-- The sidebar has the search, the quality switches and the category tree.
 search = Style.Input(frame, SIDEBAR - 24, "Search looted items", "Interface\\Common\\UI-Searchbox-Icon")
 search.box:SetPoint("TOPLEFT", 12, -(TOP + 12))
 -- Typing redraws once the keys pause, not on every letter.
@@ -124,8 +175,15 @@ treeLabel:SetPoint("TOPLEFT", 14, -(TOP + 68))
 treeLabel:SetText("CATEGORIES")
 
 local treeScroll, treeContent = createList(8, -(TOP + 82))
-treeScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", SIDEBAR - SCROLLBAR_GAP, 12)
+treeScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", SIDEBAR - SCROLLBAR_GAP, 12 + Style.SHARE_CARD + 10)
 local treeRows = {}
+
+local shareCard = Style.ShareCard(frame)
+shareCard:SetPoint("BOTTOMLEFT", 8, 12)
+shareCard:SetPoint("RIGHT", frame, "LEFT", SIDEBAR - 8, 0)
+frame:HookScript("OnShow", function()
+    shareCard:Refresh()
+end)
 
 local divider = Style.Line(frame, C.faint)
 divider:SetWidth(1)
@@ -153,7 +211,7 @@ local function treeRow(index)
     row.name:SetPoint("RIGHT", row.count, "LEFT", -4, 0)
     row.name:SetJustifyH("LEFT")
     row:SetScript("OnClick", function(self)
-        -- Opening a class closes the one open before; a second click on the chosen open class closes it.
+        -- Opening a class closes the one that was open, and a second click on the chosen open class closes it.
         if self.hasSubs then
             openClass = (category == self.key and openClass == self.key) and nil or self.key
             ns.settings.finderOpenClass = openClass
@@ -208,7 +266,8 @@ function renderTree()
     treeContent:SetHeight(used * TREE_ROW_HEIGHT + (#items == 0 and 40 or 0))
 end
 
--- The items and title of a category; a category that no longer exists (search, quality) falls back to all items.
+-- The items and title of a category. A category that no longer exists after a search or a quality switch falls back to
+-- all items.
 local function categoryContents(key)
     local items = currentItems()
     if key ~= "all" then
@@ -226,7 +285,7 @@ local function categoryContents(key)
     return items, strtrim(search:GetText()) ~= "" and "Search results" or "All items", "all"
 end
 
--- Main pane header: item icon (item view), title, summary and a way back to the category.
+-- Header of the main pane, with the item icon (in the item view), title, summary and a way back to the category.
 local headIcon = Style.ItemIcon(frame, 36)
 headIcon:SetPoint("TOPLEFT", RIGHT, -(TOP + 12))
 local headTitle = Style.Text(frame, "heading")
@@ -262,7 +321,7 @@ local function placeTitle(withIcon)
     headTitle:SetPoint("RIGHT", back, "LEFT", -12, 0)
 end
 
--- Filters, shared by both views.
+-- Filters, which both views share.
 local filterY = -(TOP + 64)
 local zoneLabel = Style.Text(frame, "label")
 zoneLabel:SetPoint("TOPLEFT", RIGHT, filterY - 6)
@@ -299,8 +358,8 @@ local resultCount = Style.Text(frame, "muted")
 resultCount:SetPoint("TOPRIGHT", -16, filterY - 6)
 resultCount:SetJustifyH("RIGHT")
 
--- Offers the given maps in the zone dropdown; a chosen zone that is not among them is dropped.
--- Returns true when the zone filter had to be cleared.
+-- Offers the given maps in the zone dropdown and drops a chosen zone that isn't among them. Returns true when the zone
+-- filter had to be cleared.
 local function setupZones(maps)
     local cleared = false
     if filters.mapId and not tContains(maps, filters.mapId) then
@@ -332,7 +391,7 @@ filterRule:SetHeight(1)
 filterRule:SetPoint("TOPLEFT", RIGHT, headerY + 6)
 filterRule:SetPoint("TOPRIGHT", -12, headerY + 6)
 
--- A sortable table in the main pane: headers, a scrolling list and an empty state.
+-- A sortable table in the main pane, with headers, a scrolling list and an empty state.
 local function makeTable(columns, reserved, onSort)
     local offsets, firstRight = columnOffsets(columns, reserved)
     local tbl = { columns = columns, offsets = offsets, firstRight = firstRight, headers = {}, rows = {} }
@@ -355,7 +414,9 @@ local function makeTable(columns, reserved, onSort)
     tbl.scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_GAP, 12)
     tbl.emptyTitle = Style.Text(tbl.content, "heading")
     tbl.emptyTitle:SetPoint("TOP", 0, -36)
-    tbl.emptyTitle:SetTextColor(unpack(C.muted))
+    Style.Paint(function()
+        tbl.emptyTitle:SetTextColor(unpack(C.muted))
+    end)
     tbl.emptyText = Style.Text(tbl.content, "muted")
     tbl.emptyText:SetPoint("TOP", tbl.emptyTitle, "BOTTOM", 0, -6)
     function tbl:SetShown(shown)
@@ -661,7 +722,7 @@ function ns.ToggleFinder(text)
     end
 end
 
--- Reads the Finder's saved choices; after Restore defaults they are gone and start over.
+-- Reads the Finder's saved choices. After Restore defaults they're gone and everything starts over.
 local function loadSettings()
     if not ns.settings.finderQualities then
         ns.settings.finderQualities = { [0] = true, true, true, true, true }
@@ -691,9 +752,10 @@ local function redraw()
     end
     renderTree()
     renderMain()
+    shareCard:Refresh()
 end
 
--- Kills, looks at mobs and item info arriving can come many times a second; one redraw covers them all.
+-- Kills, looks at mobs and item info can arrive many times a second, so one redraw a little later covers them all.
 local REFRESH_DELAY = 0.5
 local refreshPending = false
 local function refresh()

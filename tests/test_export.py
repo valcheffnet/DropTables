@@ -64,7 +64,7 @@ def main():
     expect("kill spots stay home", mobs["1"]["cells"], {})
     expect("summary counts", (result.mobs, result.kills, result.sources), (2, 3, 0))
 
-    # Copying is no promise that it was sent: the same counts go out again until the shared database has them.
+    # Copying doesn't mean it was sent, so the same counts go out again until the shared database has them.
     expect("everything again", sorted(checked(lua_list(ns.BuildExport().strings)[0])["sources"][own]["mobs"]),
            ["1", "2"])
     expect("all mobs new", ns.NewCount(), 2)
@@ -76,6 +76,15 @@ def main():
     parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("more kills than the database has go out", sorted(parsed["sources"][own]["mobs"]), ["1", "2"])
     ns.shared[1] = None
+
+    # After every part is copied the share cards stop asking for those counts, but the export still carries them.
+    copied = ns.BuildExport()
+    ns.MarkCopied(copied)
+    expect("nothing to ask for after copying", ns.NewCount(), 0)
+    expect("copied counts still go out", sorted(checked(lua_list(ns.BuildExport().strings)[0])["sources"][own]["mobs"]),
+           ["1", "2"])
+    loot_mob(alice, 2, "B9", [(100, 1)])
+    expect("a new kill asks again", ns.NewCount(), 1)
 
     # Counts other players whispered back go out in their own section (answers count only after asking).
     peer = "0123456789abcdef"
