@@ -56,7 +56,9 @@ LE_PARTY_CATEGORY_INSTANCE = 2
 function IsEncounterInProgress() return false end
 function CanLootUnit(guid) return lootable[guid] end
 function UnitGUID(unit) return units[unit] end
-function UnitIsDead(unit) return units[unit] ~= nil end
+friendly = {}      -- unit token -> true for a living creature the player cannot attack (flight master, vendor)
+function UnitIsDead(unit) return units[unit] ~= nil and not friendly[unit] end
+function UnitCanAttack(_, unit) return units[unit] ~= nil and not friendly[unit] end
 function UnitName(unit)
     local index = tonumber(unit:match("^party(%d+)$") or "")
     if index then return groupMembers[index] end
@@ -212,10 +214,11 @@ class Client:
         self.g.lootSlots = table
         self.fire("LOOT_OPENED", True, from_item)
 
-    def see(self, npc, spawn, level, unit="target"):
-        """The player targets (or mouses over) a mob of the given level."""
+    def see(self, npc, spawn, level, unit="target", friendly=False):
+        """The player targets (or mouses over) a mob of the given level, or a friendly NPC."""
         self.g.units[unit] = "Creature-0-1-0-1-%d-%s" % (npc, spawn)
         self.g.unitLevels[unit] = level
+        self.g.friendly[unit] = friendly or None
         self.fire("PLAYER_TARGET_CHANGED" if unit == "target" else "UPDATE_MOUSEOVER_UNIT")
 
     def stand(self, map_id, x=None, y=None):

@@ -574,7 +574,7 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
 end)
 
 ns.On("PLAYER_TARGET_CHANGED", function()
-    local npc = ns.UnitNpc("target")
+    local npc = ns.UnitMob("target")
     if npc then
         ask(npc)
     end

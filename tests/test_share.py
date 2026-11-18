@@ -172,6 +172,13 @@ def main():
     expect("only mine hides peer counts", carol.ns.GetStats(1, "all"), None)
     carol.ns.settings.onlyMine = False
 
+    # Friendly NPCs drop nothing: targeting a flight master neither asks about it nor records it.
+    start = len(net.log)
+    carol.see(90, "C90", 30, friendly=True)
+    net.run(10)
+    expect("no question about a flight master", net.sent("Carol", "Q|", start), [])
+    expect("flight master not recorded", carol.ns.db.names[90], None)
+
     # The question lists what the asker holds: Alice has nothing newer for Carol, Bob's own counts are new.
     loot_mob(bob, 1, "B1", [(100, 1)])
     net.run(600)

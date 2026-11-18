@@ -122,6 +122,20 @@ function ns.UnitNpc(unit)
     return ns.NpcFromGuid(guid), guid
 end
 
+-- Like UnitNpc, but nil for creatures the player cannot fight, such as flight masters, vendors and trainers, which
+-- drop nothing. Corpses count, and so does a unit whose state the client hides.
+function ns.UnitMob(unit)
+    local npc, guid = ns.UnitNpc(unit)
+    if not npc then
+        return nil
+    end
+    local canAttack, dead = UnitCanAttack("player", unit), UnitIsDead(unit)
+    if isSecret(canAttack) or canAttack or isSecret(dead) or dead then
+        return npc, guid
+    end
+    return nil
+end
+
 function ns.ItemIcon(itemId)
     return select(5, C_Item.GetItemInfoInstant(itemId)) or 134400
 end

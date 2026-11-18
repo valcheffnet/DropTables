@@ -344,7 +344,7 @@ ns.On("PLAYER_TARGET_CHANGED", function()
     if not frame:IsShown() or not ns.settings.detailsFollow then
         return
     end
-    local npc = ns.UnitNpc("target")
+    local npc = ns.UnitMob("target")
     if npc and npc ~= shownNpc then
         setNpc(npc)
         render()

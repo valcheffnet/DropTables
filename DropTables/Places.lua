@@ -67,7 +67,7 @@ ns.On("PARTY_KILL", function(_, victim)
 end)
 
 local function remember(unit)
-    local npc = ns.UnitNpc(unit)
+    local npc = ns.UnitMob(unit)
     if not npc then
         return
     end
