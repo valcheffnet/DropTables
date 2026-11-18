@@ -1,5 +1,5 @@
 {
- "built": 1795011607,
+ "built": 1795012566,
  "mobs": {
   "12296": {
    "buckets": {
@@ -1214,29 +1214,29 @@
     "1": {
      "items": {
       "5124": {
-       "drops": 1,
+       "drops": 4,
        "max": 1,
        "min": 1,
-       "qty": 1
+       "qty": 4
       }
      },
-     "kills": 2,
-     "lootable": 1,
+     "kills": 10,
+     "lootable": 4,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 1
+     "opened": 4
     }
    },
    "from": {
-    "2750ad299c178787": 2
+    "2750ad299c178787": 10
    },
    "maps": {
-    "1413": 2
+    "1413": 10
    },
    "maxLevel": 18,
-   "minLevel": 17,
+   "minLevel": 16,
    "name": "Sunscale Scytheclaw"
   },
   "3272": {
@@ -1771,5 +1771,5 @@
    "name": "Overseer Glibby"
   }
  },
- "submissions": 1
+ "submissions": 2
 }

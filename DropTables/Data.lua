@@ -2,7 +2,7 @@ local _, ns = ...
 
 -- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do
 -- not edit; the issue workflow rebuilds it after each accepted submission.
-ns.SharedBuilt = 1795011607
+ns.SharedBuilt = 1795012566
 ns.AddSharedData(function() return {
 [1529]={buckets={[1]={items={[118]={drops=1,max=1,min=1,qty=1},[774]={drops=1,qty=1},[1415]={drops=1,max=1,min=1,qty=1},[2140]={drops=1,max=1,min=1,qty=1},[2589]={drops=9,max=2,min=1,qty=15},[3319]={drops=2,max=1,min=1,qty=2},[4604]={drops=3,max=1,min=1,qty=3},[6509]={drops=1,max=1,min=1,qty=1},[6513]={drops=1,qty=1},[7350]={drops=1,max=1,min=1,qty=1},[9759]={drops=1,qty=1}},kills=39,lootable=37,money={copper=315,drops=36,max=15,min=2},opened=36}},from={["2750ad299c178787"]=39},maps={[1420]=14},maxLevel=10,minLevel=9,name="Bleeding Horror"},
 [1532]={buckets={[1]={items={[118]={drops=2,max=1,min=1,qty=2},[159]={drops=1,max=1,min=1,qty=1},[774]={drops=1,max=1,min=1,qty=1},[1181]={drops=1,max=1,min=1,qty=1},[1417]={drops=1,max=1,min=1,qty=1},[1423]={drops=1,max=1,min=1,qty=1},[1430]={drops=1,qty=1},[1512]={drops=1,qty=1},[2589]={drops=8,max=2,min=1,qty=13},[3374]={drops=1,qty=1},[4604]={drops=2,max=1,min=1,qty=2},[6517]={drops=1,qty=1},[6520]={drops=1,max=1,min=1,qty=1},[9752]={drops=1,qty=1}},kills=34,lootable=33,money={copper=324,drops=32,max=17,min=2},opened=32}},from={["2750ad299c178787"]=34},maps={[1420]=7},maxLevel=11,minLevel=10,name="Wandering Spirit"},
@@ -25,7 +25,7 @@ ns.AddSharedData(function() return {
 [3251]={buckets={[2]={items={[5268]={drops=1,max=1,min=1,qty=1}},kills=1,lootable=1,money={copper=0,drops=0},opened=1}},from={["6b05637e02d9a0a8"]=1},maps={[1413]=1},maxLevel=20,minLevel=20,name="Silithid Grub"},
 [3254]={buckets={[1]={items={},kills=1,lootable=1,money={copper=0,drops=0},opened=1},[2]={items={[5123]={drops=1,max=1,min=1,qty=1}},kills=1,lootable=1,money={copper=0,drops=0},opened=1}},from={["2750ad299c178787"]=1,["6b05637e02d9a0a8"]=1},maps={[1413]=3},maxLevel=12,minLevel=11,name="Sunscale Lashtail"},
 [3255]={buckets={[1]={items={[4878]={drops=2,max=1,min=1,qty=2},[5123]={drops=1,max=1,min=1,qty=1}},kills=7,lootable=4,money={copper=0,drops=0},opened=4}},from={["2750ad299c178787"]=7},maps={[1413]=7},maxLevel=15,minLevel=13,name="Sunscale Screecher"},
-[3256]={buckets={[1]={items={[5124]={drops=1,max=1,min=1,qty=1}},kills=2,lootable=1,money={copper=0,drops=0},opened=1}},from={["2750ad299c178787"]=2},maps={[1413]=2},maxLevel=18,minLevel=17,name="Sunscale Scytheclaw"},
+[3256]={buckets={[1]={items={[5124]={drops=4,max=1,min=1,qty=4}},kills=10,lootable=4,money={copper=0,drops=0},opened=4}},from={["2750ad299c178787"]=10},maps={[1413]=10},maxLevel=18,minLevel=16,name="Sunscale Scytheclaw"},
 [3272]={buckets={[1]={items={[2287]={drops=1,max=1,min=1,qty=1}},kills=6,lootable=6,money={copper=57,drops=6,max=14,min=3},opened=6}},from={["2750ad299c178787"]=6},maps={[1413]=6},maxLevel=13,minLevel=12,name="Kolkar Wrangler"},
 [3273]={buckets={[1]={items={},kills=2,lootable=2,money={copper=36,drops=2,max=29,min=7},opened=2}},from={["2750ad299c178787"]=2},maps={[1413]=2},maxLevel=13,minLevel=13,name="Kolkar Stormer"},
 [3275]={buckets={[1]={items={[1181]={drops=1,max=1,min=1,qty=1}},kills=1,lootable=1,money={copper=5,drops=1,max=5,min=5},opened=1}},from={["2750ad299c178787"]=1},maps={[1413]=1},maxLevel=15,minLevel=15,name="Kolkar Marauder"},
