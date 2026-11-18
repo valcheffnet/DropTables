@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, Client, expect, report  # noqa: E402
 
 
 def guid(npc, spawn):
@@ -191,6 +191,29 @@ def main():
     expect("settings back to defaults", (ns.settings.minQuality, ns.settings.debug, ns.settings.stripPos,
                                          ns.settings.finderCategory), (0, False, None, None))
     expect("recorded drops kept", ns.db.mobs[1][1].kills, 8)
+
+    # The icons under the target: a mob without data gets the question mark, a friendly NPC gets nothing.
+    viewer = Client("Viewer", files=ALL_FILES + ("Strip.lua",), saved="""
+        -- Any frame method works; Show and Hide are remembered.
+        function widget(name)
+            local w = { shown = true }
+            if name then _G[name] = w end
+            return setmetatable(w, { __index = function(_, key)
+                if key == "Show" then return function(self) self.shown = true end end
+                if key == "Hide" then return function(self) self.shown = false end end
+                if key == "SetShown" then return function(self, value) self.shown = value and true or false end end
+                if key == "IsShown" then return function(self) return self.shown end end
+                if key:find("^Get") then return function() return 1 end end
+                return function() return widget() end
+            end })
+        end
+        function CreateFrame(_, name) return widget(name) end
+        UIParent, GameTooltip, EventRegistry = widget(), widget(), widget()
+    """)
+    viewer.see(7, "M7", 10)
+    expect("icons for a mob without data", viewer.g.DropTablesStrip.shown, True)
+    viewer.see(90, "C90", 30, friendly=True)
+    expect("no icons for a friendly NPC", viewer.g.DropTablesStrip.shown, False)
 
     report("collector")
 

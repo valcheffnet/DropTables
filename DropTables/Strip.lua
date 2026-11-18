@@ -196,7 +196,7 @@ local function fillPreview()
 end
 
 local function update()
-    local npc = ns.settings and ns.settings.showStrip and ns.UnitNpc("target")
+    local npc = ns.settings and ns.settings.showStrip and ns.UnitMob("target")
     currentNpc = npc
     if not npc and not unlocked then
         strip:Hide()

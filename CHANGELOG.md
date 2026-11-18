@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Targeting a flight master or another friendly NPC no longer asks other players about its drops, and the details window no longer jumps to it.
+- Targeting a flight master or another friendly NPC no longer asks other players about its drops or puts a question mark under the target frame, and the details window no longer jumps to it.
 
 ## [0.2.7] - 2026-11-18
 
