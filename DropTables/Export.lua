@@ -64,11 +64,30 @@ function ns.CanExport()
     return C_EncodingUtil ~= nil and C_EncodingUtil.CompressString ~= nil and Enum.CompressionMethod ~= nil
 end
 
--- One line per mob, or nil when nothing complete is left to send. Kill spots stay out because the shared database has
--- no use for them.
+-- One line per mob, or nil when nothing complete is left to send. The player's own kill spots go along, so the shared
+-- database can show where the mob is; other players never send theirs, so their lines have none.
 local function ownLine(npc)
     local records = Wire.SourceRecords(npc, ns.OwnSource(npc), ns.db.names[npc])
-    return #records > 0 and table.concat(records, ";") or nil
+    if #records == 0 then
+        return nil
+    end
+    local info = ns.db.info[npc]
+    local spots = {}
+    for mapId, place in pairs(info and info.maps or {}) do
+        for cell, kills in pairs(place.cells) do
+            table.insert(spots, { mapId = mapId, cell = cell, record = Wire.SpotRecord(npc, mapId, cell, kills) })
+        end
+    end
+    table.sort(spots, function(a, b)
+        if a.mapId ~= b.mapId then
+            return a.mapId < b.mapId
+        end
+        return a.cell < b.cell
+    end)
+    for _, spot in ipairs(spots) do
+        table.insert(records, spot.record)
+    end
+    return table.concat(records, ";")
 end
 
 local function peerLine(npc, peer)

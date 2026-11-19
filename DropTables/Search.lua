@@ -101,9 +101,10 @@ local function droppersOf(npc)
         return found
     end
     local info = ns.MobInfo(npc)
-    local maps = {}
+    local maps, spots = {}, false
     for mapId, place in pairs(info and info.maps or {}) do
         table.insert(maps, { mapId = mapId, kills = place.kills })
+        spots = spots or next(place.cells) ~= nil
     end
     table.sort(maps, function(a, b)
         return a.kills > b.kills
@@ -122,6 +123,7 @@ local function droppersOf(npc)
                 minLevel = info and info.minLevel,
                 maxLevel = info and info.maxLevel,
                 maps = maps,
+                spots = spots,
                 zone = zone,
             }
         end

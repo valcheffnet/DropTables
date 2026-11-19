@@ -11,12 +11,30 @@ import tempfile
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
 sys.path.insert(0, str(ROOT / "tools"))
-from wowsim import Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
 from test_share import Net, loot_mob  # noqa: E402
 import build_data  # noqa: E402
 import ingest_issue  # noqa: E402
 
 DAY = "2026-11-18T10:00:00Z"
+
+# The world map, enough for ns.ShowOnMap: the map it shows and the waypoint it gets.
+MAP_STUBS = """
+WorldMapFrame = widget("WorldMapFrame")
+WorldMapFrame.shown = false
+WorldMapFrame.SetMapID = function(_, id) shownMap = id end
+WorldMapFrame.GetMapID = function() return shownMap end
+local canvas = widget()
+canvas.GetSize = function() return 1000, 600 end
+WorldMapFrame.GetCanvas = function() return canvas end
+function ToggleWorldMap() WorldMapFrame.shown = not WorldMapFrame.shown end
+function InCombatLockdown() return false end
+function hooksecurefunc() end
+C_Map.CanSetUserWaypointOnMap = function() return true end
+C_Map.SetUserWaypoint = function(point) waypoint = point end
+UiMapPoint = { CreateFromCoordinates = function(m, x, y) return { m = m, x = x, y = y } end }
+C_SuperTrack = { SetSuperTrackedUserWaypoint = function() end }
+"""
 
 
 def issue(number, body, login="alice-gh", labels=(), created=DAY):
@@ -123,6 +141,112 @@ def merge_rules():
     expect("all mobs loaded", sum(1 for _ in client.ns.shared.keys()), 3000)
 
 
+def partial_import(origin_id, mobs):
+    sub = submission(0, origin_id, {origin_id: mobs}, submitter="import:" + origin_id)
+    sub["partial"] = True
+    sub["source"] = {"name": "Test harvest", "url": "https://example.org/harvest", "license": "MIT",
+                     "copyright": "Copyright (c) 2026 Test",
+                     "notice": "MIT License\n\nCopyright (c) 2026 Test\n\nPermission is hereby granted, free of charge"}
+    return sub
+
+
+def imports(root):
+    """A partial import brings looted corpses and items, and takes kills, money and stack sizes from the players."""
+    corpses = {npc: mob({1: bucket(40, 40, 40, {100: 20})}) for npc in (31, 32)}
+    for record in corpses.values():
+        record["buckets"]["1"]["items"]["100"].pop("min")
+        record["buckets"]["1"]["items"]["100"].pop("max")
+        record["buckets"]["1"]["items"]["100"]["qty"] = 20
+        del record["name"]
+    harvest = partial_import("harvest", corpses)
+
+    db = build_data.build([], [harvest])
+    alone = db["mobs"]["31"]["buckets"]["1"]
+    expect("alone: every corpse a kill with loot", (alone["kills"], alone["lootable"], alone["opened"]), (40, 40, 40))
+    expect("alone: no money", alone["money"]["drops"], 0)
+    expect("alone: no name", "name" in db["mobs"]["31"], False)
+    expect("the import is credited", db["imports"][0]["id"], "harvest")
+
+    player = submission(1, origin(70), {origin(70): {31: mob({1: bucket(100, 80, 40, {100: 10}, money=30)})}})
+    player["result"]["sources"][origin(70)]["mobs"]["31"]["buckets"]["1"]["items"]["100"]["qty"] = 30
+    db = build_data.build([player], [harvest])
+    both = db["mobs"]["31"]["buckets"]["1"]
+    expect("kills follow the player's share of opened corpses", (both["kills"], both["lootable"], both["opened"]),
+           (200, 160, 80))
+    expect("money keeps the player's rate", (both["money"]["drops"], both["money"]["copper"]), (60, 600))
+    expect("items add up, stacks keep the player's average", (both["items"]["100"]["drops"],
+                                                               both["items"]["100"]["qty"]), (30, 90))
+    expect("both are in from", db["mobs"]["31"]["from"], {origin(70): 100, "harvest": 40})
+    expect("the player's name stays", db["mobs"]["31"]["name"], "Wolf")
+
+    # Three players with plenty of empty corpses and money, and a big import with neither, are all kept.
+    honest = [submission(10 + i, origin(80 + i), {origin(80 + i): {32: mob({1: bucket(100, 70, 70, {100: 35},
+                                                                                      money=60)})}})
+              for i in range(3)]
+    db = build_data.build(honest, [harvest])
+    expect("an import is never an empty-kill or money outlier", "harvest" in db["mobs"]["32"]["from"], True)
+    odd = partial_import("odd", {32: mob({1: bucket(40, 40, 40, {101: 20})})})
+    db = build_data.build(honest, [odd])
+    expect("an import that never sees a 50% drop is left out", "odd" in db["mobs"]["32"]["from"], False)
+
+    lua = build_data.lua_file(build_data.build([], [harvest]))
+    expect("Data.lua names the imported source and its license", "Copyright (c) 2026 Test, under the MIT license" in lua,
+           True)
+    expect("Data.lua carries the import's whole notice, as a comment",
+           "\n-- Permission is hereby granted, free of charge\n" in lua, True)
+    client = Client("Imported", data=lua)
+    entry = next(e for e in client.ns.GetStats(31, "all").list.values() if e.itemId == 100)
+    expect("the addon shows the imported chance", round(entry.rate, 2), 0.5)
+
+    # Kill spots: the import's cells become the mob's spots, the busiest MAX_SPOTS per map, and exports bring none.
+    spotted = partial_import("spotted", {33: mob({1: bucket(60, 60, 60, {100: 30})}, maps={"12": 60})})
+    spotted["result"]["sources"]["spotted"]["mobs"]["33"]["cells"] = {
+        "12": {str(cell): 1 + cell % 3 for cell in range(build_data.MAX_SPOTS + 5)}}
+    player = submission(2, origin(71), {origin(71): {33: mob({1: bucket(10, 10, 10, {100: 5})})}})
+    db = build_data.build([player], [spotted])
+    spots = db["mobs"]["33"]["spots"]["12"]
+    expect("spots per map are capped at the busiest", (len(spots), min(spots.values())), (build_data.MAX_SPOTS, 1))
+    expect("the busiest spots stay", all(spots.get(str(c)) == 3 for c in range(2, build_data.MAX_SPOTS + 5, 3)), True)
+    expect("an export without spots brings none", "spots" in build_data.build([player])["mobs"]["33"], False)
+    # One install's spots weigh at most PEER_CAP kills, like its counts.
+    loud = submission(3, origin(72), {origin(72): {34: mob({1: bucket(3000, 3000, 3000)}, maps={"12": 3000})}})
+    loud["result"]["sources"][origin(72)]["mobs"]["34"]["cells"] = {"12": {"7": 3000}}
+    quiet = submission(4, origin(73), {origin(73): {34: mob({1: bucket(200, 200, 200)}, maps={"12": 200})}})
+    quiet["result"]["sources"][origin(73)]["mobs"]["34"]["cells"] = {"12": {"8": 200}}
+    expect("a big install's spots are scaled down like its kills",
+           build_data.build([loud, quiet])["mobs"]["34"]["spots"]["12"], {"7": 300, "8": 200})
+
+    lua = build_data.lua_file(build_data.build([], [spotted]))
+    hunter = Client("Hunter", data=lua)
+    hunter.lua.execute("DropTablesDB.info[33] = { maps = { [12] = { kills = 2, cells = { [5] = 2 } } } }")
+    info = hunter.ns.MobInfo(33)
+    expect("shared spots join the player's own", (info.maps[12].cells[5], info.maps[12].cells[2]), (5, 3))
+    expect("the player's saved spots don't change", hunter.ns.db.info[33].maps[12].cells[5], 2)
+    dropper = hunter.ns.FindDroppers(100)[1]
+    expect("a mob with shared spots offers the map", dropper.spots, True)
+    hunter.ns.settings.onlyMine = True
+    expect("Only mine leaves the shared spots out", hunter.ns.MobInfo(33).maps[12].cells[2], None)
+    plain = Client("Plain", data=build_data.lua_file(build_data.build([player])))
+    expect("a mob without spots offers no map", plain.ns.FindDroppers(100)[1].spots, False)
+
+    mapper = Client("Mapper", files=ALL_FILES + ("Style.lua", "Map.lua"), saved=UI_STUBS + MAP_STUBS, data=lua)
+    # Alone the player's busiest spot is 46, added to the shared ones it is 5.
+    mapper.lua.execute("DropTablesDB.info[33] = { maps = { [12] = { kills = 3, cells = { [46] = 2, [5] = 1 } } } }")
+    mapper.ns.ShowOnMap(33, 12)
+    waypoint = mapper.g.waypoint
+    expect("the waypoint goes to the busiest spot, own and shared added up",
+           (waypoint.m, round(waypoint.x, 2), round(waypoint.y, 2)), (12, 0.01, 0.11))
+
+    (root / "data" / "submissions").mkdir(parents=True)
+    (root / "data" / "imports").mkdir(parents=True)
+    (root / "data" / "imports" / "harvest.json").write_text(json.dumps(harvest), encoding="utf-8")
+    build_data.main(["--root", str(root)])
+    shared = json.loads((root / "data" / "shared.json").read_text(encoding="utf-8"))
+    expect("main reads data/imports", sorted(shared["mobs"]), ["31", "32"])
+    expect("imports aren't counted as submissions", shared["submissions"], 0)
+    expect("the import file stays", (root / "data" / "imports" / "harvest.json").exists(), True)
+
+
 def issues_and_game(root):
     alice = Client("Alice")
     alice.stand(12, 0.3, 0.3)
@@ -160,6 +284,9 @@ def issues_and_game(root):
     expect("the shared mob is known", carol.ns.KnownNpcs()[1], True)
     expect("its name and level come along", (carol.ns.MobName(1), carol.ns.MobInfo(1).minLevel), ("Test Mob", 5))
     expect("the loot finder lists it", sorted(d.npc for d in carol.ns.FindDroppers(100).values()), [1, 3])
+    alice_cells = {c: k for c, k in alice.ns.db.info[1].maps[12].cells.items()}
+    expect("alice's kill spots reach carol's map", ({c: k for c, k in carol.ns.MobInfo(1).maps[12].cells.items()},
+                                                    len(alice_cells) > 0), (alice_cells, True))
     carol.ns.settings.onlyMine = True
     carol.fire("DT_SETTINGS_CHANGED")
     expect("only mine hides the shared data", carol.ns.GetStats(1, "all"), None)
@@ -310,6 +437,8 @@ def daily_limit(root):
 def main():
     merge_rules()
     shared_is_trusted()
+    with tempfile.TemporaryDirectory() as folder:
+        imports(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:
         issues_and_game(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:

@@ -391,7 +391,8 @@ function ns.KnownNpcs()
 end
 
 -- Level range and kills per map from the player's own records, filled in with what other players sent and with the
--- shared database. Kill spots (cells) only ever come from the player's own kills.
+-- shared database. Kill spots (cells) come from the player's own kills and the shared database, never from other
+-- players.
 function ns.MobInfo(npc)
     local own = ns.db.info[npc] or ns.SeenMob(npc)
     local peers = not ns.settings.onlyMine and ns.db.peers[npc] or {}
@@ -406,13 +407,17 @@ function ns.MobInfo(npc)
             info.maxLevel = math.max(info.maxLevel or minLevel, maxLevel or minLevel)
         end
     end
+    -- The cells are added into a table of their own, so the player's saved ones never change.
     local function addKills(mapId, kills, cells)
         local place = info.maps[mapId]
         if not place then
-            place = { kills = 0, cells = cells or {} }
+            place = { kills = 0, cells = {} }
             info.maps[mapId] = place
         end
         place.kills = place.kills + kills
+        for cell, count in pairs(cells or {}) do
+            place.cells[cell] = (place.cells[cell] or 0) + count
+        end
     end
     if own then
         addLevels(own.minLevel, own.maxLevel)
@@ -429,7 +434,7 @@ function ns.MobInfo(npc)
     if shared then
         addLevels(shared.minLevel, shared.maxLevel)
         for mapId, kills in pairs(shared.maps) do
-            addKills(mapId, kills)
+            addKills(mapId, kills, shared.spots and shared.spots[mapId])
         end
     end
     return info

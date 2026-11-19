@@ -1,7 +1,12 @@
-"""Merges the accepted submissions (data/submissions/*.json) into the shared database.
+"""Merges the accepted submissions (data/submissions/*.json) and the imports (data/imports/*.json) into the shared
+database.
 
 Writes data/shared.json and DropTables/Data.lua, which the addon loads as one more source of counts.
 The same input always gives the same output, so a rebuild without new submissions changes nothing.
+
+An import marked partial counts looted corpses and the items in them, but not kills, empty corpses, money or stack
+sizes. Its corpses get those in the same proportion as the players' own counts of the mob, so it moves the item
+chances and nothing else.
 
 Usage:
     python tools/build_data.py [--root DIR]
@@ -21,6 +26,7 @@ OUTLIER_Z = 3
 # How many installs one submitter may bring that only one exporter ever sent and that never exported themselves.
 UNCONFIRMED_CAP = 50
 CHUNK = 500  # mobs per Lua function, far below the constant limit of one Lua 5.1 function
+MAX_SPOTS = 40  # kill spots kept per map of a mob, the busiest, as MAX_CELLS in DropTables/Places.lua
 
 
 def mob_kills(mob):
@@ -45,7 +51,7 @@ def versions(submissions):
                 mob = dict(mob, buckets=buckets)
                 found.setdefault((origin, npc), []).append({
                     "kills": mob_kills(mob), "exporter": result["exporter"], "submitter": sub["submitter"],
-                    "issue": sub["issue"], "mob": mob,
+                    "issue": sub["issue"], "mob": mob, "partial": bool(sub.get("partial")),
                 })
     return found
 
@@ -160,17 +166,18 @@ def plausible(seen, opened, p):
     return abs(p - center) <= half + 1e-9
 
 
-def item_outliers(sums):
+def item_outliers(sums, partial=frozenset()):
     """usedFor in the addon. With enough big installs, one whose share of an item is far off their median doesn't fit,
-    and when none of them fits for an item, nobody gets blamed for it."""
-    big = {o: s for o, s in sums.items() if s["opened"] >= BIG_SOURCE}
-    if len(big) < MIN_BIG_SOURCES:
-        return set()
+    and when none of them fits for an item, nobody gets blamed for it. Partial sources have no money count, so they
+    are left out of the money comparison."""
     keys = set()
-    for s in big.values():
+    for s in sums.values():
         keys.update(s["entries"])
     out = set()
     for key in sorted(keys):
+        big = {o: s for o, s in sums.items() if s["opened"] >= BIG_SOURCE and not (key == "money" and o in partial)}
+        if len(big) < MIN_BIG_SOURCES:
+            continue
         shares = {o: min(1, s["entries"].get(key, 0) / s["opened"]) for o, s in big.items()}
         middle = median(list(shares.values()))
         failing = {o for o, share in shares.items() if not plausible(share, big[o]["opened"], middle)}
@@ -189,20 +196,59 @@ def merge_range(into, low, high):
         into["max"] = high if into.get("max") is None else max(into["max"], high)
 
 
+def full_totals(kept):
+    """The scaled counts of the full sources over all buckets, which a partial source's missing counts follow."""
+    total = {"kills": 0.0, "lootable": 0.0, "opened": 0.0, "money": 0.0, "copper": 0.0, "drops": {}, "qty": {}}
+    for v in kept.values():
+        if v["partial"]:
+            continue
+        factor = PEER_CAP / v["kills"] if v["kills"] > PEER_CAP else 1
+        for data in v["mob"]["buckets"].values():
+            for key in ("kills", "lootable", "opened"):
+                total[key] += data[key] * factor
+            total["money"] += data["money"]["drops"] * factor
+            total["copper"] += data["money"]["copper"] * factor
+            for item, entry in data["items"].items():
+                total["drops"][item] = total["drops"].get(item, 0) + entry["drops"] * factor
+                total["qty"][item] = total["qty"].get(item, 0) + entry["qty"] * factor
+    return total
+
+
+def completed(data, full):
+    """A partial bucket with kills, empty corpses, money and stack sizes in the same proportion as the full sources.
+    Without any full source to follow, every corpse counts as a kill with loot, and nothing as money."""
+    opened = data["opened"]
+    out = {"opened": opened, "kills": opened, "lootable": opened, "money": {"drops": 0.0, "copper": 0.0}, "items": {}}
+    if full["opened"] > 0:
+        out["kills"] = opened * full["kills"] / full["opened"]
+        out["lootable"] = opened * full["lootable"] / full["opened"]
+        money = opened * full["money"] / full["opened"]
+        out["money"] = {"drops": money, "copper": money * full["copper"] / full["money"] if full["money"] else 0.0}
+    for item, entry in data["items"].items():
+        drops = entry["drops"]
+        known = full["drops"].get(item, 0)
+        out["items"][item] = {"drops": drops, "qty": drops * full["qty"][item] / known if known else drops}
+    return out
+
+
 def shared_mob(chosen):
     """chosen: origin -> version. Returns the shared record of the mob, or None when no install is left."""
     sums = {origin: scaled_sum(v["mob"]) for origin, v in chosen.items()}
-    out = empty_kill_outliers(sums)
-    out |= item_outliers({o: s for o, s in sums.items() if o not in out})
+    partial = frozenset(o for o, v in chosen.items() if v["partial"])
+    out = empty_kill_outliers({o: s for o, s in sums.items() if o not in partial})
+    out |= item_outliers({o: s for o, s in sums.items() if o not in out}, partial)
     kept = {o: v for o, v in chosen.items() if o not in out}
     if not kept:
         return None
+    full = full_totals(kept)
     raw = {}
     for origin, v in kept.items():
         mob = v["mob"]
         kills = v["kills"]
         factor = PEER_CAP / kills if kills > PEER_CAP else 1
         for bucket, data in mob["buckets"].items():
+            if v["partial"]:
+                data = completed(data, full)
             into = raw.setdefault(bucket, {"kills": 0.0, "lootable": 0.0, "opened": 0.0,
                                            "money": {"drops": 0.0, "copper": 0.0}, "items": {}})
             into["kills"] += data["kills"] * factor
@@ -246,9 +292,22 @@ def shared_mob(chosen):
     if levels:
         record["minLevel"] = min(low for low, _ in levels)
         record["maxLevel"] = max(high for _, high in levels)
+    # Spots weigh like counts: one install brings at most PEER_CAP kills' worth, so it can't make its own spots the
+    # busiest ones by claiming huge numbers.
+    spots = {}
     for v in kept.values():
+        factor = PEER_CAP / v["kills"] if v["kills"] > PEER_CAP else 1
         for map_id, kills in v["mob"]["maps"].items():
             record["maps"][map_id] = record["maps"].get(map_id, 0) + kills
+        for map_id, cells in (v["mob"].get("cells") or {}).items():
+            into = spots.setdefault(map_id, {})
+            for cell, kills in cells.items():
+                into[cell] = into.get(cell, 0) + kills * factor
+    for map_id, cells in sorted(spots.items()):
+        rounded = {cell: round_half_up(kills) for cell, kills in cells.items()}
+        busiest = sorted(((c, k) for c, k in rounded.items() if k > 0), key=lambda kv: (-kv[1], int(kv[0])))
+        if busiest:
+            record.setdefault("spots", {})[map_id] = dict(busiest[:MAX_SPOTS])
     names = {}
     for v in kept.values():
         name = v["mob"].get("name")
@@ -283,9 +342,10 @@ def superseded(submissions):
     return [old for i, old in enumerate(ordered) if any(covered(old, new) for new in ordered[i + 1:])]
 
 
-def build(submissions):
-    """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}."""
-    found = versions(submissions)
+def build(submissions, imports=()):
+    """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}, plus "imports" with the source
+    and license of each import that went in."""
+    found = versions(list(submissions) + list(imports))
     cut = unconfirmed_cut(found)
     by_npc = {}
     for (origin, npc), candidates in found.items():
@@ -297,8 +357,12 @@ def build(submissions):
         if record:
             mobs[npc] = record
     built = max((s["received"] for s in submissions), default=0)
-    return {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
-            "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables"}
+    database = {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
+                "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables"}
+    if imports:
+        database["imports"] = sorted((dict(imp["source"], id=imp["result"]["exporter"]) for imp in imports),
+                                     key=lambda s: s["id"])
+    return database
 
 
 def lua_string(text):
@@ -337,9 +401,18 @@ def lua_file(database):
         "",
         "-- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do",
         "-- not edit; the issue workflow rebuilds it after each accepted submission.",
-        "-- The data is under CC BY-SA 4.0, credited to the Drop Tables contributors (see LICENSE-DATA).",
-        "ns.SharedBuilt = %d" % database["built"],
+        "-- The data is under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), credited to the Drop",
+        "-- Tables contributors, https://github.com/valcheffnet/DropTables (see LICENSE-DATA there).",
     ]
+    # The release ships this folder alone, so each import's own notice has to travel inside this file.
+    for imp in database.get("imports", []):
+        lines.append("--")
+        lines.append("-- It includes %s, %s, under the %s license: %s." % (
+            imp["name"], imp["copyright"], imp["license"], imp["url"]))
+        if imp.get("notice"):
+            lines.append("--")
+            lines.extend(("-- " + line).rstrip() for line in imp["notice"].splitlines())
+    lines.append("ns.SharedBuilt = %d" % database["built"])
     npcs = sorted(database["mobs"], key=int)
     for start in range(0, len(npcs), CHUNK):
         lines.append("ns.AddSharedData(function() return {")
@@ -349,10 +422,14 @@ def lua_file(database):
     return "\n".join(lines) + "\n"
 
 
-def load_submissions(root):
-    folder = root / "data" / "submissions"
+def load_submissions(root, folder="submissions"):
+    folder = root / "data" / folder
     subs = [json.loads(path.read_text(encoding="utf-8")) for path in folder.glob("*.json")]
     return sorted(subs, key=lambda s: (s["issue"], s["index"]))
+
+
+def load_imports(root):
+    return load_submissions(root, "imports")
 
 
 def write_outputs(root, database):
@@ -377,10 +454,11 @@ def main(argv):
     for old in superseded(submissions):
         (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
         submissions.remove(old)
-    database = build(submissions)
+    imports = load_imports(root)
+    database = build(submissions, imports)
     changed = write_outputs(root, database)
-    print("%d submissions, %d mobs%s" % (database["submissions"], len(database["mobs"]),
-                                          "" if changed else ", nothing changed"))
+    print("%d submissions, %d imports, %d mobs%s" % (database["submissions"], len(imports), len(database["mobs"]),
+                                                     "" if changed else ", nothing changed"))
     return 0
 
 

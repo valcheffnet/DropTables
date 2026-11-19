@@ -23,6 +23,8 @@ HEADER_RE = re.compile(r"DTX\|1\|([0-9a-f]{16})\|([0-9A-Za-z.\-]{1,20}|\?)\|(\d{
 SECTION_RE = re.compile(r"@([0-9a-f]{16})")
 NUMBER_RE = re.compile(r"[0-9a-z]{0,%d}" % MAX_NUMBER_DIGITS)
 MAX_NAME_BYTES = 64
+GRID = 50       # DropTables/Places.lua: kill spots are cells of a GRID x GRID grid
+MAX_CELLS = 40  # and a mob keeps at most this many per map
 NAME_RE = re.compile(r"N([0-9a-z]{1,%d})\.([^|;\x00-\x1f\x7f]+)" % MAX_NUMBER_DIGITS)
 
 FIELDS = {
@@ -66,6 +68,8 @@ def consistent(r):
         return r["drops"] >= 1 and r["qty"] >= r["drops"] and stack_range(r["min"], r["max"])
     if kind == "L":
         return (r["minLevel"] is None) == (r["maxLevel"] is None) and or_zero(r["minLevel"]) <= or_zero(r["maxLevel"])
+    if kind == "P":
+        return r["cell"] < GRID * GRID and or_zero(r["kills"]) >= 1
     return True
 
 
@@ -183,6 +187,11 @@ def add_mob(mob, records):
         for item in bucket["items"].values():
             if item["drops"] > bucket["opened"]:
                 raise Invalid("an item dropped more often than corpses were opened")
+    for map_id, cells in mob["cells"].items():
+        if len(cells) > MAX_CELLS:
+            raise Invalid("more than %d kill spots on one map" % MAX_CELLS)
+        if sum(cells.values()) > mob["maps"].get(map_id, 0):
+            raise Invalid("more kills at the spots of a map than kills on it")
 
 
 def check(string):

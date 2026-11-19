@@ -1,6 +1,7 @@
 local _, ns = ...
 
--- Kill spots of one mob, drawn on the world map as soft round spots that get stronger where more kills happened.
+-- Kill spots of one mob, the player's own and the shared database's, drawn on the world map as soft round spots that
+-- get stronger where more kills happened.
 -- The marks follow the player around the map, so every zone the mob was killed in shows its spots, and a line at the
 -- top names the mob and its other zones. Closing the map ends the marking.
 local GRID = ns.GRID
@@ -39,7 +40,7 @@ local function drawPins()
         return
     end
     local mapId = WorldMapFrame:GetMapID()
-    local info = ns.db.info[shownNpc]
+    local info = ns.MobInfo(shownNpc)
     local place = info and info.maps[mapId]
 
     local text = "|cffe8c46aDrop Tables:|r " .. ns.MobName(shownNpc)
@@ -145,7 +146,7 @@ function ns.ShowOnMap(npc, mapId)
     WorldMapFrame:SetMapID(mapId)
     drawPins()
 
-    local info = ns.db.info[npc]
+    local info = ns.MobInfo(npc)
     local cell = info and info.maps[mapId] and busiestCell(info.maps[mapId])
     if cell and C_Map.CanSetUserWaypointOnMap(mapId) then
         local x, y = ns.CellCenter(cell)

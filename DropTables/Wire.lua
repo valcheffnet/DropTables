@@ -76,6 +76,10 @@ function Wire.MapRecord(npc, mapId, kills)
     return "Z" .. encodeNumber(npc) .. "." .. encodeNumber(mapId) .. "." .. encodeNumber(kills)
 end
 
+function Wire.SpotRecord(npc, mapId, cell, kills)
+    return "P" .. encodeNumber(npc) .. "." .. encodeNumber(mapId) .. "." .. encodeNumber(cell) .. "." .. encodeNumber(kills)
+end
+
 -- Mob names are client text and never contain "|", ";" or control characters, so a name with any of them is refused.
 local function validName(name)
     return type(name) == "string" and #name > 0 and #name <= 64 and not name:find("[%c|;]")

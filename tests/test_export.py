@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 sys.path.insert(0, str(ROOT / "tools"))
 from wowsim import Client, expect, report  # noqa: E402
 import check_export  # noqa: E402
-from test_share import bucket_view, loot_mob, plain  # noqa: E402
+from test_share import b36, bucket_view, loot_mob, plain  # noqa: E402
 
 
 def lua_list(table):
@@ -61,7 +61,9 @@ def main():
     expect("both mobs exported", sorted(mobs), ["1", "2"])
     expect("counts survive", json_view(mobs["1"]["buckets"]["1"]), bucket_view(ns.db.mobs[1][1]))
     expect("level and name", (mobs["1"]["levels"], mobs["1"]["name"]), ([5, 5], "Test Mob"))
-    expect("kill spots stay home", mobs["1"]["cells"], {})
+    own_cells = {str(m): {str(c): k for c, k in place.cells.items()} for m, place in ns.db.info[1].maps.items()}
+    expect("the player's kill spots go along", mobs["1"]["cells"], own_cells)
+    expect("there are some", sum(len(c) for c in own_cells.values()) > 0, True)
     expect("summary counts", (result.mobs, result.kills, result.sources), (2, 3, 0))
 
     # Copying doesn't mean it was sent, so the same counts go out again until the shared database has them.
@@ -95,6 +97,7 @@ def main():
     parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("peer section", parsed["sources"][peer]["mobs"]["5"]["buckets"]["1"]["kills"], 10)
     expect("peer levels", parsed["sources"][peer]["mobs"]["5"]["levels"], [2, 3])
+    expect("no kill spots in another player's section", parsed["sources"][peer]["mobs"]["5"]["cells"], {})
     ns.shared[5] = alice.lua.table_from({"from": alice.lua.table_from({peer: 10}), "buckets": alice.lua.table()})
     parsed = checked(lua_list(ns.BuildExport().strings)[0])
     expect("another player's counts the database has stay out", peer in parsed["sources"], False)
@@ -167,7 +170,17 @@ def main():
         "name over 64 bytes": pack(header + "N1." + "ö" * 33),
         "name with escape": pack(header + "N1.|cffff0000x"),
         "empty": pack("DTX|1|%s|0.2.0|1700000000|1/1" % own),
+        "spot off the grid": pack(header + "M1.1.a.a.a.0.0..;Z1.13p.a;P1.13p.1xg.1"),
+        "spot with no kills": pack(header + "M1.1.a.a.a.0.0..;Z1.13p.a;P1.13p.5.0"),
+        "spots above the map's kills": pack(header + "M1.1.a.a.a.0.0..;Z1.13p.2;P1.13p.5.2;P1.13p.6.1"),
+        "spots without the map": pack(header + "M1.1.a.a.a.0.0..;P1.13p.5.1"),
+        "41 spots on a map": pack(header + "M1.1.zz.zz.zz.0.0..;Z1.13p.zz;" + ";".join(
+            "P1.13p.%s.1" % b36(c) for c in range(41))),
     }
+    accepted = checked(pack(header + "M1.1.zz.zz.zz.0.0..;Z1.13p.zz;" + ";".join(
+        "P1.13p.%s.1" % b36(c) for c in range(40))))
+    expect("40 spots on a map pass", isinstance(accepted, dict) and len(accepted["sources"][own]["mobs"]["1"]["cells"]
+                                                                          ["1429"]), 40)
     for label, string in bad.items():
         result = checked(string)
         expect("refuses %s" % label, isinstance(result, str) and result.startswith("rejected"), True)
