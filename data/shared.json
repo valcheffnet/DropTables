@@ -1,6 +1,6 @@
 {
  "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables",
- "built": 1795046458,
+ "built": 1795125896,
  "imports": [
   {
    "copyright": "Copyright (c) 2026 Blackthornes",
@@ -13,6 +13,69 @@
  ],
  "license": "CC-BY-SA-4.0",
  "mobs": {
+  "10720": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1441": 1
+   },
+   "maxLevel": 28,
+   "minLevel": 27,
+   "name": "Galak Assassin",
+   "spots": {
+    "1441": {
+     "516": 1
+    }
+   }
+  },
+  "10992": {
+   "buckets": {
+    "2": {
+     "items": {
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1441": 1
+   },
+   "maxLevel": 30,
+   "minLevel": 30,
+   "name": "Enraged Panther",
+   "spots": {
+    "1441": {
+     "562": 1
+    }
+   }
+  },
   "11318": {
    "buckets": {
     "1": {
@@ -115,6 +178,195 @@
    },
    "name": "Earthborer"
   },
+  "11858": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 80,
+      "drops": 1,
+      "max": 80,
+      "min": 80
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 18,
+   "minLevel": 18,
+   "name": "Grundig Darkcloud",
+   "spots": {
+    "1442": {
+     "1843": 1
+    }
+   }
+  },
+  "11910": {
+   "buckets": {
+    "1": {
+     "items": {
+      "1509": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 2,
+       "max": 3,
+       "min": 1,
+       "qty": 4
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 64,
+      "drops": 3,
+      "max": 34,
+      "min": 8
+     },
+     "opened": 3
+    }
+   },
+   "from": {
+    "2750ad299c178787": 3
+   },
+   "maps": {
+    "1442": 3
+   },
+   "maxLevel": 15,
+   "minLevel": 14,
+   "name": "Grimtotem Ruffian",
+   "spots": {
+    "1442": {
+     "1945": 1,
+     "1994": 1,
+     "2047": 1
+    }
+   }
+  },
+  "11911": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 22,
+      "drops": 1,
+      "max": 22,
+      "min": 22
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 14,
+   "minLevel": 14,
+   "name": "Grimtotem Mercenary",
+   "spots": {
+    "1442": {
+     "1995": 1
+    }
+   }
+  },
+  "11912": {
+   "buckets": {
+    "1": {
+     "items": {
+      "1179": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 2,
+       "max": 2,
+       "min": 1,
+       "qty": 3
+      }
+     },
+     "kills": 5,
+     "lootable": 5,
+     "money": {
+      "copper": 97,
+      "drops": 5,
+      "max": 34,
+      "min": 8
+     },
+     "opened": 5
+    }
+   },
+   "from": {
+    "2750ad299c178787": 5
+   },
+   "maps": {
+    "1442": 5
+   },
+   "maxLevel": 16,
+   "minLevel": 15,
+   "name": "Grimtotem Brute",
+   "spots": {
+    "1442": {
+     "1793": 2,
+     "1843": 1,
+     "1893": 2
+    }
+   }
+  },
+  "11913": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2589": {
+       "drops": 2,
+       "max": 3,
+       "min": 2,
+       "qty": 5
+      }
+     },
+     "kills": 5,
+     "lootable": 5,
+     "money": {
+      "copper": 135,
+      "drops": 5,
+      "max": 38,
+      "min": 9
+     },
+     "opened": 5
+    }
+   },
+   "from": {
+    "2750ad299c178787": 5
+   },
+   "maps": {
+    "1442": 5
+   },
+   "maxLevel": 16,
+   "minLevel": 15,
+   "name": "Grimtotem Sorcerer",
+   "spots": {
+    "1442": {
+     "1793": 2,
+     "1843": 2,
+     "1892": 1
+    }
+   }
+  },
   "12296": {
    "buckets": {
     "1": {
@@ -154,25 +406,42 @@
        "drops": 1,
        "qty": 1
       },
+      "1819": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "248688": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "2592": {
-       "drops": 3,
-       "qty": 3
+       "drops": 6,
+       "max": 2,
+       "min": 1,
+       "qty": 10
       }
      },
-     "kills": 9,
-     "lootable": 9,
+     "kills": 19,
+     "lootable": 19,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 1163,
+      "drops": 19,
+      "max": 103,
+      "min": 17
      },
-     "opened": 9
+     "opened": 19
     }
    },
    "from": {
+    "2750ad299c178787": 10,
     "blackthornes-mit": 9
    },
    "maps": {
-    "1440": 9
+    "1440": 18
    },
    "maxLevel": 24,
    "minLevel": 23,
@@ -180,7 +449,12 @@
    "spots": {
     "1440": {
      "1786": 5,
-     "1836": 4
+     "1787": 1,
+     "1835": 2,
+     "1836": 5,
+     "1837": 3,
+     "1885": 1,
+     "1886": 1
     }
    }
   },
@@ -3640,20 +3914,23 @@
        "qty": 2
       }
      },
-     "kills": 24,
-     "lootable": 24,
+     "kills": 25,
+     "lootable": 25,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 600,
+      "drops": 25,
+      "max": 24,
+      "min": 24
      },
-     "opened": 24
+     "opened": 25
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 24
    },
    "maps": {
-    "1421": 24
+    "1421": 25
    },
    "maxLevel": 19,
    "minLevel": 18,
@@ -3703,16 +3980,19 @@
        "qty": 1
       }
      },
-     "kills": 21,
-     "lootable": 21,
+     "kills": 22,
+     "lootable": 22,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 924,
+      "drops": 22,
+      "max": 42,
+      "min": 42
      },
-     "opened": 21
+     "opened": 22
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 21
    },
    "maps": {
@@ -4922,7 +5202,7 @@
        "qty": 1
       }
      },
-     "kills": 26,
+     "kills": 27,
      "lootable": 26,
      "money": {
       "copper": 0,
@@ -4932,10 +5212,11 @@
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 26
    },
    "maps": {
-    "1424": 26
+    "1424": 27
    },
    "maxLevel": 22,
    "minLevel": 21,
@@ -4970,28 +5251,31 @@
        "qty": 2
       },
       "3730": {
-       "drops": 9,
-       "qty": 9
+       "drops": 10,
+       "max": 1,
+       "min": 1,
+       "qty": 10
       },
       "5635": {
        "drops": 1,
        "qty": 1
       }
      },
-     "kills": 32,
-     "lootable": 32,
+     "kills": 33,
+     "lootable": 33,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 32
+     "opened": 33
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 32
    },
    "maps": {
-    "1424": 32
+    "1424": 33
    },
    "maxLevel": 23,
    "minLevel": 22,
@@ -10349,52 +10633,58 @@
     "1": {
      "items": {
       "17056": {
-       "drops": 2,
+       "drops": 12,
        "max": 1,
        "min": 1,
-       "qty": 2
+       "qty": 12
       },
       "4775": {
-       "drops": 4,
+       "drops": 15,
        "max": 1,
        "min": 1,
-       "qty": 4
+       "qty": 15
       },
       "4776": {
-       "drops": 1,
-       "qty": 1
-      },
-      "5114": {
-       "drops": 4,
-       "qty": 4
-      },
-      "5115": {
-       "drops": 1,
-       "qty": 1
-      },
-      "5469": {
-       "drops": 4,
+       "drops": 3,
        "max": 1,
        "min": 1,
-       "qty": 4
+       "qty": 3
+      },
+      "5114": {
+       "drops": 12,
+       "max": 1,
+       "min": 1,
+       "qty": 12
+      },
+      "5115": {
+       "drops": 5,
+       "max": 1,
+       "min": 1,
+       "qty": 5
+      },
+      "5469": {
+       "drops": 16,
+       "max": 1,
+       "min": 1,
+       "qty": 16
       }
      },
-     "kills": 9,
-     "lootable": 9,
+     "kills": 40,
+     "lootable": 35,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 9
+     "opened": 35
     }
    },
    "from": {
-    "2750ad299c178787": 1,
-    "6b05637e02d9a0a8": 1,
+    "2750ad299c178787": 2,
+    "6b05637e02d9a0a8": 30,
     "blackthornes-mit": 7
    },
    "maps": {
-    "1413": 9
+    "1413": 37
    },
    "maxLevel": 17,
    "minLevel": 16,
@@ -10405,7 +10695,8 @@
      "1275": 1,
      "1324": 4,
      "1425": 1,
-     "1453": 1
+     "1453": 1,
+     "913": 1
     }
    }
   },
@@ -10685,6 +10976,52 @@
    "minLevel": 20,
    "name": "Silithid Grub"
   },
+  "3252": {
+   "buckets": {
+    "1": {
+     "items": {
+      "5268": {
+       "drops": 5,
+       "max": 1,
+       "min": 1,
+       "qty": 5
+      },
+      "5269": {
+       "drops": 4,
+       "max": 1,
+       "min": 1,
+       "qty": 4
+      }
+     },
+     "kills": 8,
+     "lootable": 6,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 6
+    },
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "6b05637e02d9a0a8": 9
+   },
+   "maps": {
+    "1413": 9
+   },
+   "maxLevel": 22,
+   "minLevel": 21,
+   "name": "Silithid Swarmer"
+  },
   "3254": {
    "buckets": {
     "1": {
@@ -10756,27 +11093,28 @@
        "qty": 3
       },
       "5123": {
-       "drops": 6,
+       "drops": 7,
        "max": 1,
        "min": 1,
-       "qty": 6
+       "qty": 7
       }
      },
-     "kills": 56,
-     "lootable": 32,
+     "kills": 66,
+     "lootable": 33,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 32
+     "opened": 33
     }
    },
    "from": {
     "2750ad299c178787": 7,
+    "6b05637e02d9a0a8": 3,
     "blackthornes-mit": 28
    },
    "maps": {
-    "1413": 35
+    "1413": 38
    },
    "maxLevel": 15,
    "minLevel": 13,
@@ -13237,20 +13575,23 @@
        "qty": 1
       }
      },
-     "kills": 3,
-     "lootable": 3,
+     "kills": 4,
+     "lootable": 4,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 128,
+      "drops": 4,
+      "max": 32,
+      "min": 32
      },
-     "opened": 3
+     "opened": 4
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 3
    },
    "maps": {
-    "1413": 3
+    "1413": 4
    },
    "maxLevel": 21,
    "minLevel": 20,
@@ -14400,6 +14741,31 @@
     }
    }
   },
+  "3781": {
+   "buckets": {
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 21,
+      "drops": 1,
+      "max": 21,
+      "min": 21
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1440": 1
+   },
+   "maxLevel": 24,
+   "minLevel": 23,
+   "name": "Shadethicket Wood Shaper"
+  },
   "3782": {
    "buckets": {
     "1": {
@@ -14458,26 +14824,30 @@
        "qty": 1
       }
      },
-     "kills": 18,
-     "lootable": 18,
+     "kills": 19,
+     "lootable": 19,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 627,
+      "drops": 19,
+      "max": 33,
+      "min": 33
      },
-     "opened": 18
+     "opened": 19
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "blackthornes-mit": 18
    },
    "maps": {
-    "1440": 18
+    "1440": 19
    },
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Shadethicket Bark Ripper",
    "spots": {
     "1440": {
+     "1690": 1,
      "1692": 15,
      "1741": 3
     }
@@ -14723,44 +15093,51 @@
        "qty": 1
       },
       "2251": {
-       "drops": 8,
-       "qty": 8
+       "drops": 9,
+       "max": 1,
+       "min": 1,
+       "qty": 9
       },
       "248683": {
        "drops": 1,
        "qty": 1
       },
       "3174": {
-       "drops": 10,
-       "qty": 10
+       "drops": 11,
+       "max": 1,
+       "min": 1,
+       "qty": 11
       },
       "3182": {
        "drops": 2,
        "qty": 2
       },
       "4428": {
-       "drops": 3,
-       "qty": 3
+       "drops": 5,
+       "max": 1,
+       "min": 1,
+       "qty": 5
       },
       "878": {
        "drops": 2,
        "qty": 2
       }
      },
-     "kills": 23,
-     "lootable": 23,
+     "kills": 38,
+     "lootable": 25,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 23
+     "opened": 25
     }
    },
    "from": {
+    "2750ad299c178787": 3,
     "blackthornes-mit": 23
    },
    "maps": {
-    "1440": 23
+    "1440": 26
    },
    "maxLevel": 21,
    "minLevel": 20,
@@ -14769,7 +15146,9 @@
     "1440": {
      "1692": 3,
      "1736": 5,
-     "1836": 5,
+     "1835": 1,
+     "1836": 6,
+     "1839": 1,
      "626": 2,
      "777": 4,
      "928": 4
@@ -14834,7 +15213,7 @@
        "qty": 1
       }
      },
-     "kills": 16,
+     "kills": 18,
      "lootable": 16,
      "money": {
       "copper": 0,
@@ -14844,17 +15223,20 @@
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "blackthornes-mit": 16
    },
    "maps": {
-    "1440": 16
+    "1440": 18
    },
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Ghostpaw Runner",
    "spots": {
     "1440": {
+     "1737": 1,
      "1792": 1,
+     "1835": 1,
      "1838": 3,
      "516": 9,
      "776": 3
@@ -14873,49 +15255,69 @@
        "drops": 1,
        "qty": 1
       },
+      "248705": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "2765": {
        "drops": 1,
        "qty": 1
       },
       "3669": {
-       "drops": 12,
-       "qty": 12
+       "drops": 14,
+       "max": 1,
+       "min": 1,
+       "qty": 14
       },
       "3670": {
-       "drops": 11,
-       "qty": 11
+       "drops": 16,
+       "max": 1,
+       "min": 1,
+       "qty": 16
       },
       "3674": {
-       "drops": 7,
-       "qty": 7
+       "drops": 11,
+       "max": 1,
+       "min": 1,
+       "qty": 11
       },
       "3676": {
-       "drops": 10,
-       "qty": 10
+       "drops": 14,
+       "max": 1,
+       "min": 1,
+       "qty": 14
       }
      },
-     "kills": 49,
-     "lootable": 49,
+     "kills": 100,
+     "lootable": 67,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 49
+     "opened": 62
     }
    },
    "from": {
+    "2750ad299c178787": 21,
     "blackthornes-mit": 49
    },
    "maps": {
-    "1440": 49
+    "1440": 70
    },
    "maxLevel": 22,
    "minLevel": 20,
    "name": "Rotting Slime",
    "spots": {
     "1440": {
-     "1786": 22,
-     "1836": 27
+     "1786": 25,
+     "1787": 3,
+     "1835": 3,
+     "1836": 33,
+     "1837": 1,
+     "1838": 2,
+     "1887": 3
     }
    }
   },
@@ -14960,6 +15362,63 @@
     }
    }
   },
+  "4005": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 2,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 2
+   },
+   "maps": {
+    "1442": 2
+   },
+   "maxLevel": 17,
+   "minLevel": 16,
+   "name": "Deepmoss Creeper",
+   "spots": {
+    "1442": {
+     "1693": 1,
+     "1743": 1
+    }
+   }
+  },
+  "4008": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 15,
+   "minLevel": 15,
+   "name": "Cliff Stormer",
+   "spots": {
+    "1442": {
+     "1894": 1
+    }
+   }
+  },
   "4075": {
    "buckets": {
     "1": {
@@ -14990,36 +15449,92 @@
     }
    }
   },
+  "4097": {
+   "buckets": {
+    "1": {
+     "items": {
+      "1760": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 120,
+      "drops": 1,
+      "max": 120,
+      "min": 120
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1441": 1
+   },
+   "maxLevel": 26,
+   "minLevel": 26,
+   "name": "Galak Stormer",
+   "spots": {
+    "1441": {
+     "562": 1
+    }
+   }
+  },
   "4127": {
    "buckets": {
     "1": {
      "items": {
-      "3301": {
-       "drops": 13,
+      "15011": {
+       "drops": 1,
        "max": 1,
        "min": 1,
-       "qty": 13
+       "qty": 1
+      },
+      "15298": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3301": {
+       "drops": 14,
+       "max": 1,
+       "min": 1,
+       "qty": 14
       },
       "5635": {
        "drops": 2,
        "qty": 2
       }
      },
-     "kills": 42,
-     "lootable": 21,
+     "kills": 35,
+     "lootable": 23,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 21
+     "opened": 23
     }
    },
    "from": {
-    "2750ad299c178787": 4,
+    "2750ad299c178787": 5,
+    "6b05637e02d9a0a8": 1,
     "blackthornes-mit": 19
    },
    "maps": {
-    "1413": 23
+    "1413": 24
    },
    "maxLevel": 16,
    "minLevel": 15,
@@ -15038,25 +15553,51 @@
    "buckets": {
     "1": {
      "items": {
-      "3301": {
+      "2319": {
        "drops": 1,
+       "max": 1,
+       "min": 1,
        "qty": 1
+      },
+      "3301": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
       }
      },
-     "kills": 3,
-     "lootable": 3,
+     "kills": 7,
+     "lootable": 5,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 3
+     "opened": 5
+    },
+    "2": {
+     "items": {
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "6b05637e02d9a0a8": 4,
     "blackthornes-mit": 3
    },
    "maps": {
-    "1413": 3
+    "1413": 7
    },
    "maxLevel": 23,
    "minLevel": 22,
@@ -15125,6 +15666,41 @@
      "1123": 2,
      "1175": 10,
      "1178": 2
+    }
+   }
+  },
+  "4248": {
+   "buckets": {
+    "1": {
+     "items": {
+      "3402": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1441": 1
+   },
+   "maxLevel": 27,
+   "minLevel": 26,
+   "name": "Pesterhide Hyena",
+   "spots": {
+    "1441": {
+     "670": 1
     }
    }
   },
@@ -15602,5 +16178,5 @@
    }
   }
  },
- "submissions": 3
+ "submissions": 4
 }
