@@ -58,7 +58,7 @@ The shared database only grows when players send their tables in. Type `/dt expo
 
 ## Data from other players
 
-Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). In the drop table window, Only mine hides the counts of other players and the shared database alike.
+Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.
 
 ## Bugs
 
@@ -66,4 +66,6 @@ Open an issue here. To see Lua errors in game, type `/console scriptErrors 1` on
 
 ## License
 
-All rights reserved, see LICENSE. You can use the addon in game and read the code, but not republish it or reuse the code without asking first.
+The code is all rights reserved, see LICENSE. You can use the addon in game and read the code, but not republish it or reuse the code without asking first.
+
+The drop data is different. Everything players send and the shared database built from it are under CC BY-SA 4.0 (see LICENSE-DATA), so other addons and sites can use them as long as they credit Drop Tables and keep what they make from them under the same license.

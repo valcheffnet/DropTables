@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- The shared drop data is under CC BY-SA 4.0 now, so other addons can use it as long as they credit Drop Tables and keep it open. The addon's code stays all rights reserved.
+
 ## [0.3.0] - 2026-11-18
 
 ### Added
@@ -144,6 +150,7 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/valcheffnet/DropTables/compare/v0.2.7...v0.3.0
 [0.2.7]: https://github.com/valcheffnet/DropTables/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/valcheffnet/DropTables/compare/v0.2.5...v0.2.6

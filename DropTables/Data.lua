@@ -2,6 +2,7 @@ local _, ns = ...
 
 -- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do
 -- not edit; the issue workflow rebuilds it after each accepted submission.
+-- The data is under CC BY-SA 4.0, credited to the Drop Tables contributors (see LICENSE-DATA).
 ns.SharedBuilt = 1795046458
 ns.AddSharedData(function() return {
 [1529]={buckets={[1]={items={[118]={drops=1,max=1,min=1,qty=1},[774]={drops=1,qty=1},[1415]={drops=1,max=1,min=1,qty=1},[2140]={drops=1,max=1,min=1,qty=1},[2589]={drops=9,max=2,min=1,qty=15},[3319]={drops=2,max=1,min=1,qty=2},[4604]={drops=3,max=1,min=1,qty=3},[6509]={drops=1,max=1,min=1,qty=1},[6513]={drops=1,qty=1},[7350]={drops=1,max=1,min=1,qty=1},[9759]={drops=1,qty=1}},kills=39,lootable=37,money={copper=315,drops=36,max=15,min=2},opened=36}},from={["2750ad299c178787"]=39},maps={[1420]=14},maxLevel=10,minLevel=9,name="Bleeding Horror"},

@@ -297,7 +297,8 @@ def build(submissions):
         if record:
             mobs[npc] = record
     built = max((s["received"] for s in submissions), default=0)
-    return {"built": built, "submissions": len(submissions), "mobs": mobs}
+    return {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
+            "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables"}
 
 
 def lua_string(text):
@@ -336,6 +337,7 @@ def lua_file(database):
         "",
         "-- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do",
         "-- not edit; the issue workflow rebuilds it after each accepted submission.",
+        "-- The data is under CC BY-SA 4.0, credited to the Drop Tables contributors (see LICENSE-DATA).",
         "ns.SharedBuilt = %d" % database["built"],
     ]
     npcs = sorted(database["mobs"], key=int)
