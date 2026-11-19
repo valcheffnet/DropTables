@@ -5,6 +5,8 @@
 ### Changed
 
 - The shared drop data is under CC BY-SA 4.0 now, so other addons can use it as long as they credit Drop Tables and keep it open. The addon's code stays all rights reserved.
+- The share page now links to the GitHub issue it opened, so you can read the bot's answer without an account. If sending fails, your text stays in the box for the next try.
+- An export over the daily limit of 20 used to be turned down. Now it waits and goes in the next day.
 
 ### Fixed
 

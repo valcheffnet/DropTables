@@ -7,7 +7,9 @@ Usage:
     python tools/ingest_issue.py ISSUES_JSON --replies DIR [--root DIR]
 ISSUES_JSON is a list of issues as `gh issue list --json number,body,author,labels,createdAt` gives it. Writes
 data/submissions/<issue>-<n>.json for each new string, DIR/<issue>.md with the reply for each issue, DIR/outcomes.txt
-with one "<issue> <accepted|rejected|duplicate>" line per issue and DIR/message.txt with the commit message.
+with one "<issue> <outcome>" line per issue and DIR/message.txt with the commit message. The outcome is accepted,
+rejected, duplicate, waiting (over the daily limit, the issue stays open for the next day) or still-waiting (the
+same, already answered, so the workflow leaves it alone).
 """
 import datetime
 import hashlib
@@ -15,6 +17,7 @@ import json
 import pathlib
 import re
 import sys
+import time
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import check_export  # noqa: E402
@@ -22,7 +25,7 @@ import check_export  # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MAX_BODY = 1_000_000
 MAX_STRINGS = 10   # parts in one issue
-DAILY_LIMIT = 20   # accepted strings per submitter per UTC day
+DAILY_LIMIT = 20   # accepted strings per submitter per UTC day, counted on the day they were taken in
 STRING_RE = re.compile(r"DT1:[A-Za-z0-9+/]+={0,2}")
 SHARE_PAGE = "https://droptables-relay.valcheffnet.workers.dev"
 
@@ -58,8 +61,9 @@ def day(timestamp):
     return datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc).date()
 
 
-def ingest(issue, root):
-    """Returns (outcome, reply text)."""
+def ingest(issue, root, now=None):
+    """Returns (outcome, reply text). now: the time it runs, as a unix time."""
+    now = int(time.time() if now is None else now)
     number = int(issue["number"])
     body = (issue.get("body") or "")[:MAX_BODY]
     strings = STRING_RE.findall(body)
@@ -89,13 +93,19 @@ def ingest(issue, root):
             continue
         hashes.add(digest)
         submitter = "relay:" + result["exporter"] if relay else author(issue)
-        new.append({"issue": number, "index": index, "submitter": submitter, "received": received,
+        new.append({"issue": number, "index": index, "submitter": submitter, "received": received, "accepted": now,
                     "sha256": digest, "string": string, "result": result})
     if new:
         submitter = new[0]["submitter"]
-        today = sum(1 for s in known if s["submitter"] == submitter and day(s["received"]) == day(received))
+        today = sum(1 for s in known
+                    if s["submitter"] == submitter and day(s.get("accepted", s["received"])) == day(now))
         if today + len(new) > DAILY_LIMIT:
-            return "rejected", "You sent more than %d exports today. Please send the rest tomorrow." % DAILY_LIMIT
+            # The issue stays open, and the hourly run takes it in once a new day starts.
+            if "waiting" in labels(issue):
+                return "still-waiting", ""
+            return "waiting", ("You've sent %d exports today, and this issue would go over the limit of %d for one "
+                               "day. It waits here and goes in by itself after midnight UTC, so you don't need to "
+                               "send it again." % (today, DAILY_LIMIT))
     for sub in new:
         path = folder / ("%d-%d.json" % (sub["issue"], sub["index"]))
         path.write_text(json.dumps(sub, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")

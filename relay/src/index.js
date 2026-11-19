@@ -130,11 +130,13 @@ async function submit(request, env) {
             console.error("create issue", response.status, await response.text());
             return json(502, { error: "GitHub did not take it right now. Try again later." });
         }
+        // The page links to the issue, where the bot answers, so a sender without a GitHub account sees the outcome.
+        const issue = await response.json();
+        return json(200, { ok: true, issue: issue.number, url: issue.html_url });
     } catch (error) {
         console.error(error);
         return json(502, { error: "GitHub could not be reached. Try again later." });
     }
-    return json(200, { ok: true });
 }
 
 export default {

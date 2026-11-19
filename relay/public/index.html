@@ -96,9 +96,37 @@
   let token = null;
   let widget = null;
 
-  function show(text, kind) {
+  // A text that couldn't be sent is kept in this browser until it goes through. Storage can be blocked, and then the
+  // page just works without it.
+  const SAVED = "droptables-unsent";
+  function keep(text) {
+    try {
+      if (text) {
+        localStorage.setItem(SAVED, text);
+      } else {
+        localStorage.removeItem(SAVED);
+      }
+    } catch {}
+  }
+  function kept() {
+    try {
+      return localStorage.getItem(SAVED) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function show(text, kind, link) {
     status.textContent = text;
     status.className = kind || "";
+    if (link) {
+      const a = document.createElement("a");
+      a.href = link.url;
+      a.textContent = "#" + link.issue;
+      a.target = "_blank";
+      a.rel = "noopener";
+      status.append(" ", a, ".");
+    }
   }
 
   function update() {
@@ -129,24 +157,43 @@
 
   data.addEventListener("input", update);
 
+  if (kept()) {
+    data.value = kept();
+    show("The text you didn't get to send last time is back in the box.");
+  }
+
+  const KEPT = " Your text stays in the box for the next try.";
+
   send.addEventListener("click", async () => {
     send.disabled = true;
     show("Sending...");
+    const text = data.value;
+    let response = null;
     try {
-      const response = await fetch("/submit", {
+      response = await fetch("/submit", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ data: data.value, token }),
+        body: JSON.stringify({ data: text, token }),
       });
+      // Over its daily quota Cloudflare answers with its own page instead of the Worker's JSON.
       const result = await response.json();
       if (response.ok) {
-        show("Got it, thanks. Your counts will be in the next data update.", "good");
+        keep("");
         data.value = "";
+        if (result.url && result.issue) {
+          show("Got it, thanks. A bot looks at it within a few minutes and answers on GitHub in", "good",
+            { url: result.url, issue: result.issue });
+        } else {
+          show("Got it, thanks. A bot looks at it within a few minutes.", "good");
+        }
       } else {
-        show(result.error || "Something went wrong. Try again later.", "bad");
+        keep(text);
+        show((result.error || "Something went wrong. Try again later.") + KEPT, "bad");
       }
     } catch {
-      show("The page could not reach the server. Try again later.", "bad");
+      keep(text);
+      show((response ? "The share page is busy right now. Try again later." :
+        "The page could not reach the server. Try again later.") + KEPT, "bad");
     }
     token = null;
     turnstile.reset(widget);

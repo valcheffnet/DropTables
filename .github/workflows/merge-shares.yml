@@ -1,10 +1,14 @@
 name: Merge shared counts
 
 # Every run takes all open issues labelled share or relay, so when GitHub drops a run from the queue nothing is lost
-# and the next run picks those issues up. Only the Python scripts read the issue text, and only from JSON files.
+# and the next run picks those issues up. The hourly run takes in the issues that wait for the next day's limit, more
+# than a run's 100, and any left open by a failed run. Only the Python scripts read the issue text, and only from JSON
+# files.
 on:
   issues:
     types: [opened, labeled]
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       issue:
@@ -77,12 +81,20 @@ jobs:
           set -euo pipefail
           gh label create rejected --repo "$GITHUB_REPOSITORY" --color B60205 \
             --description "Export text that could not be taken in" --force
+          gh label create waiting --repo "$GITHUB_REPOSITORY" --color FBCA04 \
+            --description "Over the daily limit, goes in on the next day" --force
           while read -r number outcome; do
-            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/replies/$number.md"
-            if [ "$outcome" = "rejected" ]; then
-              gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --add-label rejected
-              gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason "not planned"
-            else
-              gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason completed
+            if [ "$outcome" = "still-waiting" ]; then
+              continue
             fi
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/replies/$number.md"
+            case "$outcome" in
+              waiting)
+                gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --add-label waiting ;;
+              rejected)
+                gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --add-label rejected
+                gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason "not planned" ;;
+              *)
+                gh issue close "$number" --repo "$GITHUB_REPOSITORY" --reason completed ;;
+            esac
           done < "$RUNNER_TEMP/replies/outcomes.txt"

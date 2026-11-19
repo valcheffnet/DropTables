@@ -44,7 +44,8 @@ function mockFetch({ turnstile = true, issueStatus = 201 } = {}) {
             return Response.json({ token: "inst-token", expires_at: new Date(Date.now() + 3600e3).toISOString() }, { status: 201 });
         }
         if (String(url).endsWith("/issues")) {
-            return new Response("{}", { status: issueStatus });
+            const issue = { number: 12, html_url: "https://github.com/owner/repo/issues/12" };
+            return Response.json(issueStatus < 300 ? issue : {}, { status: issueStatus });
         }
         throw new Error(`unexpected fetch ${url}`);
     };
@@ -130,6 +131,8 @@ test("a valid export opens an issue in the form's layout, signed by the app", as
     const spaced = EXPORT.slice(0, 20) + "\n  " + EXPORT.slice(20) + "\n";
     const response = await worker.fetch(post({ data: spaced, token: "t" }), makeEnv());
     assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true, issue: 12, url: "https://github.com/owner/repo/issues/12" },
+        "the page gets the issue to link to");
 
     const tokenCall = calls.find((call) => call.url.endsWith("/app/installations/456/access_tokens"));
     const [header, payload, signature] = tokenCall.init.headers.authorization.replace("Bearer ", "").split(".");

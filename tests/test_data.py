@@ -290,13 +290,21 @@ def issue_list(root):
 
 
 def daily_limit(root):
+    noon = 1795089600  # 2026-11-19 12:00 UTC
     outcomes = []
     for i in range(ingest_issue.DAILY_LIMIT + 1):
         sub = Client("Spam%d" % i)
         loot_mob(sub, 5, "S", [(100, 1)])
-        outcomes.append(ingest_issue.ingest(issue(100 + i, form_body(export_string(sub)), login="busy"), root)[0])
-    expect("accepted up to the daily limit, refused past it", outcomes,
-           ["accepted"] * ingest_issue.DAILY_LIMIT + ["rejected"])
+        late = issue(100 + i, form_body(export_string(sub)), login="busy")
+        outcomes.append(ingest_issue.ingest(late, root, now=noon)[0])
+    expect("accepted up to the daily limit, then waiting", outcomes,
+           ["accepted"] * ingest_issue.DAILY_LIMIT + ["waiting"])
+    expect("nothing saved for the waiting one", (root / "data" / "submissions" / "120-1.json").exists(), False)
+    # The hourly runs see it again with the waiting label and leave it alone until the day is over.
+    late["labels"] = [{"name": "waiting"}]
+    expect("answered once while it waits", ingest_issue.ingest(late, root, now=noon + 3600),
+           ("still-waiting", ""))
+    expect("taken in on the next day", ingest_issue.ingest(late, root, now=noon + 13 * 3600)[0], "accepted")
 
 
 def main():
