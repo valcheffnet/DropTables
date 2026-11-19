@@ -293,11 +293,14 @@ def main():
     hider.advance(5)
     hider.loot([{"type": 2, "name": "7 Copper", "qty": 0, "hiddenQty": True, "sources": [coins, 7]}])
     expect("hidden money not counted", (data.money.drops, data.money.copper), (0, 0))
+    # Read as no slots, the window would count the corpse under the mouse as one that left nothing.
     hider.lua.execute("GetNumLootItems = function() return { secret = true } end")
-    hider.kill(15, "H2", True)
+    unread = hider.kill(15, "H2", True)
     hider.advance(5)
+    hider.g.units["mouseover"] = unread
     hider.loot([])
-    expect("a hidden slot count skips the window", hider.ns.db.mobs[15][1].opened, 1)
+    hider.g.units["mouseover"] = None
+    expect("a hidden slot count skips the window", (data.kills, data.lootable, data.opened), (3, 3, 1))
 
     # /dt debug is a saved setting and opens its own chat tab with no other messages in it.
     tester = Client("Debugger")
