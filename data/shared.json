@@ -1,5 +1,5 @@
 {
- "built": 1795012566,
+ "built": 1795046458,
  "mobs": {
   "12296": {
    "buckets": {
@@ -306,6 +306,30 @@
    "minLevel": 8,
    "name": "Vampiric Duskbat"
   },
+  "209797": {
+   "buckets": {
+    "2": {
+     "items": {},
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1,
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 2
+   },
+   "maxLevel": 20,
+   "minLevel": 20,
+   "name": "Bruuz"
+  },
   "266849": {
    "buckets": {
     "1": {
@@ -442,6 +466,31 @@
    "maxLevel": 9,
    "minLevel": 9,
    "name": "Bloodtalon Matriarch"
+  },
+  "268624": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 89,
+      "drops": 1,
+      "max": 89,
+      "min": 89
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 16,
+   "minLevel": 16,
+   "name": "Razormane Raider"
   },
   "276198": {
    "buckets": {
@@ -819,6 +868,108 @@
    "minLevel": 8,
    "name": "Hexed Troll"
   },
+  "3239": {
+   "buckets": {
+    "1": {
+     "items": {
+      "248704": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5125": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5128": {
+       "drops": 6,
+       "max": 1,
+       "min": 1,
+       "qty": 6
+      },
+      "5470": {
+       "drops": 14,
+       "max": 1,
+       "min": 1,
+       "qty": 14
+      }
+     },
+     "kills": 43,
+     "lootable": 21,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 19
+    },
+    "2": {
+     "items": {},
+     "kills": 2,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 6,
+    "6b05637e02d9a0a8": 39
+   },
+   "maps": {
+    "1413": 46
+   },
+   "maxLevel": 21,
+   "minLevel": 20,
+   "name": "Thunderhead"
+  },
+  "3240": {
+   "buckets": {
+    "1": {
+     "items": {
+      "5125": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "5128": {
+       "drops": 5,
+       "max": 1,
+       "min": 1,
+       "qty": 5
+      },
+      "5470": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 15,
+     "lootable": 10,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 10
+    }
+   },
+   "from": {
+    "2750ad299c178787": 7,
+    "6b05637e02d9a0a8": 8
+   },
+   "maps": {
+    "1413": 14
+   },
+   "maxLevel": 19,
+   "minLevel": 18,
+   "name": "Stormsnout"
+  },
   "3242": {
    "buckets": {
     "1": {
@@ -845,22 +996,29 @@
      "opened": 16
     },
     "2": {
-     "items": {},
-     "kills": 1,
-     "lootable": 1,
+     "items": {
+      "5118": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      }
+     },
+     "kills": 10,
+     "lootable": 5,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 1
+     "opened": 4
     }
    },
    "from": {
-    "2750ad299c178787": 16,
-    "6b05637e02d9a0a8": 1
+    "2750ad299c178787": 22,
+    "6b05637e02d9a0a8": 4
    },
    "maps": {
-    "1413": 18
+    "1413": 31
    },
    "maxLevel": 14,
    "minLevel": 13,
@@ -1065,6 +1223,29 @@
    "minLevel": 12,
    "name": "Fleeting Plainstrider"
   },
+  "3247": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 19,
+   "minLevel": 18,
+   "name": "Thunderhawk Hatchling"
+  },
   "3250": {
    "buckets": {
     "2": {
@@ -1239,6 +1420,37 @@
    "minLevel": 16,
    "name": "Sunscale Scytheclaw"
   },
+  "3257": {
+   "buckets": {
+    "2": {
+     "items": {
+      "5124": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1,
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 2
+   },
+   "maxLevel": 19,
+   "minLevel": 19,
+   "name": "Ishamuhale"
+  },
   "3272": {
    "buckets": {
     "1": {
@@ -1274,25 +1486,32 @@
   "3273": {
    "buckets": {
     "1": {
-     "items": {},
-     "kills": 2,
-     "lootable": 2,
-     "money": {
-      "copper": 36,
-      "drops": 2,
-      "max": 29,
-      "min": 7
+     "items": {
+      "2589": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
      },
-     "opened": 2
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 41,
+      "drops": 3,
+      "max": 29,
+      "min": 5
+     },
+     "opened": 3
     }
    },
    "from": {
-    "2750ad299c178787": 2
+    "2750ad299c178787": 3
    },
    "maps": {
-    "1413": 2
+    "1413": 3
    },
-   "maxLevel": 13,
+   "maxLevel": 14,
    "minLevel": 13,
    "name": "Kolkar Stormer"
   },
@@ -1447,6 +1666,313 @@
    "minLevel": 13,
    "name": "Venture Co. Peon"
   },
+  "3381": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2589": {
+       "drops": 4,
+       "max": 2,
+       "min": 1,
+       "qty": 7
+      },
+      "414": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "5069": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5498": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 15,
+     "lootable": 15,
+     "money": {
+      "copper": 206,
+      "drops": 15,
+      "max": 20,
+      "min": 5
+     },
+     "opened": 15
+    },
+    "3": {
+     "items": {
+      "1513": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 3,
+       "max": 3,
+       "min": 2,
+       "qty": 8
+      },
+      "3286": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 55,
+      "drops": 4,
+      "max": 16,
+      "min": 10
+     },
+     "opened": 4
+    }
+   },
+   "from": {
+    "2750ad299c178787": 19
+   },
+   "maps": {
+    "1413": 24
+   },
+   "maxLevel": 13,
+   "minLevel": 12,
+   "name": "Southsea Brigand"
+  },
+  "3382": {
+   "buckets": {
+    "1": {
+     "items": {
+      "1514": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 2,
+       "max": 3,
+       "min": 2,
+       "qty": 5
+      },
+      "858": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 6,
+     "lootable": 6,
+     "money": {
+      "copper": 100,
+      "drops": 6,
+      "max": 24,
+      "min": 9
+     },
+     "opened": 6
+    },
+    "3": {
+     "items": {
+      "2589": {
+       "drops": 3,
+       "max": 3,
+       "min": 1,
+       "qty": 6
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 38,
+      "drops": 2,
+      "max": 28,
+      "min": 10
+     },
+     "opened": 3
+    }
+   },
+   "from": {
+    "2750ad299c178787": 9
+   },
+   "maps": {
+    "1413": 12
+   },
+   "maxLevel": 14,
+   "minLevel": 13,
+   "name": "Southsea Cannoneer"
+  },
+  "3385": {
+   "buckets": {
+    "1": {
+     "items": {
+      "15487": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "248682": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 5,
+       "max": 3,
+       "min": 1,
+       "qty": 10
+      },
+      "3374": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 14,
+     "lootable": 14,
+     "money": {
+      "copper": 286,
+      "drops": 14,
+      "max": 34,
+      "min": 5
+     },
+     "opened": 14
+    },
+    "3": {
+     "items": {
+      "15495": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1815": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      },
+      "5786": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 8,
+     "lootable": 8,
+     "money": {
+      "copper": 35,
+      "drops": 3,
+      "max": 18,
+      "min": 5
+     },
+     "opened": 4
+    }
+   },
+   "from": {
+    "2750ad299c178787": 22
+   },
+   "maps": {
+    "1413": 33
+   },
+   "maxLevel": 16,
+   "minLevel": 15,
+   "name": "Theramore Marine"
+  },
+  "3386": {
+   "buckets": {
+    "1": {
+     "items": {
+      "5787": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 44,
+      "drops": 2,
+      "max": 30,
+      "min": 14
+     },
+     "opened": 2
+    },
+    "3": {
+     "items": {},
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 48,
+      "drops": 1,
+      "max": 48,
+      "min": 48
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 4
+   },
+   "maps": {
+    "1413": 6
+   },
+   "maxLevel": 17,
+   "minLevel": 16,
+   "name": "Theramore Preserver"
+  },
+  "3393": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2592": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 62,
+      "drops": 1,
+      "max": 62,
+      "min": 62
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 20,
+   "minLevel": 20,
+   "name": "Captain Fairmount"
+  },
   "3397": {
    "buckets": {
     "1": {
@@ -1494,6 +2020,47 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Savannah Huntress"
+  },
+  "3424": {
+   "buckets": {
+    "1": {
+     "items": {
+      "6444": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
+    },
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 2,
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 3
+   },
+   "maxLevel": 22,
+   "minLevel": 20,
+   "name": "Thunderhawk Cloudscraper"
   },
   "3425": {
    "buckets": {
@@ -1556,22 +2123,17 @@
    "minLevel": 18,
    "name": "Supervisor Lugwizzle"
   },
-  "3466": {
+  "3454": {
    "buckets": {
     "1": {
-     "items": {
-      "5120": {
-       "drops": 1,
-       "max": 1,
-       "min": 1,
-       "qty": 1
-      }
-     },
+     "items": {},
      "kills": 1,
      "lootable": 1,
      "money": {
-      "copper": 0,
-      "drops": 0
+      "copper": 13,
+      "drops": 1,
+      "max": 13,
+      "min": 13
      },
      "opened": 1
     }
@@ -1582,9 +2144,141 @@
    "maps": {
     "1413": 1
    },
+   "maxLevel": 19,
+   "minLevel": 19,
+   "name": "Cannoneer Smythe"
+  },
+  "3455": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 28,
+      "drops": 1,
+      "max": 28,
+      "min": 28
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 19,
+   "minLevel": 19,
+   "name": "Cannoneer Whessan"
+  },
+  "3466": {
+   "buckets": {
+    "1": {
+     "items": {
+      "12997": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2601": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5120": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 14,
+     "lootable": 7,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 4
+    },
+    "2": {
+     "items": {},
+     "kills": 3,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 3,
+    "6b05637e02d9a0a8": 14
+   },
+   "maps": {
+    "1413": 19
+   },
    "maxLevel": 21,
    "minLevel": 20,
    "name": "Zhevra Courser"
+  },
+  "3467": {
+   "buckets": {
+    "3": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 16,
+   "minLevel": 16,
+   "name": "Baron Longshore"
+  },
+  "3473": {
+   "buckets": {
+    "2": {
+     "items": {
+      "5133": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1,
+    "6b05637e02d9a0a8": 1
+   },
+   "maps": {
+    "1413": 2
+   },
+   "maxLevel": 24,
+   "minLevel": 24,
+   "name": "Owatanka"
   },
   "3475": {
    "buckets": {
@@ -1608,6 +2302,156 @@
    "maxLevel": 16,
    "minLevel": 16,
    "name": "Echeyakee"
+  },
+  "3476": {
+   "buckets": {
+    "1": {
+     "items": {
+      "17057": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5516": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5524": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 27,
+   "minLevel": 27,
+   "name": "Isha Awak"
+  },
+  "3630": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1414": 1
+   },
+   "maxLevel": 15,
+   "minLevel": 15,
+   "name": "Deviate Coiler"
+  },
+  "3632": {
+   "buckets": {
+    "1": {
+     "items": {
+      "5124": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 2
+   },
+   "maps": {
+    "1414": 2
+   },
+   "maxLevel": 16,
+   "minLevel": 15,
+   "name": "Deviate Creeper"
+  },
+  "3655": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2592": {
+       "drops": 1,
+       "max": 3,
+       "min": 3,
+       "qty": 3
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 82,
+      "drops": 1,
+      "max": 82,
+      "min": 82
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1414": 1
+   },
+   "maxLevel": 18,
+   "minLevel": 18,
+   "name": "Mad Magglish"
+  },
+  "3680": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 2,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 2
+   },
+   "maps": {
+    "1414": 2
+   },
+   "maxLevel": 1,
+   "minLevel": 1,
+   "name": "Serpentbloom Snake"
   },
   "4075": {
    "buckets": {
@@ -1661,6 +2505,66 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Hecklefang Hyena"
+  },
+  "4129": {
+   "buckets": {
+    "1": {
+     "items": {
+      "3299": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3301": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 4,
+     "lootable": 3,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 3
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1,
+    "6b05637e02d9a0a8": 3
+   },
+   "maps": {
+    "1413": 3
+   },
+   "maxLevel": 19,
+   "minLevel": 18,
+   "name": "Hecklefang Snarler"
+  },
+  "5780": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1414": 1
+   },
+   "maxLevel": 17,
+   "minLevel": 17,
+   "name": "Cloned Ectoplasm"
   },
   "5835": {
    "buckets": {
@@ -1732,6 +2636,73 @@
    "minLevel": 17,
    "name": "Rocklance"
   },
+  "6020": {
+   "buckets": {
+    "1": {
+     "items": {
+      "1768": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2781": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5523": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 73,
+      "drops": 3,
+      "max": 38,
+      "min": 12
+     },
+     "opened": 3
+    }
+   },
+   "from": {
+    "2750ad299c178787": 3
+   },
+   "maps": {
+    "1413": 3
+   },
+   "maxLevel": 19,
+   "minLevel": 18,
+   "name": "Slimeshell Makrura"
+  },
+  "6494": {
+   "buckets": {
+    "3": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1413": 1
+   },
+   "maxLevel": 13,
+   "minLevel": 13,
+   "name": "Tazan"
+  },
   "6606": {
    "buckets": {
     "1": {
@@ -1771,5 +2742,5 @@
    "name": "Overseer Glibby"
   }
  },
- "submissions": 2
+ "submissions": 3
 }
