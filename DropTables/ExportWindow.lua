@@ -1,6 +1,7 @@
 local _, ns = ...
 
--- Shows the export string to copy and the address of the share page to paste it on.
+-- Shows the address of the share page and, under it, the export string to paste there. The page comes first because
+-- the player has to open it before the text has anywhere to go.
 local Style = ns.Style
 local C = Style.colors
 local TOP = Style.HEADER
@@ -17,14 +18,26 @@ intro:SetPoint("TOPLEFT", 16, -(TOP + 12))
 intro:SetPoint("RIGHT", -16, 0)
 intro:SetJustifyH("LEFT")
 intro:SetWordWrap(true)
-intro:SetText("Drop Tables gets better with every table players share. Press Select and then Ctrl+C, open the page "
-    .. "under the text in your browser, paste the text there and press Send. You don't need an account. Your kills "
+intro:SetText("Drop Tables gets better with every table players share, and you don't need an account for it. Open "
+    .. "the share page below in your browser, then copy the text under it, paste it there and press Send. Your kills "
     .. "then help other players' tables, the way theirs help yours.")
 
+local linkLabel = Style.Text(frame, "label")
+linkLabel:SetPoint("TOPLEFT", intro, "BOTTOMLEFT", 0, -14)
+linkLabel:SetText("SHARE PAGE")
+local link = Style.Input(frame, 300, "")
+link.box:SetPoint("TOPLEFT", linkLabel, "BOTTOMLEFT", 0, -6)
+link.box:SetPoint("RIGHT", -16, 0)
+link:SetText(PAGE_URL)
+
+local textLabel = Style.Text(frame, "label")
+textLabel:SetPoint("TOPLEFT", link.box, "BOTTOMLEFT", 0, -16)
+textLabel:SetText("TEXT TO SEND")
+
 local box = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-box:SetPoint("TOPLEFT", intro, "BOTTOMLEFT", 0, -10)
+box:SetPoint("TOPLEFT", textLabel, "BOTTOMLEFT", 0, -6)
 box:SetPoint("RIGHT", -16, 0)
-box:SetPoint("BOTTOM", 0, 118)
+box:SetPoint("BOTTOM", 0, 78)
 box:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
 Style.Paint(function()
     box:SetBackdropColor(C.raised[1], C.raised[2], C.raised[3], 0.9)
@@ -51,14 +64,6 @@ status:SetPoint("TOPLEFT", box, "BOTTOMLEFT", 0, -8)
 status:SetPoint("RIGHT", -16, 0)
 status:SetJustifyH("LEFT")
 status:SetWordWrap(true)
-
-local linkLabel = Style.Text(frame, "label")
-linkLabel:SetPoint("TOPLEFT", status, "BOTTOMLEFT", 0, -12)
-linkLabel:SetText("SHARE PAGE")
-local link = Style.Input(frame, 300, "")
-link.box:SetPoint("TOPLEFT", linkLabel, "BOTTOMLEFT", 0, -4)
-link.box:SetPoint("RIGHT", -16, 0)
-link:SetText(PAGE_URL)
 
 local nextPart = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 nextPart:SetSize(110, 22)
@@ -118,10 +123,21 @@ local function showPart()
     nextPart:SetShown(count > 1)
     nextPart:SetEnabled(part < count)
     if count > 1 then
-        status:SetText(("Part %d of %d. Press Select, then Ctrl+C, and send each part on the page by itself."):format(part, count))
+        status:SetText(("Part %d of %d. Press Select above the text, then Ctrl+C, and send this part on the page by "
+            .. "itself."):format(part, count))
     else
-        status:SetText("Press Select, then Ctrl+C, and paste it on the page.")
+        status:SetText("Press Select above the text, then Ctrl+C, and paste it on the page.")
     end
+    status:SetTextColor(unpack(C.text))
+end
+
+-- On opening, the address is the first thing to copy, so it starts selected.
+local function showLink()
+    link:SetFocus()
+    link:HighlightText()
+    local count = #result.strings
+    status:SetText("The page address is selected. Press Ctrl+C, open it in your browser, and come back for the text."
+        .. (count > 1 and (" It comes in %d parts."):format(count) or ""))
     status:SetTextColor(unpack(C.text))
 end
 
@@ -152,6 +168,7 @@ local function build()
         return
     end
     showPart()
+    showLink()
 end
 
 text:SetScript("OnKeyDown", function(self, key)
@@ -169,7 +186,7 @@ text:SetScript("OnKeyDown", function(self, key)
         end
     end
     ns.MarkCopied(result)
-    status:SetText("Copied. Paste it on the page at the address below and press Send. Thank you!")
+    status:SetText("Copied. Paste it on the page and press Send. Thank you!")
     status:SetTextColor(unpack(C.gold))
 end)
 
