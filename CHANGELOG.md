@@ -6,6 +6,11 @@
 
 - The shared drop data is under CC BY-SA 4.0 now, so other addons can use it as long as they credit Drop Tables and keep it open. The addon's code stays all rights reserved.
 
+### Fixed
+
+- If you did a /reload while a corpse still had loot in it, reopening that corpse counted it as a second kill. The addon now remembers the corpses it has counted across a reload, for up to 15 minutes after the kill.
+- When the game hid a value in a loot window, like an item link or a stack size, the whole window went unrecorded. Now only that slot is left out.
+
 ## [0.3.0] - 2026-11-18
 
 ### Added

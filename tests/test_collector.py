@@ -229,6 +229,76 @@ def main():
     party.advance(5)
     expect("partner's corpse not counted", party.ns.db.mobs[6], None)
 
+    # A /reload keeps the corpses already counted, so reopening one under the mouse doesn't count it again.
+    before = Client("Reloader")
+    opened = before.kill(13, "O1", True)
+    waiting = before.kill(13, "O2", True)
+    before.advance(5)
+    before.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [opened, 1]}])
+    fresh = before.kill(13, "O3", False)  # its loot check hasn't run yet at the reload
+    after = before.reload()
+    for corpse in (opened, waiting, fresh):
+        after.g.lootable[corpse] = True
+    after.advance(5)
+    expect("the reload's cut-off loot check runs again", counts_of(after, 13)[:3], (3, 3, 1))
+    for corpse in (opened, waiting):
+        after.g.units["mouseover"] = corpse
+        after.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [corpse, 1]}])
+    after.g.units["mouseover"] = None
+    expect("corpses counted before a reload counted once", counts_of(after, 13), (3, 3, 2, 2))
+    expect("nothing about corpses stays saved", after.ns.db.corpses, None)
+    # Corpses older than the time a kill waits for its loot are not kept.
+    late = Client("Late")
+    late.kill(14, "X1", True)
+    late.advance(1000)
+    late.fire("PLAYER_LOGOUT")
+    expect("an old corpse is not saved", late.ns.db.corpses, None)
+    # Nor one from a session that ended long before the next login.
+    gone = late.kill(14, "X2", True)
+    late.advance(5)
+    next_day = late.reload(later=1000)
+    next_day.g.lootable[gone] = True
+    next_day.g.units["mouseover"] = gone
+    next_day.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [gone, 1]}])
+    expect("a corpse from long before the login counts as new", next_day.ns.db.mobs[14][1].kills, 3)
+
+    # A value the client hides in one slot leaves that slot out and keeps the rest of the window.
+    hider = Client("Hider")
+    hider.lua.execute("""
+        -- A hidden string is still a string in the game, so the stub marks the link text as secret.
+        secrets = {}
+        issecretvalue = function(value)
+            return (type(value) == "table" and value.secret == true) or (value ~= nil and secrets[value] == true)
+        end
+        local link = GetLootSlotLink
+        GetLootSlotLink = function(i)
+            local text = link(i)
+            if lootSlots[i].hidden then secrets[text] = true end
+            return text
+        end
+        local sources = GetLootSourceInfo
+        GetLootSourceInfo = function(i)
+            if lootSlots[i].hiddenQty then return lootSlots[i].sources[1], { secret = true } end
+            return sources(i)
+        end
+    """)
+    hidden = hider.kill(15, "H1", True)
+    hider.advance(5)
+    hider.loot([{"type": 1, "item": 101, "name": "Meat", "qty": 1, "hidden": True, "sources": [hidden, 1]},
+                {"type": 1, "item": 100, "name": "Wolf Fang", "qty": 3, "hiddenQty": True, "sources": [hidden, 3]}])
+    data = hider.ns.db.mobs[15][1]
+    expect("hidden values leave only their slots out", (data.kills, data.opened, data["items"][101],
+                                                         data["items"][100]), (1, 1, None, None))
+    coins = hider.kill(15, "H3", True)
+    hider.advance(5)
+    hider.loot([{"type": 2, "name": "7 Copper", "qty": 0, "hiddenQty": True, "sources": [coins, 7]}])
+    expect("hidden money not counted", (data.money.drops, data.money.copper), (0, 0))
+    hider.lua.execute("GetNumLootItems = function() return { secret = true } end")
+    hider.kill(15, "H2", True)
+    hider.advance(5)
+    hider.loot([])
+    expect("a hidden slot count skips the window", hider.ns.db.mobs[15][1].opened, 1)
+
     # /dt debug is a saved setting and opens its own chat tab with no other messages in it.
     tester = Client("Debugger")
     tester.lua.execute("""

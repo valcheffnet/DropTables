@@ -96,6 +96,34 @@ local function prune()
     end
 end
 
+-- A /reload empties pending, and a corpse that still holds loot would then count again as a new kill when reopened.
+-- So the kills survive it in db.corpses, with the clock time of the kill, and only for as long as PENDING_TTL.
+ns.On("PLAYER_LOGOUT", function()
+    prune()
+    local saved, clock, now = {}, time(), GetTime()
+    for guid, kill in pairs(pending) do
+        saved[guid] = { npc = kill.npc, bucket = kill.bucket, state = kill.state, at = clock - (now - kill.at) }
+    end
+    ns.db.corpses = next(saved) and saved or nil
+end)
+
+ns.On("DT_READY", function()
+    local clock, now = time(), GetTime()
+    for guid, kill in pairs(ns.db.corpses or {}) do
+        local age = clock - kill.at
+        if age >= 0 and age <= PENDING_TTL then
+            pending[guid] = { npc = kill.npc, bucket = kill.bucket, state = kill.state, at = now - age }
+            -- The reload cut off the loot check of a fresh kill, so it runs again.
+            if kill.state == "checking" then
+                C_Timer.After(FIRST_CHECK, function()
+                    check(guid, true)
+                end)
+            end
+        end
+    end
+    ns.db.corpses = nil
+end)
+
 ns.On("PARTY_KILL", function(_, victim)
     local npc = ns.NpcFromGuid(victim)
     if not npc or pending[victim] then
@@ -176,6 +204,15 @@ local function lateKill(guid)
     end
 end
 
+-- A value the client hides (a Midnight secret value) reads as nil, since using one in a match or a sum throws and
+-- would lose the whole loot window.
+local function readable(value)
+    if ns.IsSecret(value) then
+        return nil
+    end
+    return value
+end
+
 local function isQuestItem(itemId, questFlag)
     return questFlag or select(6, C_Item.GetItemInfoInstant(itemId)) == QUEST_CLASS
 end
@@ -237,22 +274,31 @@ ns.On("LOOT_OPENED", function(_, fromItem)
         return claims[guid] or nil
     end
 
-    local count = GetNumLootItems()
+    local count = readable(GetNumLootItems())
+    if not count then
+        ns.Debug("loot window skipped: the client hides how many slots it has")
+        return
+    end
     for slot = 1, count do
-        local slotType = GetLootSlotType(slot)
+        local slotType = readable(GetLootSlotType(slot))
         local _, name, _, _, quality, _, questFlag = GetLootSlotInfo(slot)
-        local link = GetLootSlotLink(slot)
+        name, quality, questFlag = readable(name), readable(quality), readable(questFlag)
+        local link = readable(GetLootSlotLink(slot))
         local itemId = link and tonumber(link:match("item:(%d+)"))
         local sources = { GetLootSourceInfo(slot) }
         for s = 1, #sources, 2 do
-            local guid, quantity = sources[s], sources[s + 1] or 1
-            if corpse(guid) then
+            local guid, quantity = sources[s], sources[s + 1]
+            if ns.IsSecret(quantity) then
+                ns.Debug("  a slot with a hidden stack size left out")
+            elseif corpse(guid) then
+                quantity = quantity or 1
                 local loot = found[guid]
                 if slotType == MONEY_SLOT then
                     loot.money = loot.money + quantity
                 elseif itemId and not isQuestItem(itemId, questFlag) then
                     loot.items[itemId] = (loot.items[itemId] or 0) + quantity
-                    ns.db.items[itemId] = { name = name, quality = quality }
+                    local known = ns.db.items[itemId] or {}
+                    ns.db.items[itemId] = { name = name or known.name, quality = quality or known.quality }
                 elseif itemId then
                     ns.Debug("  quest item %s left out", tostring(name))
                 end

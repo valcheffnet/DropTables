@@ -185,6 +185,23 @@ function CreateFont() return widget() end
 function CreateColor() return widget() end
 """
 
+# Lua that writes a table back as Lua source, the way the game keeps SavedVariables.
+DUMP = r"""
+local function dump(value)
+    if type(value) == "table" then
+        local out = {}
+        for k, v in pairs(value) do
+            out[#out + 1] = "[" .. dump(k) .. "]=" .. dump(v)
+        end
+        return "{" .. table.concat(out, ",") .. "}"
+    elseif type(value) == "string" then
+        return ("%q"):format(value)
+    end
+    return tostring(value)
+end
+return dump
+"""
+
 ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua", "Export.lua", "Stats.lua",
              "Search.lua")
 
@@ -201,7 +218,7 @@ class Client:
     def __init__(self, name, files=ALL_FILES, saved=None, data=None):
         """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would.
         data: the text of a Data.lua (shared database) loaded right after Core.lua, as the toc does."""
-        self.name = name
+        self.name, self.files = name, files
         self.lua = lua51.LuaRuntime(unpack_returned_tuples=True)
         self.g = self.lua.globals()
         self.g.pyCompress = py_compress
@@ -220,6 +237,14 @@ class Client:
         errors = self.g.luaErrors
         if len(errors):
             raise RuntimeError("%s: Lua error in a listener: %s" % (self.name, errors[1]))
+
+    def reload(self, saved="", later=0):
+        """/reload: the client logs out and a new one starts from the saved DropTablesDB, `later` seconds afterwards.
+        saved: Lua run before the saved variables, e.g. UI_STUBS."""
+        self.fire("PLAYER_LOGOUT")
+        dump = self.lua.execute(DUMP)
+        state = "%s\nDropTablesDB = %s\nnow = %s" % (saved, dump(self.g.DropTablesDB), self.g.now + later)
+        return Client(self.name, files=self.files, saved=state)
 
     def fire(self, event, *args):
         self.ns.Fire(event, *args)
