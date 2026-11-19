@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+## [0.4.0] - 2026-11-19
+
+### Added
+
+- The shared database now also holds 4,052 looted corpses of 305 mobs that Blackthornes Farmer counted on the Forever beta, from the version of its data that was under the MIT license. 259 of those mobs had no counts at all before. Quest items and leather from skinning are left out, and where players already sent counts of a mob, the money and stack sizes still come from the players alone.
+
+### Changed
+
+- The shared database can say where a mob was killed. The map button in the Loot Finder now shows for every mob with known kill spots, not only for the ones you killed yourself, and the map marks your spots and the shared ones together. Most of the mobs above come with their spots.
+- `/dt export` sends your kill spots again, so the spots of the mobs you kill reach the shared database too. An export gets about a quarter bigger, and it still fits in one part for nearly everyone.
+
 ## [0.3.1] - 2026-11-19
 
 ### Changed
@@ -158,6 +171,7 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
+[0.4.0]: https://github.com/valcheffnet/DropTables/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/valcheffnet/DropTables/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/valcheffnet/DropTables/compare/v0.2.7...v0.3.0
 [0.2.7]: https://github.com/valcheffnet/DropTables/compare/v0.2.6...v0.2.7
