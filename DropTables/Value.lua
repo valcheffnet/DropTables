@@ -64,10 +64,16 @@ function ns.UnitPrice(itemId, vendorOnly)
     return (ns.PriceInfo(itemId, vendorOnly))
 end
 
--- True when the entry counts in g/ph: not rare, and a world drop only when the player asks for those. Skinning has no
--- world drops.
+-- True when the entry counts in g/ph. Otherwise false and why: "rare", or "world" for a world drop while the player
+-- hasn't asked for those. Skinning has no world drops.
 function ns.CountsInValue(entry)
-    return (entry.quality or 0) < RARE and (not entry.world or ns.settings.gphWorldDrops)
+    if (entry.quality or 0) >= RARE then
+        return false, "rare"
+    end
+    if entry.world and not ns.settings.gphWorldDrops then
+        return false, "world"
+    end
+    return true
 end
 
 -- Copper one kill of the mob brings on average: money plus every item that isn't rare, each at its chance per kill and

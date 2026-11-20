@@ -244,6 +244,10 @@ local PRICE_SOURCES = {
     vendor = "What a vendor pays. Without Auctionator or TradeSkillMaster, and for items bound on pickup and world "
         .. "drops, that's the price.",
 }
+local LEFT_OUT = {
+    rare = "Rare and epic drops don't count in g/ph.",
+    world = "World drops count in g/ph only with \"World drops in g/ph\" ticked in the Loot Finder.",
+}
 
 local function rowEnter(self)
     if not self.itemId then
@@ -257,11 +261,9 @@ local function rowEnter(self)
         GameTooltip:AddDoubleLine("Price for g/ph", ns.FormatGold(price) .. (price == 0 and "none" or ""),
             1, 0.82, 0, 1, 1, 1)
         GameTooltip:AddLine(PRICE_SOURCES[source], 0.7, 0.7, 0.7, true)
-        if (self.entry.quality or 0) >= 3 then
-            GameTooltip:AddLine("Rare and epic drops don't count in g/ph.", 0.7, 0.7, 0.7, true)
-        elseif not ns.CountsInValue(self.entry) then
-            GameTooltip:AddLine("World drops count in g/ph only with \"World drops in g/ph\" ticked in the Loot Finder.",
-                0.7, 0.7, 0.7, true)
+        local _, leftOut = ns.CountsInValue(self.entry)
+        if leftOut then
+            GameTooltip:AddLine(LEFT_OUT[leftOut], 0.7, 0.7, 0.7, true)
         end
     end
     GameTooltip:AddLine(self.skin and "Click: which other mobs give it when skinned" or "Click: which other mobs drop it",

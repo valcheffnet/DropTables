@@ -6,6 +6,7 @@ local Style = {}
 ns.Style = Style
 
 local WHITE = "Interface\\Buttons\\WHITE8x8"
+local MAX_WIDTH, MAX_HEIGHT = 1400, 1100  -- the largest a window can be dragged to
 
 -- Colour themes. Each one sets the background (ink), raised panels, the accent with its hairlines (line, faint), text,
 -- muted text and the chance bars. The accent is still called "gold" whatever colour it is, and lineRgb, when given,
@@ -126,7 +127,7 @@ function Style.Window(name, width, height, minWidth, minHeight, positionKey, siz
     frame:SetClampedToScreen(true)
     frame:SetMovable(true)
     frame:SetResizable(true)
-    frame:SetResizeBounds(minWidth, minHeight, 1400, 1100)
+    frame:SetResizeBounds(minWidth, minHeight, MAX_WIDTH, MAX_HEIGHT)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
     frame:SetFrameStrata("DIALOG")
@@ -198,8 +199,8 @@ function Style.Window(name, width, height, minWidth, minHeight, positionKey, siz
         local scale = frame:GetEffectiveScale()
         local startX, startY = GetCursorPosition()
         local startWidth, startHeight = frame:GetWidth(), frame:GetHeight()
-        local maxWidth = math.min(1400, (UIParent:GetRight() or 1400) - left)
-        local maxHeight = math.min(1100, top - (UIParent:GetBottom() or 0))
+        local maxWidth = math.min(MAX_WIDTH, UIParent:GetRight() - left)
+        local maxHeight = math.min(MAX_HEIGHT, top - UIParent:GetBottom())
         self:SetScript("OnUpdate", function()
             local x, y = GetCursorPosition()
             local newWidth = startWidth + (x - startX) / scale
@@ -217,8 +218,8 @@ function Style.Window(name, width, height, minWidth, minHeight, positionKey, siz
     -- start or after Restore defaults. A saved size larger than the screen shrinks to fit it.
     function frame:RestorePlacement()
         local size, pos = ns.settings[sizeKey], ns.settings[positionKey]
-        local screenWidth, screenHeight = UIParent:GetWidth() or 1400, UIParent:GetHeight() or 1100
-        self:SetSize(math.min(size and size[1] or width, screenWidth), math.min(size and size[2] or height, screenHeight))
+        self:SetSize(math.min(size and size[1] or width, UIParent:GetWidth()),
+            math.min(size and size[2] or height, UIParent:GetHeight()))
         self:ClearAllPoints()
         if pos then
             self:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4])

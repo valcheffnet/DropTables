@@ -547,11 +547,14 @@ local function makeTable(columns, reserved, onSort)
     return tbl
 end
 
+-- Columns that put the highest first on their first click; the others start from the lowest, or from A.
+local HIGHEST_FIRST = { rate = true, mobs = true, kills = true, drops = true, gph = true }
+
 local itemTable = makeTable(ITEM_COLUMNS, 8, function(key)
     if itemSort == key then
         itemDescending = not itemDescending
     else
-        itemSort, itemDescending = key, key == "rate" or key == "mobs" or key == "kills" or key == "gph"
+        itemSort, itemDescending = key, HIGHEST_FIRST[key] or false
     end
     renderMain()
 end)
@@ -560,7 +563,7 @@ local mobTable = makeTable(MOB_COLUMNS, MAP_BUTTON + 8, function(key)
     if mobSort == key then
         mobDescending = not mobDescending
     else
-        mobSort, mobDescending = key, key == "rate" or key == "drops" or key == "gph"
+        mobSort, mobDescending = key, HIGHEST_FIRST[key] or false
     end
     renderMain()
 end)
@@ -569,7 +572,7 @@ local skinItemTable = makeTable(SKIN_ITEM_COLUMNS, 8, function(key)
     if skinItemSort == key then
         skinItemDescending = not skinItemDescending
     else
-        skinItemSort, skinItemDescending = key, key == "rate" or key == "mobs" or key == "gph"
+        skinItemSort, skinItemDescending = key, HIGHEST_FIRST[key] or false
     end
     renderMain()
 end)
@@ -578,7 +581,7 @@ local skinMobTable = makeTable(SKIN_MOB_COLUMNS, MAP_BUTTON + 8, function(key)
     if skinMobSort == key then
         skinMobDescending = not skinMobDescending
     else
-        skinMobSort, skinMobDescending = key, key == "rate" or key == "drops" or key == "gph"
+        skinMobSort, skinMobDescending = key, HIGHEST_FIRST[key] or false
     end
     renderMain()
 end)
@@ -606,6 +609,15 @@ local function itemRow(tbl, index)
     end)
     row:HookScript("OnLeave", GameTooltip_Hide)
     return row
+end
+
+-- A tooltip line like "Worth 1s 20c a kill, 84s an hour at 70 kills an hour", left out under a copper. eachText holds
+-- the first part with a %s for the value of one.
+local function addWorth(eachText, each, perHour, npc)
+    if each >= 1 then
+        GameTooltip:AddLine(("%s, %s an hour at %d kills an hour"):format(eachText:format(ns.FormatGold(each)),
+            ns.FormatGold(perHour), math.floor(ns.KillsPerHour(npc) + 0.5)), 0.7, 0.7, 0.7, true)
+    end
 end
 
 local function mobRow(tbl, index)
@@ -656,24 +668,15 @@ local function mobRow(tbl, index)
             if dropper.skill then
                 GameTooltip:AddLine(("Needs %d Skinning"):format(dropper.skill), 0.7, 0.7, 0.7)
             end
-            local perSkin = ns.SkinValue(dropper.npc)
-            if perSkin >= 1 then
-                GameTooltip:AddLine(("Skinning is worth %s a corpse, %s an hour at %d kills an hour"):format(
-                    ns.FormatGold(perSkin), ns.FormatGold(ns.SkinGoldPerHour(dropper.npc)),
-                    math.floor(ns.KillsPerHour(dropper.npc) + 0.5)), 0.7, 0.7, 0.7, true)
-            end
+            addWorth("Skinning is worth %s a corpse", ns.SkinValue(dropper.npc), ns.SkinGoldPerHour(dropper.npc),
+                dropper.npc)
             if dropper.scarce then
                 GameTooltip:AddLine("The Bountiful Harvest perk gives more of it.", 0.7, 0.7, 0.7, true)
             end
         else
             GameTooltip:AddLine(("Dropped %d times in %d looted corpses"):format(dropper.drops, dropper.opened),
                 0.7, 0.7, 0.7)
-            local perKill = ns.ValuePerKill(dropper.npc)
-            if perKill >= 1 then
-                GameTooltip:AddLine(("Worth %s a kill, %s an hour at %d kills an hour"):format(ns.FormatGold(perKill),
-                    ns.FormatGold(ns.GoldPerHour(dropper.npc)), math.floor(ns.KillsPerHour(dropper.npc) + 0.5)),
-                    0.7, 0.7, 0.7, true)
-            end
+            addWorth("Worth %s a kill", ns.ValuePerKill(dropper.npc), ns.GoldPerHour(dropper.npc), dropper.npc)
         end
         GameTooltip:AddLine("Click for the mob's full table", 0.5, 0.5, 0.5)
         GameTooltip:Show()

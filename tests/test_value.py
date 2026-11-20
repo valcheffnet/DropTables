@@ -67,8 +67,12 @@ def main():
     ns.settings.gphWorldDrops = True
     c.fire("DT_SETTINGS_CHANGED")
     expect("world drops count at their vendor price when asked for", ns.GoldPerHour(1), int((per_kill + 0.25 * 30) * 70))
+    counts = c.lua.eval("function(ns, quality, world) return ns.CountsInValue({ quality = quality, world = world }) end")
+    expect("a world drop counts when asked for", counts(ns, 2, True), True)
+    expect("a rare drop never counts, and the drop table says why", counts(ns, 3, True), (False, "rare"))
     ns.settings.gphWorldDrops = False
     c.fire("DT_SETTINGS_CHANGED")
+    expect("a world drop left out says why", counts(ns, 2, True), (False, "world"))
 
     # An auction price older than 21 days doesn't count, and the vendor price takes over.
     c.g.auctionAges[100] = 30
@@ -140,21 +144,30 @@ def main():
     expect("the skinning list shows the lowest mob's skinning g/ph",
            next(s.gph for s in skin_rows.values() if s.itemId == 100), ns.SkinGoldPerHour(50))
 
-    # The Loot Finder draws the g/ph cell of every mob that drops the item.
+    # The Loot Finder writes the g/ph of every mob that drops the item into its row. The stub frames keep every text
+    # set on them, so the test can look for it.
     viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=UI_STUBS + PRICES + """
         UISpecialFrames = {}
         function tContains(t, v) for _, x in ipairs(t) do if x == v then return true end end return false end
         GameTooltip_Hide = function() end
+        texts = {}
+        local plain = widget
+        function widget(name)
+            local w = plain(name)
+            local meta = getmetatable(w)
+            local index = meta.__index
+            meta.__index = function(self, key)
+                if key == "SetText" then return function(_, text) texts[#texts + 1] = text end end
+                return index(self, key)
+            end
+            return w
+        end
     """)
     loot(viewer, 1, "A", [(100, 1)], 10)
-    asked = viewer.lua.eval("""function(ns)
-        local get = ns.GoldPerHour
-        gphAsked = {}
-        ns.GoldPerHour = function(npc) gphAsked[npc] = true return get(npc) end
-    end""")
-    asked(viewer.ns)
+    viewer.lua.execute("texts = {}")
     viewer.ns.OpenFinder(100)
-    expect("the Loot Finder shows g/ph for the mob", viewer.g.gphAsked[1], True)
+    shown = set(viewer.g.texts.values())
+    expect("the Loot Finder shows the mob's g/ph", viewer.ns.FormatGold(viewer.ns.GoldPerHour(1)) in shown, True)
     report("gold per hour")
 
 
