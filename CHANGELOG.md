@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-20
+
 ### Added
 
 - A "Share with other players" option, on by default. With it off, Drop Tables leaves its hidden channel and stops swapping counts in game, with your group too, so nothing goes out and nothing comes in. Counts you already got from others stay, and /dt export and the shared database work as before. Turning it back on joins the channel again right away, without a /reload.
