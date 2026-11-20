@@ -9,6 +9,10 @@
 - Quest items are now left out of every imported source by their item class, the same way the addon leaves them out of your own counts. EG Link and Blackthornes Farmer had let some through, Sunscale Feather and Blood Shard among them.
 - Engineers' target dummies are left out of the shared database. Looting your own dummy gives back what it was made of, which made Target Dummy look like a mob that drops Linen Cloth and Bronze Bars.
 
+### Changed
+
+- The best mob the Loot Finder shows for an item now needs at least 3 kills, so one lucky kill no longer makes it 100%. A mob with fewer kills only shows there when no other mob drops the item.
+
 ## [0.4.0] - 2026-11-19
 
 ### Added

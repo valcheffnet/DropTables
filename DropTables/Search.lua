@@ -183,9 +183,32 @@ function ns.FindDroppers(itemId)
     return results
 end
 
--- One line per item for a category, saying how many mobs drop it and which one gives the best chance (on a tie, the
--- one with more kills behind it). Only mobs that pass the zone and level filters count, and with a filter set, items
--- none of those mobs drop are left out. Also returns the maps of all droppers before filtering, for the zone choice.
+-- A mob needs this many kills to be an item's best mob, unless no mob that drops it has that many.
+local BEST_MIN_KILLS = 3
+
+-- The dropper with the best chance (on a tie, the one with more kills behind it). One or two lucky kills make a
+-- chance of 100%, so mobs with fewer than BEST_MIN_KILLS kills only count when no other mob drops the item.
+function ns.BestDropper(droppers)
+    local best, bestFew
+    for _, dropper in ipairs(droppers) do
+        local better = function(current)
+            return not current or dropper.rate > current.rate
+                or dropper.rate == current.rate and dropper.kills > current.kills
+        end
+        if dropper.kills >= BEST_MIN_KILLS then
+            if better(best) then
+                best = dropper
+            end
+        elseif better(bestFew) then
+            bestFew = dropper
+        end
+    end
+    return best or bestFew
+end
+
+-- One line per item for a category, saying how many mobs drop it and which one is the best (see ns.BestDropper).
+-- Only mobs that pass the zone and level filters count, and with a filter set, items none of those mobs drop are left
+-- out. Also returns the maps of all droppers before filtering, for the zone choice.
 function ns.SummarizeItems(items, filters)
     filters = filters or {}
     local active = filters.mapId or filters.minLevel or filters.maxLevel
@@ -204,11 +227,10 @@ function ns.SummarizeItems(items, filters)
         if #droppers > 0 or not active then
             local summary = { itemId = item.itemId, name = item.name, quality = item.quality, mobs = #droppers, rate = 0,
                 best = "", kills = 0 }
-            for _, dropper in ipairs(droppers) do
-                if dropper.rate > summary.rate or dropper.rate == summary.rate and dropper.kills > summary.kills then
-                    summary.rate, summary.best, summary.bestNpc = dropper.rate, dropper.name, dropper.npc
-                    summary.kills, summary.small = dropper.kills, dropper.small
-                end
+            local best = ns.BestDropper(droppers)
+            if best then
+                summary.rate, summary.best, summary.bestNpc = best.rate, best.name, best.npc
+                summary.kills, summary.small = best.kills, best.small
             end
             table.insert(results, summary)
         end

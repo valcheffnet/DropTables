@@ -131,8 +131,10 @@ def main():
     summaries = {s.itemId: s for s in lua_list(summary_list)}
     expect("zones offered for the category", lua_list(summary_maps), [12, 40])
     expect("cloth mobs", summaries[2589].mobs, 3)
-    expect("cloth best mob", (summaries[2589].bestNpc, round(summaries[2589].rate, 4)), (3, 1.0))
-    expect("kills behind the best chance", (summaries[2589].kills, summaries[2589].small), (1, True))
+    # Mob 3 has the best cloth chance, 1 in 1, but under 3 kills it loses to mob 1's 2 in 3.
+    expect("cloth best mob has 3 kills or more", (summaries[2589].bestNpc, round(summaries[2589].rate, 4)),
+           (1, round(2 / 3, 4)))
+    expect("kills behind the best chance", summaries[2589].kills, 3)
     expect("kills behind the fang chance", summaries[100].kills, 3)
     expect("fang mobs", summaries[100].mobs, 1)
     expect("fang best chance", round(summaries[100].rate, 4), round(2 / 3, 4))
@@ -143,6 +145,8 @@ def main():
     expect("zone list ignores the zone filter", lua_list(zone40_maps), [12, 40])
     level_low, _ = ns.SummarizeItems(ns.SearchItems(""), c.lua.table_from({"maxLevel": 6}))
     expect("level filter on categories", sorted(s.itemId for s in lua_list(level_low)), [100, 2589])
+    mob3 = c.lua.table_from([by_npc[3]])
+    expect("with only mobs under 3 kills, the best of them still shows", ns.BestDropper(mob3).npc, 3)
     ordered, _ = ns.SummarizeItems(ns.SearchItems(""))
     expect("sorted by mobs", [s.itemId for s in lua_list(ns.SortSummaries(ordered, "mobs", True))], [2589, 100])
     expect("sorted by chance ascending", [s.itemId for s in lua_list(ns.SortSummaries(ordered, "rate", False))],
@@ -170,11 +174,15 @@ def main():
     c.fire("DT_SETTINGS_CHANGED")
 
     # When two mobs give the same best chance, the one with more kills behind it is shown.
-    for spawn in ("t1", "t2"):
+    for spawn in ("t1", "t2", "t3"):
         kill_and_loot(c, 7, spawn, [cloth])
+    for spawn in ("t1", "t2", "t3", "t4"):
+        kill_and_loot(c, 8, spawn, [cloth])
     tie_list = ns.SummarizeItems(ns.SearchItems(""))[0]
     tie = {s.itemId: s for s in lua_list(tie_list)}
-    expect("a tie goes to more kills", (tie[2589].bestNpc, tie[2589].kills), (7, 2))
+    expect("a tie goes to more kills", (tie[2589].bestNpc, tie[2589].kills), (8, 4))
+    tie_order = c.lua.table_from([d for d in lua_list(ns.FindDroppers(2589)) if d.npc in (7, 8)][::-1])
+    expect("whichever comes first", ns.BestDropper(tie_order).npc, 8)
     expect("sorted by kills", [s.itemId for s in lua_list(ns.SortSummaries(tie_list, "kills", True))], [2589, 100])
 
     # Names and levels saved by earlier versions for creatures without any counts are dropped on login.

@@ -640,12 +640,7 @@ local function renderMobs()
     local r, g, b = ns.QualityRGB(quality)
     headTitle:SetText(ns.ItemName(selectedItem))
     headTitle:SetTextColor(r or C.text[1], g or C.text[2], b or C.text[3])
-    local best
-    for _, dropper in ipairs(list) do
-        if not best or dropper.rate > best.rate then
-            best = dropper
-        end
-    end
+    local best = ns.BestDropper(list)
     local zones = #ns.DropperMaps(list)
     local summary = ("Drops from %d %s"):format(#list, #list == 1 and "mob" or "mobs")
     if zones > 0 then
