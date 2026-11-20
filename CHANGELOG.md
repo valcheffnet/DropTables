@@ -5,6 +5,9 @@
 ### Added
 
 - The shared database now also holds counts from EG Link, an addon whose players' records Efficient Games publishes as open data under CC BY 4.0. They were counted on the live servers, and the part that fits Drop Tables is 8,591 corpses of 837 mobs, looted solo. With them the database knows 914 mobs instead of 342. Corpses looted in a group are left out, since EG Link doesn't say how big the group was, and so are quest items and skinning. The kill spots come along, so the map button in the Loot Finder shows for most of these mobs.
+- The shared database now also holds the loot that Everloot's players recorded on the live servers, which Everloot publishes under CC BY-SA 4.0: 12,982 opened corpses of 1,274 mobs from 27 installs. 660 of those mobs weren't in the database yet, so it now knows 1,574. Everloot doesn't count kills or corpses that left nothing, so those follow the other counts of the mob, but the money and stack sizes are Everloot's own. Names, levels and places come from the mobs its players saw. Everloot doesn't record that in dungeons, so dungeon mobs have their names but no zone yet.
+- Quest items are now left out of every imported source by their item class, the same way the addon leaves them out of your own counts. EG Link and Blackthornes Farmer had let some through, Sunscale Feather and Blood Shard among them.
+- Engineers' target dummies are left out of the shared database. Looting your own dummy gives back what it was made of, which made Target Dummy look like a mob that drops Linen Cloth and Bronze Bars.
 
 ## [0.4.0] - 2026-11-19
 

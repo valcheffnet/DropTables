@@ -7,7 +7,8 @@ accepted share, and the same data ships inside the addon as `DropTables/Data.lua
 - `submissions/` keeps every accepted export as it came in, so the database can be rebuilt when the merge rules
   change. Its format is internal and can change at any time.
 - `imports/` holds counts that didn't come from a Drop Tables export, already turned into the submission format.
-  There is one so far, see "Imported counts" below.
+  There are three so far, see "Imported counts" below.
+- `quest-items.json` lists the quest items of the game client, which the merge leaves out of every source.
 
 ## License
 
@@ -34,7 +35,7 @@ One mob:
 | `minLevel`, `maxLevel` | lowest and highest level seen, missing when no level was read |
 | `maps` | kills per map, keyed by uiMapID. Kills recorded without a map aren't in it, so it can add up to less than the kills |
 | `spots` | where on each map the mob was killed: per uiMapID, kills per grid cell, at most the 40 busiest cells. The map is cut into a 50 x 50 grid, and cell `c` is column `floor(c / 50)` and row `c % 50` from the top left, so its centre is at `x = (floor(c / 50) + 0.5) / 50`, `y = (c % 50 + 0.5) / 50`. Missing when nothing tells where |
-| `from` | the installs that went into this mob, keyed by a random install id, with how many kills each had. An import is listed under its `id` from `imports`, with its looted corpses |
+| `from` | the installs that went into this mob, keyed by a random install id, with how many kills each had. An import is listed under its `id` from `imports`, with its looted corpses, except Everloot, whose installs are listed one by one as `everloot-` and the start of their install id |
 | `buckets` | the counts, split by group size: `"1"` solo, `"2"` to `"5"` a party of that size, `"6"` a raid |
 
 One bucket:
@@ -117,6 +118,34 @@ corpses and the drop rates stay as EG Link has them, give or take the rounding t
 Unlike the Blackthornes import, this one has kills, empty corpses, money and stack sizes of its own, so it counts
 like a player who sent an export: at most 300 kills of a mob, and left out of a mob when its counts don't fit the
 rest.
+
+`imports/everloot.json` comes from Everloot's public corpus (https://everloot.app/database), which Everloot publishes
+under CC BY-SA 4.0 from what the players running its addon record on WoW Forever. Copying it in bulk takes a free API
+key from an Everloot account:
+
+    EVERLOOT_API_KEY=... python tools/import_everloot.py fetch everloot-corpus
+    python tools/import_everloot.py everloot-corpus --names questie.json
+    python tools/build_data.py
+
+The corpus has a record for every loot window. The import takes the windows of killed creatures from the day the
+live servers opened, and each Everloot install becomes a source of its own, so the 300 kill cap and the checks for
+counts that don't fit work per install, as they do for players who send exports. Skinning, gathering, fishing,
+disenchanting and containers stay out, and so do quest items.
+
+A loot window is an opened corpse, but the corpus doesn't count kills, corpses that left nothing, or group sizes. So
+the import is partial like the Blackthornes one: its corpses go into the solo bucket and get kills and empty corpses
+in the same proportion as the full sources of the mob, or count as kills with loot where there's no full source.
+Money and stack sizes are its own, since Everloot records the copper and the stacks of every window.
+
+Names, levels and kill spots come from the NPC sightings in the same corpus. A sighting carries the name in the
+language of the player's client, so names only come from installs whose names match the English ones most installs
+agree on. Its place is where the player stood, and an install's corpses of a mob are spread over the cells where the
+mob was seen. Everloot records no sightings in dungeons, so mobs nobody saw get the English name QuestieDB has for
+their npc id, as the Blackthornes import does, and have no level or place.
+
+`quest-items.json` lists the item ids of class 12, the quest items, from Everloot's item list of the current game
+client. `import_everloot.py` writes it, and `build_data.py` leaves those items out of every source, because the
+addon never records them and an import can't always tell them apart.
 
 ## Changes to the format
 

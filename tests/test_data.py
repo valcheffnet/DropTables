@@ -134,7 +134,7 @@ def merge_rules():
     expect("digit install id is a string key", client.ns.shared[11]["from"][digits], 3)
 
     # Many mobs are written in chunks and all load.
-    many = {origin(500): {1000 + i: mob({1: bucket(4, 4, 3, {100 + i % 50: 1})}, name="Mob %d" % i) for i in range(3000)}}
+    many = {origin(500): {20000 + i: mob({1: bucket(4, 4, 3, {100 + i % 50: 1})}, name="Mob %d" % i) for i in range(3000)}}
     lua = build_data.lua_file(build_data.build([submission(60, origin(500), many)]))
     expect("chunks of 500 mobs", lua.count("ns.AddSharedData(function()"), 6)
     client = Client("Many", data=lua)

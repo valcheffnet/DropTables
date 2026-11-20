@@ -50,6 +50,21 @@ Drop Tables changed it. The import keeps only corpses looted solo on the live se
 adds up the client builds and turns the counts into the Drop Tables format. The changed counts are shared under
 CC BY-SA 4.0 with the rest, which CC BY 4.0 allows.
 
+data/imports/everloot.json holds loot from Everloot's public corpus (https://everloot.app/database), which the
+players running the Everloot addon recorded on WoW Forever and which Everloot publishes under CC BY-SA 4.0.
+tools/import_everloot.py made the file from the corpus as of the dataAsOf time in its source. That part is credited
+as:
+
+    Data from Everloot (https://everloot.app), CC BY-SA 4.0.
+
+Drop Tables changed it. The import keeps only the loot windows of killed creatures on the live servers, leaves out
+quest items, counts the windows per install, and takes names, levels and places from the NPC sightings in the same
+corpus. Mobs nobody saw there get the name QuestieDB has for their npc id. The changed counts are shared under the same license, CC BY-SA 4.0.
+
+data/quest-items.json is a list of item ids, the quest items of the game client, as Everloot reads them from the
+client files. It's Blizzard's game data and not part of the data under CC BY-SA 4.0. The build only uses it to leave
+those items out.
+
 The addon's code isn't covered here, see LICENSE. The full legal code of CC BY-SA 4.0 follows below and is
 also at https://creativecommons.org/licenses/by-sa/4.0/legalcode
 

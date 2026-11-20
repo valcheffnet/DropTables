@@ -4,9 +4,12 @@ database.
 Writes data/shared.json and DropTables/Data.lua, which the addon loads as one more source of counts.
 The same input always gives the same output, so a rebuild without new submissions changes nothing.
 
-An import marked partial counts looted corpses and the items in them, but not kills, empty corpses, money or stack
-sizes. Its corpses get those in the same proportion as the players' own counts of the mob, so it moves the item
-chances and nothing else.
+An import marked partial counts looted corpses and the items in them, but not kills or empty corpses, and unless its
+"own" list names them, not money or stack sizes either. Its corpses get what's missing in the same proportion as the
+full sources of the mob, so it moves the item chances and nothing else.
+
+Items in data/quest-items.json (item class 12 of the game client, which the addon never records) are left out of
+every source, since an import can't always tell them apart.
 
 Usage:
     python tools/build_data.py [--root DIR]
@@ -27,6 +30,9 @@ OUTLIER_Z = 3
 UNCONFIRMED_CAP = 50
 CHUNK = 500  # mobs per Lua function, far below the constant limit of one Lua 5.1 function
 MAX_SPOTS = 40  # kill spots kept per map of a mob, the busiest, as MAX_CELLS in DropTables/Places.lua
+# Creatures that aren't mobs: engineers' Target Dummy, Advanced Target Dummy and Masterwork Target Dummy. Looting
+# one's own dummy gives back what it was made of.
+NOT_MOBS = frozenset({"2673", "2674", "12426"})
 
 
 def mob_kills(mob):
@@ -38,20 +44,30 @@ def complete_buckets(mob):
     return {b: data for b, data in mob["buckets"].items() if data["kills"] > 0}
 
 
-def versions(submissions):
+def without(buckets, quest_items):
+    if not quest_items:
+        return buckets
+    return {b: dict(data, items={i: e for i, e in data["items"].items() if int(i) not in quest_items})
+            for b, data in buckets.items()}
+
+
+def versions(submissions, quest_items=frozenset()):
     """(origin, npc) -> list of versions, each {kills, exporter, submitter, issue, mob}."""
     found = {}
     for sub in submissions:
         result = sub["result"]
         for origin, source in result["sources"].items():
             for npc, mob in source["mobs"].items():
-                buckets = complete_buckets(mob)
+                if npc in NOT_MOBS:
+                    continue
+                buckets = without(complete_buckets(mob), quest_items)
                 if not buckets:
                     continue
                 mob = dict(mob, buckets=buckets)
                 found.setdefault((origin, npc), []).append({
                     "kills": mob_kills(mob), "exporter": result["exporter"], "submitter": sub["submitter"],
                     "issue": sub["issue"], "mob": mob, "partial": bool(sub.get("partial")),
+                    "own": frozenset(sub.get("own") or ()),
                 })
     return found
 
@@ -96,7 +112,8 @@ def unconfirmed_cut(found):
                 first_seen[origin] = (v["issue"], v["submitter"])
     per_submitter, cut = {}, set()
     for origin, (_issue, submitter) in sorted(first_seen.items(), key=lambda kv: (kv[1][0], kv[0])):
-        if origin in confirmed:
+        # The installs of an import come from a source checked by hand, not from a player's export.
+        if origin in confirmed or submitter.startswith("import:"):
             continue
         count = per_submitter.get(submitter, 0) + 1
         per_submitter[submitter] = count
@@ -166,16 +183,16 @@ def plausible(seen, opened, p):
     return abs(p - center) <= half + 1e-9
 
 
-def item_outliers(sums, partial=frozenset()):
+def item_outliers(sums, moneyless=frozenset()):
     """usedFor in the addon. With enough big installs, one whose share of an item is far off their median doesn't fit,
-    and when none of them fits for an item, nobody gets blamed for it. Partial sources have no money count, so they
-    are left out of the money comparison."""
+    and when none of them fits for an item, nobody gets blamed for it. Partial sources without money of their own are
+    left out of the money comparison."""
     keys = set()
     for s in sums.values():
         keys.update(s["entries"])
     out = set()
     for key in sorted(keys):
-        big = {o: s for o, s in sums.items() if s["opened"] >= BIG_SOURCE and not (key == "money" and o in partial)}
+        big = {o: s for o, s in sums.items() if s["opened"] >= BIG_SOURCE and not (key == "money" and o in moneyless)}
         if len(big) < MIN_BIG_SOURCES:
             continue
         shares = {o: min(1, s["entries"].get(key, 0) / s["opened"]) for o, s in big.items()}
@@ -214,9 +231,10 @@ def full_totals(kept):
     return total
 
 
-def completed(data, full):
-    """A partial bucket with kills, empty corpses, money and stack sizes in the same proportion as the full sources.
-    Without any full source to follow, every corpse counts as a kill with loot, and nothing as money."""
+def completed(data, full, own=frozenset()):
+    """A partial bucket with kills, empty corpses, money and stack sizes in the same proportion as the full sources,
+    except for the money and stack sizes that own says the source counted itself. Without any full source to follow,
+    every corpse counts as a kill with loot, and nothing as money."""
     opened = data["opened"]
     out = {"opened": opened, "kills": opened, "lootable": opened, "money": {"drops": 0.0, "copper": 0.0}, "items": {}}
     if full["opened"] > 0:
@@ -224,8 +242,13 @@ def completed(data, full):
         out["lootable"] = opened * full["lootable"] / full["opened"]
         money = opened * full["money"] / full["opened"]
         out["money"] = {"drops": money, "copper": money * full["copper"] / full["money"] if full["money"] else 0.0}
+    if "money" in own:
+        out["money"] = data["money"]
     for item, entry in data["items"].items():
         drops = entry["drops"]
+        if "qty" in own:
+            out["items"][item] = entry
+            continue
         known = full["drops"].get(item, 0)
         out["items"][item] = {"drops": drops, "qty": drops * full["qty"][item] / known if known else drops}
     return out
@@ -235,8 +258,9 @@ def shared_mob(chosen):
     """chosen: origin -> version. Returns the shared record of the mob, or None when no install is left."""
     sums = {origin: scaled_sum(v["mob"]) for origin, v in chosen.items()}
     partial = frozenset(o for o, v in chosen.items() if v["partial"])
+    moneyless = frozenset(o for o in partial if "money" not in chosen[o]["own"])
     out = empty_kill_outliers({o: s for o, s in sums.items() if o not in partial})
-    out |= item_outliers({o: s for o, s in sums.items() if o not in out}, partial)
+    out |= item_outliers({o: s for o, s in sums.items() if o not in out}, moneyless)
     kept = {o: v for o, v in chosen.items() if o not in out}
     if not kept:
         return None
@@ -248,7 +272,7 @@ def shared_mob(chosen):
         factor = PEER_CAP / kills if kills > PEER_CAP else 1
         for bucket, data in mob["buckets"].items():
             if v["partial"]:
-                data = completed(data, full)
+                data = completed(data, full, v["own"])
             into = raw.setdefault(bucket, {"kills": 0.0, "lootable": 0.0, "opened": 0.0,
                                            "money": {"drops": 0.0, "copper": 0.0}, "items": {}})
             into["kills"] += data["kills"] * factor
@@ -342,10 +366,10 @@ def superseded(submissions):
     return [old for i, old in enumerate(ordered) if any(covered(old, new) for new in ordered[i + 1:])]
 
 
-def build(submissions, imports=()):
+def build(submissions, imports=(), quest_items=frozenset()):
     """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}, plus "imports" with the source
     and license of each import that went in."""
-    found = versions(list(submissions) + list(imports))
+    found = versions(list(submissions) + list(imports), quest_items)
     cut = unconfirmed_cut(found)
     by_npc = {}
     for (origin, npc), candidates in found.items():
@@ -432,6 +456,11 @@ def load_imports(root):
     return load_submissions(root, "imports")
 
 
+def load_quest_items(root):
+    path = root / "data" / "quest-items.json"
+    return frozenset(json.loads(path.read_text(encoding="utf-8"))["items"]) if path.exists() else frozenset()
+
+
 def write_outputs(root, database):
     """Writes both files and returns True when either one changed."""
     targets = {
@@ -455,7 +484,7 @@ def main(argv):
         (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
         submissions.remove(old)
     imports = load_imports(root)
-    database = build(submissions, imports)
+    database = build(submissions, imports, load_quest_items(root))
     changed = write_outputs(root, database)
     print("%d submissions, %d imports, %d mobs%s" % (database["submissions"], len(imports), len(database["mobs"]),
                                                      "" if changed else ", nothing changed"))
