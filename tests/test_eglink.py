@@ -1,0 +1,137 @@
+"""The EG Link import: tools/import_eglink.py turns a clone of EG Link output into data/imports/eglink.json.
+
+Requires: pip install lupa, and git on PATH
+Run: python tests/test_eglink.py
+"""
+import json
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tests"))
+sys.path.insert(0, str(ROOT / "tools"))
+from wowsim import Client, expect, report  # noqa: E402
+import build_data  # noqa: E402
+import import_eglink  # noqa: E402
+
+
+def kills(deaths, empty=0, unknown=0, levels=None):
+    return {"deaths": deaths, "empty": empty, "unknown": unknown, "levels": levels or {}, "sources": 1}
+
+
+def window(windows, items=None, coins=0, copper=0, copper_windows=0):
+    return {"windows": windows, "items": items or {}, "coins": coins, "copper": copper,
+            "copperWindows": copper_windows, "sources": 1}
+
+
+def item(drops, quantity=None, quest=None):
+    entry = {"drops": drops, "quantity": drops if quantity is None else quantity, "chance": 0}
+    if quest:
+        entry["quest"] = quest
+    return entry
+
+
+def pos(ui_map, x, y):
+    return {"instance": 0, "uiMap": ui_map, "mapX": x, "mapY": y, "worldX": 0, "worldY": 0}
+
+
+def write(folder, name, data):
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / name).write_text(json.dumps(data), encoding="utf-8")
+
+
+def fake_clone(root):
+    """Two live builds and one beta build, committed so the import can name the commit."""
+    live = root / "data" / "wowf"
+    write(live / "1.60.1.70100", "loot.json", {
+        "kills": {
+            "npc:10": kills(10, empty=2, levels={"5": 6, "6": 4}),
+            "npc:10|quest": kills(4, levels={"7": 4}),
+            "npc:10|group": kills(50, empty=40),
+            "npc:11": kills(4, empty=2),
+            "npc:12": kills(3, empty=3),
+            "object:99|spell:3365": kills(9),
+        },
+        "sources": {
+            "npc:10": window(8, {"100": item(4, quantity=6), "200": item(2, quest=123)},
+                             coins=8, copper=400, copper_windows=4),
+            "npc:10|quest": window(4, {"100": item(2), "201": item(4, quest=True)}),
+            "npc:10|group": window(10, {"100": item(10)}),
+            "npc:10|spell:8613": window(6, {"2318": item(6)}),
+            "npc:11": window(4, {"300": item(2)}, coins=3),
+            "object:99|spell:3365": window(9, {"400": item(9)}),
+        },
+    })
+    write(live / "1.60.1.70100", "creatures.json", {"creatures": {
+        "10": {"name": "Old Name", "positions": [pos(1429, 0.101, 0.205), pos(1429, 0.105, 0.209)]},
+    }})
+    write(live / "1.60.1.70200", "loot.json", {
+        "kills": {"npc:10": kills(6, empty=2, levels={"8": 6})},
+        "sources": {"npc:10": window(4, {"100": item(2)}, coins=2, copper=100, copper_windows=2)},
+    })
+    write(live / "1.60.1.70200", "creatures.json", {"creatures": {
+        "10": {"name": "Forest Thing", "positions": [pos(1429, 0.5, 0.5), pos(1430, 0.2, 0.2), {"uiMap": 0}]},
+    }})
+    write(root / "data" / "wow_classic_beta" / "1.60.1.70009", "loot.json", {
+        "kills": {"npc:13": kills(5)}, "sources": {"npc:13": window(5, {"500": item(5)})},
+    })
+    git = ["git", "-C", str(root), "-c", "user.name=t", "-c", "user.email=t@example.org"]
+    subprocess.run(["git", "init", "-q", str(root)], check=True)
+    subprocess.run(git + ["add", "."], check=True)
+    subprocess.run(git + ["commit", "-q", "-m", "data"], check=True)
+
+
+def conversion(clone):
+    imp = import_eglink.make_import(clone)
+    mobs = imp["result"]["sources"]["eglink"]["mobs"]
+    expect("solo mobs only, beta left out", sorted(mobs), ["10", "11", "12"])
+    b = mobs["10"]["buckets"]["1"]
+    expect("solo and quest corpses of both builds add up, group corpses don't", (b["kills"], b["opened"]), (20, 16))
+    expect("empty corpses count", b["lootable"], 16)
+    expect("quest items, skinning and group loot stay out", sorted(b["items"]), ["100"])
+    expect("drops and stack sizes add up", b["items"]["100"], {"drops": 8, "qty": 10})
+    # 10 windows with coins, copper known for 6 of them with 500 copper: 10 drops of about 83 copper.
+    expect("money follows the windows with one corpse", (b["money"]["drops"], b["money"]["copper"]), (10, 833))
+    expect("levels span the builds", mobs["10"]["levels"], [5, 8])
+    expect("the newest build's name wins", mobs["10"]["name"], "Forest Thing")
+    expect("kills split over the maps the deaths were seen on", mobs["10"]["maps"], {"1429": 15, "1430": 5})
+    expect("spots on the addon's 50x50 grid, one per position",
+           mobs["10"]["cells"], {"1429": {"260": 2, "1275": 1}, "1430": {"510": 1}})
+    expect("a mob with no positions has no maps", (mobs["11"]["maps"], mobs["11"]["cells"]), ({}, {}))
+
+    # npc 11: 4 kills, 2 empty, but 4 windows. Kills and corpses with loot double, so the share stays a half and
+    # the item rate stays 2 drops per 4 windows times that half.
+    b = mobs["11"]["buckets"]["1"]
+    expect("more windows than corpses with loot scale the kills up", (b["kills"], b["lootable"], b["opened"]),
+           (8, 4, 4))
+    expect("coins without any known copper give no money", b["money"]["drops"], 0)
+    expect("a mob that only ever left empty corpses still counts", mobs["12"]["buckets"]["1"]["kills"], 3)
+
+    expect("the import is full, not partial", imp["partial"], False)
+    expect("the source names the commit", "/tree/" in imp["source"]["url"], True)
+    return imp
+
+
+def in_the_addon(imp):
+    lua = build_data.lua_file(build_data.build([], [imp]))
+    expect("Data.lua carries the CC BY credit",
+           "-- Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0" in lua, True)
+    expect("Data.lua says what was changed", "Drop Tables changed it" in lua, True)
+    client = Client("EgLink", data=lua)
+    stats = client.ns.GetStats(11, "all")
+    entry = next(e for e in stats.list.values() if e.itemId == 300)
+    expect("the addon shows EG Link's own chance (share with loot times drops per window)", round(entry.rate, 2), 0.25)
+
+
+def main():
+    with tempfile.TemporaryDirectory() as folder:
+        clone = pathlib.Path(folder)
+        fake_clone(clone)
+        in_the_addon(conversion(clone))
+    report("EG Link import")
+
+
+if __name__ == "__main__":
+    main()

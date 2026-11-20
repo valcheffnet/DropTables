@@ -92,6 +92,32 @@ kills, empty corpses, money and stack sizes in the same proportion as the player
 the item chances and nothing else. Where it's the only source, every corpse counts as a kill with loot, there's no
 money, and every drop is a stack of one.
 
+`imports/eglink.json` comes from EG Link output (https://github.com/JIVESCORP/eg-link-output-wowf), which Efficient
+Games publishes under CC BY 4.0 from what the players running their EG Link addon record on WoW Forever. Its credit
+line and what was changed are in [LICENSE-DATA](../LICENSE-DATA). `tools/import_eglink.py` makes it from a clone of
+that repository:
+
+    git clone --depth 1 https://github.com/JIVESCORP/eg-link-output-wowf.git
+    python tools/import_eglink.py eg-link-output-wowf
+    python tools/build_data.py
+
+EG Link keeps a folder per client build with only what was recorded on that build, so the import adds up the
+builds of the live servers (`data/wowf/`) and leaves the beta out. From `loot.json` it takes the corpses looted solo,
+including the ones tied to a quest, and puts them in the solo bucket. Corpses looted in a group stay out, because
+EG Link doesn't say the group size and counts too many empty corpses there. Quest items, skinning, pick pocket,
+nodes, chests, fishing and containers stay out as well. Names and kill spots come from `creatures.json`, where
+EG Link keeps one spot per 5 yards, so each spot counts once.
+
+EG Link counts loot windows, and a corpse the game said nothing about can still be opened, so some mobs have more
+windows than corpses with loot. EG Link works out its chances as the share of corpses with loot times drops per
+window, the same way Drop Tables does. The windows become opened corpses, and where there are more of them than
+corpses with loot, the kills and the corpses with loot are scaled up together until they match. The share of empty
+corpses and the drop rates stay as EG Link has them, give or take the rounding to whole kills.
+
+Unlike the Blackthornes import, this one has kills, empty corpses, money and stack sizes of its own, so it counts
+like a player who sent an export: at most 300 kills of a mob, and left out of a mob when its counts don't fit the
+rest.
+
 ## Changes to the format
 
 New fields can appear. Existing ones won't be renamed or removed without a note in CHANGELOG.md first.

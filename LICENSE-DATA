@@ -39,6 +39,17 @@ copyright and permission notice:
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+data/imports/eglink.json holds counts from EG Link output, the open data Efficient Games publishes at
+https://github.com/JIVESCORP/eg-link-output-wowf. Players who run their EG Link addon recorded it on WoW Forever.
+tools/import_eglink.py made the file from the commit named in its source url. That part is credited as:
+
+    Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0
+    (https://creativecommons.org/licenses/by/4.0/).
+
+Drop Tables changed it. The import keeps only corpses looted solo on the live servers, leaves out quest items,
+adds up the client builds and turns the counts into the Drop Tables format. The changed counts are shared under
+CC BY-SA 4.0 with the rest, which CC BY 4.0 allows.
+
 The addon's code isn't covered here, see LICENSE. The full legal code of CC BY-SA 4.0 follows below and is
 also at https://creativecommons.org/licenses/by-sa/4.0/legalcode
 

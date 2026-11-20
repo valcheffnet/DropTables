@@ -68,4 +68,4 @@ Open an issue here. To see Lua errors in game, type `/console scriptErrors 1` on
 
 The code is all rights reserved, see LICENSE. You can use the addon in game and read the code, but not republish it or reuse the code without asking first.
 
-The drop data is different. Everything players send and the shared database built from it are under CC BY-SA 4.0 (see LICENSE-DATA), so other addons and sites can use them as long as they credit Drop Tables and keep what they make from them under the same license. The database also holds counts from Blackthornes Farmer that were published under the MIT license, and LICENSE-DATA carries their notice.
+The drop data is different. Everything players send and the shared database built from it are under CC BY-SA 4.0 (see LICENSE-DATA), so other addons and sites can use them as long as they credit Drop Tables and keep what they make from them under the same license. The database also holds counts from Blackthornes Farmer that were published under the MIT license, and counts from EG Link that Efficient Games published under CC BY 4.0. LICENSE-DATA says where each comes from and how to credit it.
