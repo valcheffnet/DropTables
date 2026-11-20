@@ -1,0 +1,59 @@
+name: Refresh imported counts
+
+# Every morning the imports take in what EG Link and Everloot published since the day before, and the shared database
+# is built again. 04:00 UTC is 06:00 in Bulgaria in winter and 07:00 in summer. Everloot needs the API key in the
+# EVERLOOT_API_KEY secret; without it only EG Link is refreshed. Mobs nobody saw in Everloot keep the names the shared
+# database already gave them.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: shared-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Import EG Link
+        run: |
+          set -euo pipefail
+          git clone -q --depth 1 https://github.com/JIVESCORP/eg-link-output-wowf.git "$RUNNER_TEMP/eglink"
+          python tools/import_eglink.py "$RUNNER_TEMP/eglink"
+
+      - name: Import Everloot
+        env:
+          EVERLOOT_API_KEY: ${{ secrets.EVERLOOT_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${EVERLOOT_API_KEY:-}" ]; then
+            echo "No EVERLOOT_API_KEY secret, Everloot stays as it was."
+            exit 0
+          fi
+          python tools/import_everloot.py fetch "$RUNNER_TEMP/everloot"
+          python tools/import_everloot.py "$RUNNER_TEMP/everloot" --names data/shared.json
+
+      - name: Build the shared database
+        run: python tools/build_data.py
+
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git add -A data DropTables/Data.lua
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Refresh the counts imported from EG Link and Everloot"
+          git push || { git pull --rebase -q && git push; }
