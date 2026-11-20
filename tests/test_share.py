@@ -177,6 +177,75 @@ def offline_asker():
            hide(None, "CHAT_MSG_SYSTEM", "No player named 'Ann-Lee' is currently playing."), False)
 
 
+CHANNEL_STUBS = """
+    inChannel, joins, leaves = false, 0, 0
+    GetChannelName = function() if inChannel then return 7, "DropTablesShare" end return 0 end
+    JoinTemporaryChannel = function() joins = joins + 1 inChannel = true end
+    LeaveChannelByName = function() leaves = leaves + 1 inChannel = false end
+"""
+
+
+def sharing_off():
+    """With "Share with other players" off nothing goes out or comes in, the channel is left, and turning it on joins
+    again at once. Counts already received stay."""
+    dee, eli = Client("Dee", saved=CHANNEL_STUBS), Client("Eli", saved=CHANNEL_STUBS)
+    fixed_random(eli, 0)
+    net = Net(dee, eli)
+    net.run(10)
+    hold(dee, 2, {origin_id(600): (5, [(100, 2)])})
+    for spawn in ("E1", "E2", "E3"):
+        loot_mob(eli, 1, spawn, [(100, 1)])
+    eli.g.groupMembers = eli.lua.table("Dee")
+    dee.g.groupMembers = dee.lua.table("Eli")
+
+    def share(on):
+        dee.ns.settings.sharePlayers = on
+        dee.fire("DT_SETTINGS_CHANGED")
+
+    # Eli asks about a mob Dee holds counts of, and Dee's answer waits a moment when the option goes off. Dee's own
+    # question about mob 7 hasn't gone out yet either, and mob 8 waits its turn behind it. None of it goes out when the
+    # option is back on soon after.
+    eli.see(2, "Z", 5)
+    net.run(1)
+    dee.see(7, "W", 5)
+    dee.see(8, "V", 5)
+    share(False)
+    expect("turning it off leaves the channel", (dee.g.leaves, dee.g.inChannel), (1, False))
+    start = len(net.log)
+    net.run(3)
+    share(True)
+    net.run(5)
+    expect("what waited when it went off is dropped", net.sent("Dee", None, start), [])
+
+    share(False)
+    start = len(net.log)
+    loot_mob(dee, 3, "D1", [(100, 1)])
+    dee.see(1, "X", 5)
+    net.run(70)
+    expect("nothing goes out while off", net.sent("Dee", None, start), [])
+    expect("the group's counts aren't taken in", dee.ns.db.peers[1], None)
+    expect("the channel isn't joined again while off", (dee.g.joins, dee.g.inChannel), (2, False))
+    dee.fire("CHAT_MSG_ADDON", "DropTables", "Q|%s|%s|" % (origin_id(601), b36(2)), "CHANNEL", "Eli")
+    dee.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(602), ";".join(counts(4, 5, 5))), "WHISPER", "Eli")
+    net.run(10)
+    expect("questions aren't answered while off", net.sent("Dee", None, start), [])
+    expect("whispered counts aren't taken in", dee.ns.db.peers[4], None)
+    expect("counts received before stay", dee.ns.db.peers[2][origin_id(600)] is not None, True)
+    expect("status says it's off", dee.ns.ShareStatus().startswith("Sharing with other players is off"), True)
+    share(True)
+    expect("turning it on joins at once", (dee.g.joins, dee.g.inChannel), (3, True))
+    net.run(2)
+    dee.see(1, "Y", 5)
+    net.run(70)
+    expect("asks again once on", len(net.sent("Dee", "Q|", start)), 1)
+    expect("takes in counts again once on", dee.ns.db.peers[1] is not None, True)
+    # Off from the start: a /reload keeps the client in the channel, so the addon leaves it.
+    fay = Client("Fay", saved=CHANNEL_STUBS + "inChannel = true\nDropTablesDB = { settings = { sharePlayers = false } }")
+    net.add(fay)
+    net.run(10)
+    expect("off at login leaves the channel", (fay.g.leaves, fay.g.inChannel, fay.g.joins), (1, False, 0))
+
+
 def main():
     alice, bob, carol = Client("Alice"), Client("Bob"), Client("Carol")
     fixed_random(alice, 0)
@@ -712,6 +781,7 @@ def main():
     expect("debug off is quiet", debug_lines(quinn) + debug_lines(quinn, 3), [])
 
     offline_asker()
+    sharing_off()
     report("sharing")
 
 

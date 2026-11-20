@@ -83,6 +83,7 @@ C_Map = {
     GetMapInfo = function(id) return { name = "Zone " .. id } end,
 }
 function JoinTemporaryChannel() end
+function LeaveChannelByName() end
 function GetChannelName() return 7, "DropTablesShare" end
 C_ChatInfo = {
     RegisterAddonMessagePrefix = function() end,

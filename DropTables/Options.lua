@@ -75,6 +75,10 @@ ns.On("DT_READY", function()
     slider("killsPerHour", "Kills per hour",
         "How many mobs of your level you kill in an hour, for the g/ph column of the Loot Finder. Mobs well below "
             .. "your level count up to half as many again, mobs above it fewer.", 20, 200, 5, whole)
+    checkbox("sharePlayers", "Share with other players",
+        "Swap drop counts in game with other players who run Drop Tables, over a hidden channel and with your group. "
+            .. "When it's off, the addon leaves the channel and nothing goes out or comes in. Counts you already have "
+            .. "stay, and /dt export and the shared database work either way.")
     checkbox("exportReminder", "Remind me to share my tables",
         "Once a session, when 25 or more mobs have new counts, a chat line points to /dt export.")
     slider("detailsAlpha", "Table window background", "Opacity of the /dt window's background; text and icons stay solid.",

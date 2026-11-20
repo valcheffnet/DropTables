@@ -16,6 +16,7 @@ ns.DEFAULTS = {
     onlyMine = false,
     exportReminder = true,
     showMinimap = true,
+    sharePlayers = true,  -- ask, answer and swap counts with other players in game
     killsPerHour = 70,  -- on mobs of the player's level, for g/ph in the Loot Finder
     gphWorldDrops = false,  -- random gear and recipes count in g/ph, at their vendor price
     minimapAngle = 200,

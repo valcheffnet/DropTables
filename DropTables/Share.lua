@@ -69,6 +69,11 @@ local whispered = {}  -- player key (see playerKey) -> GetTime() of the last whi
 local playerKey
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
 
+-- The option that turns all of it off, both ways.
+local function sharing()
+    return ns.settings.sharePlayers
+end
+
 -- The player's own counts of a mob in the same shape as another install's, with buckets, levels and kills per map.
 function ns.OwnSource(npc)
     local own = ns.db.mobs[npc]
@@ -637,6 +642,9 @@ end)
 -- Sends up to one channel message, one group message and a few whispers per tick. Whispers outside instances have no
 -- addon throttle, so a few at once are fine.
 local function tick()
+    if not sharing() then
+        return
+    end
     local now = GetTime()
     for key, at in pairs(whispered) do
         if now - at > WHISPER_ERROR_WINDOW then
@@ -702,7 +710,7 @@ ns.On("DT_COUNTS_CHANGED", function(npc)
 end)
 
 ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
-    if prefix ~= PREFIX or ns.IsSecret(text) or ns.IsSecret(sender) then
+    if prefix ~= PREFIX or not sharing() or ns.IsSecret(text) or ns.IsSecret(sender) then
         return
     end
     ns.Debug("got %s from %s: %s", chatType, sender, shown(text))
@@ -740,7 +748,7 @@ end)
 -- Joins the hidden channel and tries again every JOIN_RETRY seconds while the player isn't in it, which happens after
 -- loading screens, a /leave or hitting the channel limit.
 local function joinChannel()
-    if refreshChannel() then
+    if not sharing() or refreshChannel() then
         return
     end
     JoinTemporaryChannel(CHANNEL)
@@ -748,6 +756,23 @@ local function joinChannel()
         ns.Debug(refreshChannel() and "joined the sharing channel" or "could not join the sharing channel, trying again")
     end)
 end
+
+-- With the option on, joins the channel (at once when it was just turned on). With it off, leaves the channel, which
+-- a /reload doesn't do, and drops whatever waited to go out.
+local function applySharing()
+    if sharing() then
+        joinChannel()
+        return
+    end
+    if refreshChannel() then
+        LeaveChannelByName(CHANNEL)
+        channelId = nil
+    end
+    wipe(queue)
+    wipe(planned)
+    wipe(waiting)
+end
+ns.On("DT_SETTINGS_CHANGED", applySharing)
 
 -- Data from the 0.1.0 bridge mode. Counts in db.relay (by install) move to db.peers (by mob) and the rest is dropped.
 local function migrateRelay(db)
@@ -786,7 +811,7 @@ ns.On("DT_READY", function()
     migrateRelay(ns.db)
     C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
     C_Timer.After(JOIN_DELAY, function()
-        joinChannel()
+        applySharing()
         C_Timer.NewTicker(JOIN_RETRY, joinChannel)
     end)
     C_Timer.NewTicker(TICK, tick)
@@ -808,6 +833,10 @@ function ns.ShareStatus()
     local count = 0
     for _ in pairs(installs) do
         count = count + 1
+    end
+    if not sharing() then
+        return ("Sharing with other players is off in the options, so nothing is sent or taken in. Their counts "
+            .. "for %d mobs from %d installs stay."):format(mobs, count)
     end
     local text = ("Other players' counts for %d mobs from %d installs. This session: %d questions asked, %d answers whispered, %d received."):format(
         mobs, count, session.queries, session.answers, session.received)
