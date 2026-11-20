@@ -609,13 +609,14 @@ local function notFoundPattern()
     return "^" .. escape(before) .. "(.+)" .. escape(after) .. "$"
 end
 
+local notFound -- notFoundPattern(), set once the game's strings are there
+
 -- The chat filter: true hides the line.
 function ns.HideWhisperError(_, _, text)
     if type(text) ~= "string" or ns.IsSecret(text) then
         return false
     end
-    local pattern = notFoundPattern()
-    local name = pattern and text:match(pattern)
+    local name = notFound and text:match(notFound)
     local at = name and whispered[playerKey(name)]
     if not at or GetTime() - at > WHISPER_ERROR_WINDOW then
         return false
@@ -626,8 +627,9 @@ function ns.HideWhisperError(_, _, text)
 end
 
 ns.On("DT_READY", function()
+    notFound = notFoundPattern()
     local addFilter = (ChatFrameUtil and ChatFrameUtil.AddMessageEventFilter) or ChatFrame_AddMessageEventFilter
-    if addFilter then
+    if addFilter and notFound then
         addFilter("CHAT_MSG_SYSTEM", ns.HideWhisperError)
     end
 end)

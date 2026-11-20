@@ -341,13 +341,12 @@ def interface(db):
     expect("a mob with loot and skinning gets the skinning line last", "Skinning" in lines[-1], True)
 
     # The details window and the Loot Finder draw skinning without errors.
-    c.g.DropTablesNs = c.ns
-    calls = c.lua.eval("""function(ns)
+    count_calls = c.lua.eval("""function(ns)
         local get = ns.GetSkinStats
         skinCalls = 0
         ns.GetSkinStats = function(...) skinCalls = skinCalls + 1 return get(...) end
     end""")
-    calls(c.ns)
+    count_calls(c.ns)
     c.ns.ShowDetails(32)
     c.ns.ShowDetails(30)
     expect("the details window asks for the skinning", c.g.skinCalls >= 2, True)
@@ -368,7 +367,7 @@ def interface(db):
         end
     """, data=build_data.lua_file(db))
 
-    count = strip.lua.eval("""function()
+    skin_row_icons = strip.lua.eval("""function()
         local n = 0
         for _, f in ipairs(frames) do
             local point = rawget(f, "point")
@@ -376,9 +375,6 @@ def interface(db):
         end
         return n
     end""")
-
-    def skin_row_icons():
-        return count()
 
     strip.see(30, "S", 14)
     expect("a mob with skinning gets a row of skinning icons", skin_row_icons(), 2)
