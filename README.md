@@ -6,21 +6,21 @@ This is an early test build, so expect bugs. At first the tables only know your 
 
 ## Screenshots
 
-Target a mob and its likely drops show up as icons under the target frame, each with its chance.
+Target a mob and its likely drops show up as icons under the target frame, each with its chance. If you can skin it, a second row underneath shows what skinning gives.
 
-![Drop icons under the target frame of a Greater Plainstrider](screenshots/TargetedMob.png)
+![Loot and skinning icons under the target frame of a Greater Plainstrider](screenshots/TargetedMob.png)
 
-Mouse over a mob and its tooltip lists what it drops and how often.
+Mouse over a mob and its tooltip lists what it drops and how often, with skinning on a line of its own.
 
-![The tooltip of a Fleeting Plainstrider with its drop chances](screenshots/tooltip.png)
+![The tooltip of a Greater Plainstrider with its drop chances and skinning](screenshots/tooltip.png)
 
-The drop table window follows your target and shows where the kills behind each chance came from.
+The drop table window follows your target and shows where the kills behind each chance came from. The Price column is what each item is worth in the gold per hour.
 
-![The drop table window for a Greater Plainstrider](screenshots/lootTable.png)
+![The drop table window for a Greater Plainstrider with item prices](screenshots/lootTable.png)
 
-The Loot Finder works the other way round. Pick an item and it shows which mobs drop it, where, and how often.
+The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance.
 
-![The Loot Finder showing the mobs that drop Strider Meat](screenshots/LootFinder.png)
+![The Loot Finder listing all items sorted by gold per hour](screenshots/LootFinder.png)
 
 ## Download
 
