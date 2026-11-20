@@ -117,8 +117,13 @@ def ingest(issue, root, now=None):
     mobs = {npc for s in new for source in s["result"]["sources"].values() for npc in source["mobs"]}
     kills = sum(b["kills"] for s in new for source in s["result"]["sources"].values()
                 for mob in source["mobs"].values() for b in mob["buckets"].values())
-    reply = ("Thanks! Your counts are in the shared database now (%s, %s, %s), and everyone gets them with the next "
-             "Drop Tables release." % (count(len(installs), "install"), count(len(mobs), "mob"), count(kills, "kill")))
+    skinned = sum((mob.get("skins") or {}).get("skinned", 0) for s in new for source in s["result"]["sources"].values()
+                  for mob in source["mobs"].values())
+    counted = [count(len(installs), "install"), count(len(mobs), "mob"), count(kills, "kill")]
+    if skinned:
+        counted.append(count(skinned, "skinned corpse"))
+    reply = ("Thanks! Your counts are in the shared database now (%s), and everyone gets them with the next "
+             "Drop Tables release." % ", ".join(counted))
     if problems:
         reply += " Part of it couldn't be used: %s." % "; ".join(problems)
     if duplicates:

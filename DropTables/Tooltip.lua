@@ -1,12 +1,35 @@
 local _, ns = ...
 
+local SKIN_ITEMS = 3
+
+-- One line with what skinning the mob gives, the most frequent first.
+local function addSkinLine(tooltip, skin)
+    local parts = {}
+    for i = 1, math.min(SKIN_ITEMS, #skin.list) do
+        local entry = skin.list[i]
+        table.insert(parts, ("%s%s|r %s"):format(ns.QualityColor(entry.quality), ns.ItemName(entry.itemId),
+            ns.FormatRate(entry.rate)))
+    end
+    if #skin.list > SKIN_ITEMS then
+        table.insert(parts, ("+%d"):format(#skin.list - SKIN_ITEMS))
+    end
+    local shade = skin.small and 0.6 or 1
+    tooltip:AddLine(("|cffffd100Skinning|r  %s"):format(table.concat(parts, ", ")), shade, shade, shade, true)
+end
+
 local function addDropLines(tooltip, data)
     if tooltip ~= GameTooltip or not ns.settings or not ns.settings.showTooltip then
         return
     end
     local npc = ns.NpcFromGuid(data and data.guid)
     local stats = npc and ns.GetStats(npc, "all")
+    local skin = npc and ns.GetSkinStats(npc)
     if not stats then
+        if skin then
+            tooltip:AddLine(" ")
+            tooltip:AddDoubleLine("Drop Tables", ("%d skinned"):format(skin.skinned), 1, 0.82, 0, 0.6, 0.6, 0.6)
+            addSkinLine(tooltip, skin)
+        end
         return
     end
     local entries, worldCount, lowCount = ns.VisibleEntries(stats)
@@ -41,6 +64,9 @@ local function addDropLines(tooltip, data)
     end
     if #more > 0 then
         tooltip:AddLine(table.concat(more, ", ") .. " in /dt", 0.6, 0.6, 0.6)
+    end
+    if skin then
+        addSkinLine(tooltip, skin)
     end
 end
 

@@ -9,9 +9,13 @@ What goes in:
 - kills, empty corpses, opened corpses, items with their stack sizes, and money;
 - levels, the English name, and the kill spots of creatures.json.
 
+- skinning (npc:<id>|spell:<id> with one of the four Skinning ranks), from solo and group corpses alike, since the group
+  plays no part in what a skinned corpse gives, but not the corpses skinned with the Bountiful Harvest perk
+  (|bountifulHarvest:<rank>), which gives more of the scarce Pristine materials.
+
 What stays out: corpses looted in a group (EG Link doesn't say the group size, and counts too many empty corpses
-there), quest items, skinning and pick pocket (npc:<id>|spell:<id>), nodes, chests, fishing and containers, and the
-beta servers.
+there), quest items, pick pocket and other spells cast at corpses, nodes, chests, fishing and containers, and the beta
+servers.
 
 EG Link counts loot windows rather than opened corpses, and corpses the game said nothing about (unknown) can be
 opened too, so a mob can have more windows than corpses with loot. Its own chances treat the windows as a sample:
@@ -32,10 +36,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 ORIGIN = "eglink"
 PRODUCT = "wowf"
 GRID = 50  # DropTables/Places.lua
+SKINNING = {"8613", "8617", "8618", "10768"}  # the four ranks of Skinning, as DropTables/Collector.lua
 REPO_URL = "https://github.com/JIVESCORP/eg-link-output-wowf"
 NOTICE = ("Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n"
-          "(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo on the\n"
-          "live servers, without quest items, summed over the builds and turned into Drop Tables counts.")
+          "(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\n"
+          "corpses skinned without the Bountiful Harvest perk on the live servers, without quest items, summed over\n"
+          "the builds and turned into Drop Tables counts.")
 
 
 def round_half_up(value):
@@ -51,9 +57,46 @@ def corpse_key(key):
     return npc if npc.isdigit() else None
 
 
+def skin_key(key):
+    """The npc id of a key for skinning a corpse without the Bountiful Harvest perk, or None for anything else. The
+    group plays no part in skinning, so group keys count too."""
+    parts = key.split("|")
+    spells = [p for p in parts[1:] if p.startswith("spell:")]
+    rest = [p for p in parts[1:] if not p.startswith("spell:")]
+    if (not parts[0].startswith("npc:") or len(spells) != 1 or spells[0][6:] not in SKINNING
+            or any(p not in ("quest", "group") for p in rest)):
+        return None
+    npc = parts[0][4:]
+    return npc if npc.isdigit() else None
+
+
 def new_tally():
     return {"deaths": 0, "empty": 0, "unknown": 0, "windows": 0, "coins": 0, "copper": 0, "copperWindows": 0,
             "items": {}, "levels": {}}
+
+
+def add_skins(skins, loot):
+    for key, source in loot.get("sources", {}).items():
+        npc = skin_key(key)
+        if npc is None:
+            continue
+        t = skins.setdefault(npc, {"skinned": 0, "items": {}})
+        t["skinned"] += source.get("windows", 0)
+        for item, entry in source.get("items", {}).items():
+            if entry.get("quest"):
+                continue
+            into = t["items"].setdefault(item, {"drops": 0, "qty": 0})
+            into["drops"] += entry.get("drops", 0)
+            into["qty"] += entry.get("quantity", 0)
+
+
+def skin_counts(t):
+    items = {}
+    for item, entry in sorted(t["items"].items(), key=lambda kv: int(kv[0])):
+        drops = min(entry["drops"], t["skinned"])
+        if drops > 0:
+            items[item] = {"drops": drops, "qty": max(drops, entry["qty"])}
+    return {"skinned": t["skinned"], "items": items}
 
 
 def add_build(tallies, loot):
@@ -133,33 +176,40 @@ def places(positions, kills):
     return maps, cells
 
 
-def convert(tallies, info):
+def convert(tallies, info, skins=None):
+    skins = skins or {}
     mobs = {}
-    for npc in sorted(tallies, key=int):
-        t = tallies[npc]
+    for npc in sorted(set(tallies) | set(skins), key=int):
+        t = tallies.get(npc, new_tally())
         data = bucket(t)
-        if data["kills"] <= 0:
+        skinned = skins.get(npc, {}).get("skinned", 0) > 0
+        if data["kills"] <= 0 and not skinned:
             continue
         levels = [int(level) for level, count in t["levels"].items() if count > 0 and level.isdigit()]
         about = info.get(npc, {"name": None, "positions": []})
-        maps, cells = places(about["positions"], data["kills"])
-        mobs[npc] = {"buckets": {"1": data}, "cells": cells, "levels": [min(levels), max(levels)] if levels else None,
-                     "maps": maps, "name": about["name"]}
+        # A mob that was only skinned is placed by its skinned corpses.
+        maps, cells = places(about["positions"], data["kills"] if data["kills"] > 0 else skins[npc]["skinned"])
+        mobs[npc] = {"buckets": {"1": data} if data["kills"] > 0 else {}, "cells": cells,
+                     "levels": [min(levels), max(levels)] if levels else None, "maps": maps, "name": about["name"]}
+        if skinned:
+            mobs[npc]["skins"] = skin_counts(skins[npc])
     return mobs
 
 
 def read(clone):
-    tallies, info, builds = {}, {}, []
+    tallies, info, builds, skins = {}, {}, [], {}
     product = clone / "data" / PRODUCT
     for folder in sorted(p for p in product.iterdir() if p.is_dir()):
         loot = folder / "loot.json"
         creatures = folder / "creatures.json"
         if loot.exists():
-            add_build(tallies, json.loads(loot.read_text(encoding="utf-8")))
+            data = json.loads(loot.read_text(encoding="utf-8"))
+            add_build(tallies, data)
+            add_skins(skins, data)
             builds.append(folder.name)
         if creatures.exists():
             add_creatures(info, json.loads(creatures.read_text(encoding="utf-8")))
-    return tallies, info, builds
+    return tallies, info, builds, skins
 
 
 def commit_of(clone):
@@ -170,9 +220,9 @@ def commit_of(clone):
 
 
 def make_import(clone):
-    tallies, info, builds = read(clone)
+    tallies, info, builds, skins = read(clone)
     sha, when = commit_of(clone)
-    mobs = convert(tallies, info)
+    mobs = convert(tallies, info, skins)
     return {
         "index": 2, "issue": 0, "partial": False, "received": when, "submitter": "import:" + ORIGIN,
         "result": {"exporter": ORIGIN, "part": 1, "parts": 1, "sources": {ORIGIN: {"mobs": mobs}}},
@@ -195,8 +245,9 @@ def main(argv):
     target.write_text(json.dumps(imp, sort_keys=True, indent=1, ensure_ascii=False) + "\n", encoding="utf-8",
                       newline="\n")
     mobs = imp["result"]["sources"][ORIGIN]["mobs"]
-    opened = sum(m["buckets"]["1"]["opened"] for m in mobs.values())
-    print("%d mobs, %d opened corpses -> %s" % (len(mobs), opened, target))
+    opened = sum(m["buckets"]["1"]["opened"] for m in mobs.values() if m["buckets"])
+    skinned = sum(m["skins"]["skinned"] for m in mobs.values() if m.get("skins"))
+    print("%d mobs, %d opened and %d skinned corpses -> %s" % (len(mobs), opened, skinned, target))
     return 0
 
 

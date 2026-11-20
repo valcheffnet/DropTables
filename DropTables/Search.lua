@@ -5,16 +5,21 @@ function ns.MapName(mapId)
     return info and info.name or ("Map " .. tostring(mapId))
 end
 
+local currentIndex, currentSkinIndex
+
 -- Items seen in loot windows whose name contains the text (in any case) or whose id is the text, or all of them when
--- the text is empty. qualities, when given, is a set of the qualities to keep.
+-- the text is empty. qualities, when given, is a set of the qualities to keep. Items that only ever came from skinning
+-- are left to SkinItems.
 function ns.SearchItems(text, qualities)
     text = strtrim(text or ""):lower()
     local id = tonumber(text)
     local results = {}
+    local looted, skinnedOnly = currentIndex(), currentSkinIndex()
     for itemId, meta in pairs(ns.db.items) do
         local name = ns.ItemName(itemId)
         local quality = meta.quality or C_Item.GetItemQualityByID(itemId) or 1
-        if (text == "" or itemId == id or name:lower():find(text, 1, true))
+        if (looted[itemId] or not skinnedOnly[itemId])
+            and (text == "" or itemId == id or name:lower():find(text, 1, true))
             and (not qualities or qualities[quality]) then
             local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(itemId)
             table.insert(results, {
@@ -88,18 +93,15 @@ end
 -- The droppers of every item, built from one GetStats per mob. A mob's entries are only rebuilt after its counts or
 -- info change, and all of them after a settings change, because the Loot Finder asks for hundreds of items per redraw.
 local byNpc = {}      -- npc -> { [itemId] = dropper } from the mob's current chances
+local skinsByNpc = {} -- npc -> { [itemId] = dropper } from what skinning the mob gives
 local dirty = {}      -- npcs whose entries are out of date
 local allDirty = true
 local index           -- itemId -> { dropper, ... }, nil while it needs rebuilding
+local skinIndex       -- the same for skinning
 
 -- One dropper per item in the mob's chances. The counts can hold an item that the chances leave out, when it came
 -- from an install far off the rest, and such an item gets no dropper here.
-local function droppersOf(npc)
-    local stats = ns.GetStats(npc, "all")
-    local found = {}
-    if not stats then
-        return found
-    end
+local function placesOf(npc)
     local info = ns.MobInfo(npc)
     local maps, spots = {}, false
     for mapId, place in pairs(info and info.maps or {}) do
@@ -109,7 +111,48 @@ local function droppersOf(npc)
     table.sort(maps, function(a, b)
         return a.kills > b.kills
     end)
-    local name, zone = ns.MobName(npc), maps[1] and ns.MapName(maps[1].mapId) or ""
+    return info, maps, spots, maps[1] and ns.MapName(maps[1].mapId) or ""
+end
+
+-- One skinner per item that skinning the mob gives. Its kills are the skinned corpses, so the rules on how many kills
+-- a mob needs work the same for both.
+local function skinnersOf(npc)
+    local stats = ns.GetSkinStats(npc)
+    local found = {}
+    if not stats then
+        return found
+    end
+    local info, maps, spots, zone = placesOf(npc)
+    local name = ns.MobName(npc)
+    for _, entry in ipairs(stats.list) do
+        found[entry.itemId] = {
+            npc = npc,
+            name = name,
+            rate = entry.rate,
+            drops = entry.drops,
+            opened = stats.skinned,
+            kills = stats.skinned,
+            small = stats.small,
+            scarce = entry.scarce,
+            minLevel = info and info.minLevel,
+            maxLevel = info and info.maxLevel,
+            skill = ns.SkinningSkill(info and info.minLevel),
+            maps = maps,
+            spots = spots,
+            zone = zone,
+        }
+    end
+    return found
+end
+
+local function droppersOf(npc)
+    local stats = ns.GetStats(npc, "all")
+    local found = {}
+    if not stats then
+        return found
+    end
+    local info, maps, spots, zone = placesOf(npc)
+    local name = ns.MobName(npc)
     for _, entry in ipairs(stats.list) do
         if entry.itemId then
             found[entry.itemId] = {
@@ -131,33 +174,47 @@ local function droppersOf(npc)
     return found
 end
 
-local function currentIndex()
+-- itemId -> { dropper, ... } from npc -> { [itemId] = dropper }.
+local function byItem(perNpc)
+    local result = {}
+    for _, found in pairs(perNpc) do
+        for itemId, dropper in pairs(found) do
+            local list = result[itemId]
+            if not list then
+                list = {}
+                result[itemId] = list
+            end
+            table.insert(list, dropper)
+        end
+    end
+    return result
+end
+
+function currentIndex()
     if index and not allDirty and not next(dirty) then
         return index
     end
     if allDirty then
-        byNpc = {}
+        byNpc, skinsByNpc = {}, {}
         for npc in pairs(ns.KnownNpcs()) do
             byNpc[npc] = droppersOf(npc)
+            skinsByNpc[npc] = skinnersOf(npc)
         end
     else
         local known = ns.KnownNpcs()
         for npc in pairs(dirty) do
             byNpc[npc] = known[npc] and droppersOf(npc) or nil
+            skinsByNpc[npc] = known[npc] and skinnersOf(npc) or nil
         end
     end
-    allDirty, dirty, index = false, {}, {}
-    for _, found in pairs(byNpc) do
-        for itemId, dropper in pairs(found) do
-            local list = index[itemId]
-            if not list then
-                list = {}
-                index[itemId] = list
-            end
-            table.insert(list, dropper)
-        end
-    end
+    allDirty, dirty = false, {}
+    index, skinIndex = byItem(byNpc), byItem(skinsByNpc)
     return index
+end
+
+function currentSkinIndex()
+    currentIndex()
+    return skinIndex
 end
 
 local function mobChanged(npc)
@@ -179,6 +236,16 @@ function ns.FindDroppers(itemId)
     local results = {}
     for i, dropper in ipairs(currentIndex()[itemId] or {}) do
         results[i] = dropper
+    end
+    return results
+end
+
+-- Every mob whose skinned corpses gave the item, with its chance per skinned corpse and the Skinning skill its lowest
+-- level needs, in the same shape as FindDroppers.
+function ns.FindSkinners(itemId)
+    local results = {}
+    for i, skinner in ipairs(currentSkinIndex()[itemId] or {}) do
+        results[i] = skinner
     end
     return results
 end
@@ -206,15 +273,45 @@ function ns.BestDropper(droppers)
     return best or bestFew
 end
 
--- One line per item for a category, saying how many mobs drop it and which one is the best (see ns.BestDropper).
--- Only mobs that pass the zone and level filters count, and with a filter set, items none of those mobs drop are left
--- out. Also returns the maps of all droppers before filtering, for the zone choice.
-function ns.SummarizeItems(items, filters)
+-- The skinner with the lowest level, where the item can be had soonest (on a tie, the better chance, then more skinned
+-- corpses). Mobs skinned fewer than BEST_MIN_KILLS times only count when no other mob gives the item, and mobs of
+-- unknown level come last.
+function ns.LowestSkinner(skinners)
+    local best, bestFew
+    for _, skinner in ipairs(skinners) do
+        local level = skinner.minLevel or math.huge
+        local better = function(current)
+            if not current then
+                return true
+            end
+            local currentLevel = current.minLevel or math.huge
+            if level ~= currentLevel then
+                return level < currentLevel
+            elseif skinner.rate ~= current.rate then
+                return skinner.rate > current.rate
+            end
+            return skinner.kills > current.kills
+        end
+        if skinner.kills >= BEST_MIN_KILLS then
+            if better(best) then
+                best = skinner
+            end
+        elseif better(bestFew) then
+            bestFew = skinner
+        end
+    end
+    return best or bestFew
+end
+
+-- One line per item for a category, saying how many mobs give it and which one is the best of them, as pick chooses
+-- it. Only mobs that pass the zone and level filters count, and with a filter set, items none of those mobs give are
+-- left out. Also returns the maps of all the mobs before filtering, for the zone choice.
+local function summarize(items, filters, find, pick)
     filters = filters or {}
     local active = filters.mapId or filters.minLevel or filters.maxLevel
     local results, maps, seenMaps = {}, {}, {}
     for _, item in ipairs(items) do
-        local droppers = ns.FindDroppers(item.itemId)
+        local droppers = find(item.itemId)
         for _, mapId in ipairs(ns.DropperMaps(droppers)) do
             if not seenMaps[mapId] then
                 seenMaps[mapId] = true
@@ -227,10 +324,11 @@ function ns.SummarizeItems(items, filters)
         if #droppers > 0 or not active then
             local summary = { itemId = item.itemId, name = item.name, quality = item.quality, mobs = #droppers, rate = 0,
                 best = "", kills = 0 }
-            local best = ns.BestDropper(droppers)
+            local best = pick(droppers)
             if best then
                 summary.rate, summary.best, summary.bestNpc = best.rate, best.name, best.npc
                 summary.kills, summary.small = best.kills, best.small
+                summary.minLevel, summary.maxLevel = best.minLevel, best.maxLevel
             end
             table.insert(results, summary)
         end
@@ -239,6 +337,40 @@ function ns.SummarizeItems(items, filters)
         return ns.MapName(a) < ns.MapName(b)
     end)
     return results, maps
+end
+
+-- The loot items of a category, with their best mob (see ns.BestDropper).
+function ns.SummarizeItems(items, filters)
+    return summarize(items, filters, ns.FindDroppers, ns.BestDropper)
+end
+
+-- The skinning items, with the lowest mob that gives each (see ns.LowestSkinner).
+function ns.SummarizeSkinItems(items, filters)
+    return summarize(items, filters, ns.FindSkinners, ns.LowestSkinner)
+end
+
+-- Items that skinning gave, filtered like SearchItems. They come from every mob anyone skinned, the shared database
+-- included, so the list doesn't wait for the player to skin something first.
+function ns.SkinItems(text, qualities)
+    text = strtrim(text or ""):lower()
+    local id = tonumber(text)
+    local results = {}
+    for itemId in pairs(currentSkinIndex()) do
+        local name = ns.ItemName(itemId)
+        local meta = ns.db.items[itemId]
+        local quality = meta and meta.quality or C_Item.GetItemQualityByID(itemId) or 1
+        if (text == "" or itemId == id or name:lower():find(text, 1, true))
+            and (not qualities or qualities[quality]) then
+            table.insert(results, { itemId = itemId, name = name, quality = quality })
+        end
+    end
+    table.sort(results, function(a, b)
+        if a.name ~= b.name then
+            return a.name < b.name
+        end
+        return a.itemId < b.itemId
+    end)
+    return results
 end
 
 -- Sorts by value(entry) in either direction, falling back to entry[idKey] on equal values so the order stays stable.
@@ -262,6 +394,7 @@ local SUMMARY_SORT = {
     best = function(s) return s.best end,
     rate = function(s) return s.rate end,
     kills = function(s) return s.kills end,
+    level = function(s) return s.minLevel or math.huge end,
 }
 
 function ns.SortSummaries(summaries, sortKey, descending)
@@ -297,6 +430,7 @@ end
 local SORT_VALUES = {
     name = function(d) return d.name end,
     level = function(d) return d.minLevel or 0 end,
+    skill = function(d) return d.minLevel or 0 end,
     zone = function(d) return d.zone end,
     rate = function(d) return d.rate end,
     drops = function(d) return d.drops end,

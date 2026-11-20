@@ -80,7 +80,7 @@ function ns.OwnSource(npc)
     end
     return {
         origin = ns.db.installId, buckets = own, maps = maps,
-        minLevel = info and info.minLevel, maxLevel = info and info.maxLevel,
+        minLevel = info and info.minLevel, maxLevel = info and info.maxLevel, skins = ns.db.skins[npc],
     }
 end
 
@@ -90,7 +90,7 @@ local function sources(npc)
     for origin, peer in pairs(ns.db.peers[npc] or {}) do
         table.insert(list, {
             origin = origin, buckets = peer.buckets, maps = peer.maps,
-            minLevel = peer.minLevel, maxLevel = peer.maxLevel,
+            minLevel = peer.minLevel, maxLevel = peer.maxLevel, skins = peer.skins,
         })
     end
     for _, source in ipairs(list) do
@@ -105,7 +105,22 @@ local function sources(npc)
     return list
 end
 
-local function pack(header, records)
+local pack
+
+-- The messages of one install's mob: its loot (D|) and, when it skinned the mob, its skinning (S|) after it. Older
+-- versions skip S| messages, which they don't know, and still read the loot.
+local function sourceTexts(npc, source, name)
+    local texts = pack("D|" .. source.origin .. "|", Wire.SourceRecords(npc, source, name))
+    local skinRecords = Wire.SkinRecords(npc, source.skins)
+    if #skinRecords > 0 then
+        for _, text in ipairs(pack("S|" .. source.origin .. "|", skinRecords)) do
+            table.insert(texts, text)
+        end
+    end
+    return texts
+end
+
+function pack(header, records)
     local texts, text = {}, nil
     for _, record in ipairs(records) do
         if text and #text + 1 + #record > Wire.MAX_MESSAGE then
@@ -117,7 +132,9 @@ local function pack(header, records)
         end
         text = text and (text .. ";" .. record) or (header .. record)
     end
-    table.insert(texts, text)
+    if text then
+        table.insert(texts, text)
+    end
     return texts
 end
 
@@ -284,8 +301,7 @@ local function sendDueAnswers(now)
             local due = plan.due[source.origin]
             if due and now >= due then
                 plan.due[source.origin] = nil
-                local records = Wire.SourceRecords(plan.npc, source, ns.db.names[plan.npc])
-                for _, text in ipairs(pack("D|" .. source.origin .. "|", records)) do
+                for _, text in ipairs(sourceTexts(plan.npc, source, ns.db.names[plan.npc])) do
                     enqueue(text, "WHISPER", plan.target)
                 end
                 session.answers = session.answers + 1
@@ -366,6 +382,14 @@ local function store(origin, npc, records)
             peer.maps[r.map] = r.kills
         elseif r.kind == "N" and not ns.db.names[npc] then
             ns.db.names[npc] = r.name
+        elseif r.kind == "K" or r.kind == "U" then
+            peer.skins = peer.skins or { skinned = 0, items = {} }
+            if r.kind == "K" then
+                peer.skins.skinned = r.skinned
+            else
+                peer.skins.items[r.item] = { drops = r.drops, qty = r.qty, min = r.min, max = r.max }
+                rememberItem(r.item)
+            end
         end
     end
     trim(peers)
@@ -411,9 +435,12 @@ local function callOff(npc)
     end
 end
 
--- Origin, npc and records of a well-formed answer about one mob of another install, or nil.
+local SKIN_KINDS = { K = true, U = true }
+
+-- Origin, npc and records of a well-formed message about one mob of another install, or nil. A D| message holds loot
+-- and an S| message skinning, nothing else.
 local function decodeAnswer(text)
-    local origin, body = text:match("^D|(%x+)|(.+)$")
+    local kind, origin, body = text:match("^([DS])|(%x+)|(.+)$")
     if not origin or #origin ~= 16 or origin == ns.db.installId then
         return nil
     end
@@ -423,15 +450,15 @@ local function decodeAnswer(text)
     end
     local npc = records[1].npc
     for _, record in ipairs(records) do
-        if record.npc ~= npc then
+        if record.npc ~= npc or (SKIN_KINDS[record.kind] == true) ~= (kind == "S") then
             return nil
         end
     end
-    return origin, npc, records
+    return origin, npc, records, kind == "S"
 end
 
 local function receive(text, sender)
-    local origin, npc, records = decodeAnswer(text)
+    local origin, npc, records, skinning = decodeAnswer(text)
     if not origin then
         ns.Debug("  ignored: malformed, impossible counts or your own install")
         return
@@ -454,6 +481,11 @@ local function receive(text, sender)
     ns.Debug("  stored: mob %d from install %s", npc, origin)
     store(origin, npc, records)
     session.received = session.received + 1
+    -- Skinning comes along with an install's loot and doesn't make it one more answer.
+    if skinning then
+        ns.Fire("DT_DATA_CHANGED", npc)
+        return
+    end
     if not question.origins[origin] then
         question.origins[origin] = true
         question.count = question.count + 1
@@ -488,7 +520,7 @@ local function receiveGroup(text, sender)
         session.refused = session.refused + 1
         return
     end
-    local known = ns.db.mobs[npc] or ns.db.peers[npc] or asked[npc]
+    local known = ns.db.mobs[npc] or ns.db.skins[npc] or ns.db.peers[npc] or asked[npc]
     if not known and not withinDailyLimit(newMobsBySender, sender, GROUP_NEW_MOBS) then
         ns.Debug("  refused: %s brought too many mobs you have no counts of today", sender)
         session.refused = session.refused + 1
@@ -512,9 +544,9 @@ end
 local function flushGroup()
     local chatType, used = groupChatType(), 0
     for npc in pairs(groupDirty) do
-        local source = ns.OwnSource(npc)
-        local texts = source and pack("D|" .. ns.db.installId .. "|", Wire.SourceRecords(npc, source, ns.db.names[npc]))
-            or {}
+        -- A mob the player only skinned has no loot of theirs, just the skinning.
+        local source = ns.OwnSource(npc) or { origin = ns.db.installId, buckets = {}, maps = {}, skins = ns.db.skins[npc] }
+        local texts = sourceTexts(npc, source, ns.db.names[npc])
         -- A mob too big for one send still goes out when it comes first.
         if used > 0 and used + #texts > GROUP_FLUSH_CAP then
             break
@@ -617,9 +649,9 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
         if npc and planned[sender] and planned[sender].npc == npc then
             planned[sender] = nil
         end
-    elseif chatType == "WHISPER" and kind == "D|" then
+    elseif chatType == "WHISPER" and (kind == "D|" or kind == "S|") then
         receive(text, sender)
-    elseif (chatType == "PARTY" or chatType == "RAID" or chatType == "INSTANCE_CHAT") and kind == "D|" then
+    elseif (chatType == "PARTY" or chatType == "RAID" or chatType == "INSTANCE_CHAT") and (kind == "D|" or kind == "S|") then
         receiveGroup(text, sender)
     end
 end)

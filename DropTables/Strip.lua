@@ -2,6 +2,8 @@ local _, ns = ...
 
 -- The rate sits under each icon, so the gap leaves room for "100%" between neighbours.
 local SIZE, GAP = 26, 10
+-- What skinning gives goes on a second row, below the first row's rates.
+local SKIN_ROW_Y = -(SIZE + 20)
 local UNKNOWN_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 local MONEY_ICON = "Interface\\Icons\\INV_Misc_Coin_01"
 
@@ -12,6 +14,7 @@ strip:SetClampedToScreen(true)
 strip:Hide()
 
 local buttons = {}
+local skinButtons = {}
 local currentNpc
 local unlocked = false
 
@@ -60,7 +63,25 @@ end)
 
 local function showEntryTooltip(button)
     local stats = button.stats
-    if button.entry then
+    if button.skin then
+        local entry = button.entry
+        GameTooltip:SetItemByID(entry.itemId)
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddDoubleLine("Skinning chance", ns.FormatRate(entry.rate), 1, 0.82, 0, 1, 1, 1)
+        if (entry.max or 1) > 1 or entry.avgQty > 1.05 then
+            GameTooltip:AddDoubleLine("Per skin", ns.FormatStack(entry), 1, 0.82, 0, 1, 1, 1)
+        end
+        GameTooltip:AddLine(("Given %d times in %d skinned corpses"):format(entry.drops, stats.skinned), 0.7, 0.7, 0.7)
+        if entry.scarce then
+            GameTooltip:AddLine("The Bountiful Harvest perk gives more of it.", 0.7, 0.7, 0.7, true)
+        end
+        if stats.small then
+            GameTooltip:AddLine(("Only %d skinned corpses so far, rates are rough."):format(stats.skinned),
+                0.6, 0.6, 0.6, true)
+        end
+        GameTooltip:AddLine("Click for the full table", 0.5, 0.5, 0.5)
+        return
+    elseif button.entry then
         local entry = button.entry
         GameTooltip:SetItemByID(entry.itemId)
         GameTooltip:AddLine(" ")
@@ -119,14 +140,17 @@ local function onClick(self)
     ns.ShowDetails(currentNpc)
 end
 
-local function getButton(index)
-    local button = buttons[index]
+-- A button of the first row, or of the skinning row with skin set.
+local function getButton(index, skin)
+    local list = skin and skinButtons or buttons
+    local button = list[index]
     if button then
         return button
     end
     button = CreateFrame("Button", nil, strip)
     button:SetSize(SIZE, SIZE)
-    button:SetPoint("LEFT", (index - 1) * (SIZE + GAP), 0)
+    button:SetPoint("TOPLEFT", (index - 1) * (SIZE + GAP), skin and SKIN_ROW_Y or 0)
+    button.skin = skin
     button.icon = button:CreateTexture(nil, "ARTWORK")
     button.icon:SetAllPoints()
     button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
@@ -140,12 +164,12 @@ local function getButton(index)
     button:SetScript("OnEnter", onEnter)
     button:SetScript("OnLeave", GameTooltip_Hide)
     button:SetScript("OnClick", onClick)
-    buttons[index] = button
+    list[index] = button
     return button
 end
 
-local function setButton(index, stats, texture, quality, label)
-    local button = getButton(index)
+local function setButton(index, stats, texture, quality, label, skin)
+    local button = getButton(index, skin)
     button.stats = stats
     button.entry, button.money = nil, nil
     button.icon:SetTexture(texture)
@@ -187,6 +211,20 @@ local function fill(npc)
     return used
 end
 
+-- The skinning row: what skinning the mob gives, the most frequent first. Returns how many icons it shows.
+local function fillSkins(npc)
+    local skin = npc and ns.GetSkinStats(npc)
+    local used = skin and math.min(ns.settings.stripIcons, #skin.list) or 0
+    for i = 1, used do
+        local entry = skin.list[i]
+        setButton(i, skin, ns.ItemIcon(entry.itemId), entry.quality, ns.FormatRate(entry.rate), true).entry = entry
+    end
+    for i = used + 1, #skinButtons do
+        skinButtons[i]:Hide()
+    end
+    return used
+end
+
 -- While unlocked the strip shows a full row of placeholders so its size is visible.
 local function fillPreview()
     for i = 1, ns.settings.stripIcons do
@@ -206,6 +244,7 @@ local function update()
     for i = used + 1, #buttons do
         buttons[i]:Hide()
     end
+    used = math.max(used, fillSkins(not unlocked and npc or nil))
     strip:SetWidth(used * (SIZE + GAP) - GAP)
     strip:Show()
 end

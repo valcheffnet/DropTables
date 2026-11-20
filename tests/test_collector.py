@@ -369,7 +369,11 @@ def main():
     reader.lua.eval("""function(ns)
         local getStats = ns.GetStats
         renders = 0
-        ns.GetStats = function(...) renders = renders + 1 return getStats(...) end
+        -- One render asks for the loot and, through GetSkinStats, for the skinning; the loot counts it once.
+        ns.GetStats = function(npc, mode)
+            if mode ~= "skin" then renders = renders + 1 end
+            return getStats(npc, mode)
+        end
     end""")(reader.ns)
     for _ in range(3):
         reader.fire("DT_DATA_CHANGED", 8)

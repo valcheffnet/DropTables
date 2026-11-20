@@ -60,12 +60,17 @@ def fake_clone(root):
             "npc:10|quest": window(4, {"100": item(2), "201": item(4, quest=True)}),
             "npc:10|group": window(10, {"100": item(10)}),
             "npc:10|spell:8613": window(6, {"2318": item(6)}),
+            "npc:10|spell:8617|group": window(2, {"2318": item(1), "783": item(1, quantity=2)}),
+            "npc:10|spell:8613|bountifulHarvest:1": window(5, {"249427": item(5)}),
+            "npc:10|spell:921": window(3, {"5000": item(3)}),
+            "npc:14|spell:8613": window(3, {"2934": item(3)}),
             "npc:11": window(4, {"300": item(2)}, coins=3),
             "object:99|spell:3365": window(9, {"400": item(9)}),
         },
     })
     write(live / "1.60.1.70100", "creatures.json", {"creatures": {
         "10": {"name": "Old Name", "positions": [pos(1429, 0.101, 0.205), pos(1429, 0.105, 0.209)]},
+        "14": {"name": "Skinned Cat", "positions": [pos(1431, 0.5, 0.5)]},
     }})
     write(live / "1.60.1.70200", "loot.json", {
         "kills": {"npc:10": kills(6, empty=2, levels={"8": 6})},
@@ -86,7 +91,12 @@ def fake_clone(root):
 def conversion(clone):
     imp = import_eglink.make_import(clone)
     mobs = imp["result"]["sources"]["eglink"]["mobs"]
-    expect("solo mobs only, beta left out", sorted(mobs), ["10", "11", "12"])
+    expect("solo mobs and skinned mobs only, beta left out", sorted(mobs), ["10", "11", "12", "14"])
+    # Skinning: solo and group corpses alike, but not the ones skinned with Bountiful Harvest or other spells.
+    expect("skinning without the perk adds up", mobs["10"]["skins"],
+           {"skinned": 8, "items": {"2318": {"drops": 7, "qty": 7}, "783": {"drops": 1, "qty": 2}}})
+    expect("a mob only skinned has no loot", (mobs["14"]["buckets"], mobs["14"]["skins"]["skinned"]), ({}, 3))
+    expect("and is placed by its skinned corpses", (mobs["14"]["maps"], mobs["14"]["name"]), ({"1431": 3}, "Skinned Cat"))
     b = mobs["10"]["buckets"]["1"]
     expect("solo and quest corpses of both builds add up, group corpses don't", (b["kills"], b["opened"]), (20, 16))
     expect("empty corpses count", b["lootable"], 16)

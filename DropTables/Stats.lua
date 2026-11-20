@@ -317,10 +317,123 @@ local function computeStats(npc, mode)
     return stats
 end
 
+-- Pristine Leather, Pristine Hide and Pristine Scale. The Legacy perk Bountiful Harvest gives up to twice as many of
+-- them, so installs see different chances for them and none of them is left out for it.
+ns.SCARCE_SKINS = { [249427] = true, [249428] = true, [249429] = true }
+
+-- One install's skinning counts in the shape of aggregate's sums, with the skinned corpses as the opened ones.
+local function skinSum(skins, factor)
+    if not skins or (skins.skinned or 0) == 0 then
+        return nil
+    end
+    local sum = { kills = 0, lootable = 0, opened = skins.skinned * factor, entries = {} }
+    for itemId, item in pairs(skins.items) do
+        -- Counts put together from several messages can claim more drops than skinned corpses, so they wait.
+        if item.drops > skins.skinned then
+            return nil
+        end
+        local entry = { drops = item.drops * factor, qty = item.qty * factor }
+        mergeRange(entry, item)
+        sum.entries[itemId] = entry
+    end
+    return sum
+end
+
+-- The part of an install's skinning counts the shared database doesn't hold yet, like newShare for kills.
+local function newSkinShare(shared, origin, skins)
+    local before = shared and shared.skins and shared.skins.from[origin]
+    if not before then
+        return 1
+    end
+    return skins.skinned > before and (skins.skinned - before) / skins.skinned or 0
+end
+
+-- What skinning a mob's corpse gives: per item the share of skinned corpses it came from. Every skinned corpse gives
+-- something, so there is no empty share as with loot, and the group plays no part. Other installs count as at most
+-- PEER_CAP skinned corpses, and a big install whose share of an item doesn't fit the others is left out of that item,
+-- except for the scarce materials (see SCARCE_SKINS).
+local function computeSkinStats(npc)
+    local shared = not ns.settings.onlyMine and ns.shared[npc] or nil
+    local own = ns.db.skins[npc]
+    local always, small, big = {}, {}, {}
+    local ownSum = own and skinSum(own, newSkinShare(shared, ns.db.installId, own))
+    if ownSum then
+        ownSum.kind = "own"
+        table.insert(always, ownSum)
+    end
+    local sharedSum = shared and shared.skins and skinSum(shared.skins, 1)
+    if sharedSum then
+        sharedSum.kind = "shared"
+        table.insert(always, sharedSum)
+    end
+    if not ns.settings.onlyMine then
+        for origin, peer in pairs(ns.db.peers[npc] or {}) do
+            local skins = peer.skins
+            if skins and (skins.skinned or 0) > 0 then
+                local factor = (skins.skinned > PEER_CAP and PEER_CAP / skins.skinned or 1)
+                    * newSkinShare(shared, origin, skins)
+                local sum = skinSum(skins, factor)
+                if sum then
+                    sum.kind = "peer"
+                    table.insert(sum.opened >= BIG_SOURCE and big or small, sum)
+                end
+            end
+        end
+    end
+    local all, keys = {}, {}
+    for _, list in ipairs({ always, small, big }) do
+        for _, sum in ipairs(list) do
+            table.insert(all, sum)
+            for key in pairs(sum.entries) do
+                keys[key] = true
+            end
+        end
+    end
+    if #all == 0 then
+        return nil
+    end
+    local skinnedTotal, byKind = 0, { own = 0, shared = 0, peer = 0 }
+    for _, sum in ipairs(all) do
+        skinnedTotal = skinnedTotal + sum.opened
+        byKind[sum.kind] = byKind[sum.kind] + sum.opened
+    end
+    if round(skinnedTotal) == 0 then
+        return nil
+    end
+    local stats = {
+        npc = npc,
+        skinned = round(skinnedTotal),
+        ownSkinned = own and own.skinned or 0,
+        peerSkinned = round(byKind.peer),
+        sharedSkinned = round(byKind.shared),
+        small = round(skinnedTotal) < ns.SMALL_SAMPLE,
+        list = {},
+    }
+    for key in pairs(keys) do
+        local used = ns.SCARCE_SKINS[key] and all or usedFor(key, always, small, big)
+        local rate, usedOpened = pooledRate(key, used, 1)
+        if rate > 0 then
+            local entry = newEntry(key, rate, used, usedOpened)
+            if entry then
+                entry.world = nil
+                entry.scarce = ns.SCARCE_SKINS[key] or nil
+                table.insert(stats.list, entry)
+            end
+        end
+    end
+    table.sort(stats.list, function(a, b)
+        if a.rate ~= b.rate then
+            return a.rate > b.rate
+        end
+        return a.itemId < b.itemId
+    end)
+    return stats
+end
+
 -- Stats are kept per mob and mode until something they come from changes, which is the mob's counts (own or other
 -- players'), the settings, or item info arriving with the quality of an entry. The tooltip, the icons, the details
 -- window and the Loot Finder ask for the same mob over and over. Callers only read what they get.
-local cache = {}  -- npc -> { [mode] = stats or false }
+local cache = {}  -- npc -> { [mode] = stats or false }, with the skinning stats as mode "skin"
 
 local function forget(npc)
     cache[npc] = nil
@@ -345,10 +458,15 @@ function ns.GetStats(npc, mode)
     end
     local stats = byMode[mode]
     if stats == nil then
-        stats = computeStats(npc, mode) or false
+        stats = (mode == "skin" and computeSkinStats(npc) or mode ~= "skin" and computeStats(npc, mode)) or false
         byMode[mode] = stats
     end
     return stats or nil
+end
+
+-- What skinning the mob's corpses gives, or nil when nobody skinned it.
+function ns.GetSkinStats(npc)
+    return ns.GetStats(npc, "skin")
 end
 
 -- Entries for the icons and the mob tooltip, plus how many world drops and how many items below the minimum quality
@@ -377,6 +495,9 @@ end
 function ns.KnownNpcs()
     local npcs = {}
     for npc in pairs(ns.db.mobs) do
+        npcs[npc] = true
+    end
+    for npc in pairs(ns.db.skins) do
         npcs[npc] = true
     end
     if not ns.settings.onlyMine then

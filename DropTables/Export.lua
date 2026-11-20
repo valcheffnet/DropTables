@@ -27,6 +27,38 @@ local function missing(npc, origin, buckets)
     return not known or ns.SumBuckets(buckets, "kills") > known
 end
 
+-- The same for an install's skinning, by skinned corpses.
+local function skinsMissing(npc, origin, skins)
+    if not Wire.SkinsComplete(skins) then
+        return false
+    end
+    local shared = ns.shared[npc]
+    local known = shared and shared.skins and shared.skins.from[origin]
+    return not known or skins.skinned > known
+end
+
+-- The records of one install's mob that the shared database lacks: loot, skinning or both. A mob with skinning only
+-- carries its name, so the database can name it.
+local function lineRecords(npc, origin, buckets, source, skins)
+    local records = {}
+    if buckets and missing(npc, origin, buckets) then
+        records = Wire.SourceRecords(npc, source, ns.db.names[npc])
+    end
+    local loot = #records > 0
+    if skinsMissing(npc, origin, skins) then
+        if not loot then
+            local name = Wire.NameRecord(npc, ns.db.names[npc])
+            if name then
+                table.insert(records, name)
+            end
+        end
+        for _, record in ipairs(Wire.SkinRecords(npc, skins)) do
+            table.insert(records, record)
+        end
+    end
+    return records, loot
+end
+
 -- Own mobs to ask the player to share, meaning the shared database lacks them and they gained kills since the player
 -- last copied an export. Copied counts still go out again in the next export, and we only stop asking, because the
 -- database won't know about them until the next release.
@@ -64,12 +96,16 @@ function ns.CanExport()
     return C_EncodingUtil ~= nil and C_EncodingUtil.CompressString ~= nil and Enum.CompressionMethod ~= nil
 end
 
--- One line per mob, or nil when nothing complete is left to send. The player's own kill spots go along, so the shared
--- database can show where the mob is; other players never send theirs, so their lines have none.
+-- One line per mob, or nil when nothing complete is left to send, and whether it carries loot. The player's own kill
+-- spots go along with the loot, so the shared database can show where the mob is; other players never send theirs, so
+-- their lines have none.
 local function ownLine(npc)
-    local records = Wire.SourceRecords(npc, ns.OwnSource(npc), ns.db.names[npc])
+    local buckets = ns.db.mobs[npc]
+    local records, loot = lineRecords(npc, ns.db.installId, buckets, buckets and ns.OwnSource(npc), ns.db.skins[npc])
     if #records == 0 then
         return nil
+    elseif not loot then
+        return table.concat(records, ";"), false
     end
     local info = ns.db.info[npc]
     local spots = {}
@@ -87,11 +123,11 @@ local function ownLine(npc)
     for _, spot in ipairs(spots) do
         table.insert(records, spot.record)
     end
-    return table.concat(records, ";")
+    return table.concat(records, ";"), true
 end
 
-local function peerLine(npc, peer)
-    local records = Wire.SourceRecords(npc, peer, ns.db.names[npc])
+local function peerLine(npc, origin, peer)
+    local records = lineRecords(npc, origin, peer.buckets, peer, peer.skins)
     return #records > 0 and table.concat(records, ";") or nil
 end
 
@@ -102,13 +138,23 @@ local function collect()
     local db = ns.db
     local result = { sections = {}, copied = {}, mobs = 0, kills = 0, sources = 0 }
     local own = { origin = db.installId, lines = {} }
-    for npc, buckets in pairs(db.mobs) do
-        local line = missing(npc, db.installId, buckets) and ownLine(npc)
+    local npcs = {}
+    for npc in pairs(db.mobs) do
+        npcs[npc] = true
+    end
+    for npc in pairs(db.skins) do
+        npcs[npc] = true
+    end
+    for npc in pairs(npcs) do
+        local line, loot = ownLine(npc)
         if line then
             table.insert(own.lines, line)
-            result.copied[npc] = ns.SumBuckets(buckets, "kills")
             result.mobs = result.mobs + 1
-            result.kills = result.kills + ns.SumBuckets(buckets, "kills")
+            if loot then
+                local kills = ns.SumBuckets(db.mobs[npc], "kills")
+                result.copied[npc] = kills
+                result.kills = result.kills + kills
+            end
         end
     end
     if #own.lines > 0 then
@@ -117,7 +163,7 @@ local function collect()
     local byOrigin = {}
     for npc, peers in pairs(db.peers) do
         for origin, peer in pairs(peers) do
-            local line = missing(npc, origin, peer.buckets) and peerLine(npc, peer)
+            local line = peerLine(npc, origin, peer)
             if line then
                 local section = byOrigin[origin]
                 if not section then

@@ -16,7 +16,7 @@
    "id": "eglink",
    "license": "CC BY 4.0",
    "name": "EG Link output, recorded by players on WoW Forever",
-   "notice": "Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo on the\nlive servers, without quest items, summed over the builds and turned into Drop Tables counts.",
+   "notice": "Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\ncorpses skinned without the Bountiful Harvest perk on the live servers, without quest items, summed over\nthe builds and turned into Drop Tables counts.",
    "url": "https://github.com/JIVESCORP/eg-link-output-wowf/tree/c389a874888debc41eec9b0219af65ccceebac6d/data/wowf"
   },
   {
@@ -25,7 +25,7 @@
    "id": "everloot",
    "license": "CC BY-SA 4.0",
    "name": "Everloot's public corpus, recorded by players on WoW Forever",
-   "notice": "Data from Everloot (https://everloot.app), CC BY-SA 4.0. Drop Tables changed it: only the loot windows\nof killed creatures, without quest items, counted per install and turned into Drop Tables counts, with\nnames, levels and places from the NPC sightings.",
+   "notice": "Data from Everloot (https://everloot.app), CC BY-SA 4.0. Drop Tables changed it: only the loot and\nskinning windows of creatures, without quest items, counted per install and turned into Drop Tables\ncounts, with names, levels and places from the NPC sightings.",
    "url": "https://everloot.app/database"
   }
  ],
@@ -422,6 +422,26 @@
    "maxLevel": 28,
    "minLevel": 27,
    "name": "Highland Razormaw",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1437": {
      "1616": 1
@@ -757,6 +777,42 @@
    "minLevel": 25,
    "name": "Fen Lord"
   },
+  "1042": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1437": 5
+   },
+   "maxLevel": 24,
+   "minLevel": 23,
+   "name": "Red Whelp",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 5
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "7287": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   }
+  },
   "1043": {
    "buckets": {
     "1": {
@@ -794,6 +850,44 @@
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Lost Whelp",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 42
+    },
+    "items": {
+     "2318": {
+      "drops": 16,
+      "max": 2,
+      "min": 1,
+      "qty": 27
+     },
+     "2319": {
+      "drops": 19,
+      "max": 1,
+      "min": 1,
+      "qty": 19
+     },
+     "249427": {
+      "drops": 1,
+      "max": 3,
+      "min": 3,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "7287": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 42
+   },
    "spots": {
     "1437": {
      "1466": 1,
@@ -898,6 +992,44 @@
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Flamesnorting Whelp",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 56
+    },
+    "items": {
+     "2319": {
+      "drops": 36,
+      "max": 1,
+      "min": 1,
+      "qty": 36
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "4235": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "7287": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     }
+    },
+    "skinned": 56
+   },
    "spots": {
     "1437": {
      "1516": 2,
@@ -1095,6 +1227,50 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Crimson Whelp",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 116
+    },
+    "items": {
+     "2318": {
+      "drops": 45,
+      "max": 2,
+      "min": 1,
+      "qty": 68
+     },
+     "2319": {
+      "drops": 48,
+      "max": 1,
+      "min": 1,
+      "qty": 48
+     },
+     "249427": {
+      "drops": 1,
+      "max": 3,
+      "min": 3,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     },
+     "7287": {
+      "drops": 15,
+      "max": 1,
+      "min": 1,
+      "qty": 15
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 116
+   },
    "spots": {
     "1437": {
      "1467": 4,
@@ -1477,6 +1653,22 @@
    "maxLevel": 39,
    "minLevel": 38,
    "name": "Sawtooth Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 14
+    },
+    "items": {
+     "4234": {
+      "drops": 11,
+      "qty": 11
+     },
+     "4304": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1435": {
      "1317": 1,
@@ -1649,6 +1841,27 @@
    "maxLevel": 35,
    "minLevel": 34,
    "name": "Elder Stranglethorn Tiger",
+   "skins": {
+    "from": {
+     "eglink": 16,
+     "everloot-f8c829b9": 14
+    },
+    "items": {
+     "2319": {
+      "drops": 12,
+      "max": 1,
+      "min": 1,
+      "qty": 12
+     },
+     "4234": {
+      "drops": 18,
+      "max": 1,
+      "min": 1,
+      "qty": 18
+     }
+    },
+    "skinned": 30
+   },
    "spots": {
     "1434": {
      "758": 1,
@@ -1695,6 +1908,26 @@
    "maxLevel": 42,
    "minLevel": 41,
    "name": "Sawtooth Snapper",
+   "skins": {
+    "from": {
+     "eglink": 29
+    },
+    "items": {
+     "4234": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4304": {
+      "drops": 17,
+      "qty": 17
+     },
+     "8169": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 29
+   },
    "spots": {
     "1435": {
      "1857": 1,
@@ -1742,6 +1975,18 @@
    "maxLevel": 28,
    "minLevel": 28,
    "name": "Arikara",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1441": {
      "917": 1
@@ -1987,6 +2232,22 @@
    "maxLevel": 30,
    "minLevel": 30,
    "name": "Enraged Panther",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1441": {
      "562": 2,
@@ -2702,7 +2963,27 @@
    },
    "maxLevel": 6,
    "minLevel": 5,
-   "name": "Crag Boar"
+   "name": "Crag Boar",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 13
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "2934": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     }
+    },
+    "skinned": 13
+   }
   },
   "1126": {
    "buckets": {
@@ -2746,6 +3027,27 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Large Crag Boar",
+   "skins": {
+    "from": {
+     "everloot-58610e24": 1,
+     "everloot-86f7f239": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "2934": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1426": {
      "1227": 1
@@ -2805,7 +3107,28 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "Elder Crag Boar"
+   "name": "Elder Crag Boar",
+   "skins": {
+    "from": {
+     "everloot-58610e24": 1,
+     "everloot-86f7f239": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 7
+   }
   },
   "1128": {
    "buckets": {
@@ -2835,7 +3158,27 @@
    },
    "maxLevel": 6,
    "minLevel": 5,
-   "name": "Young Black Bear"
+   "name": "Young Black Bear",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
   },
   "113": {
    "buckets": {
@@ -2887,6 +3230,22 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Stonetusk Boar",
+   "skins": {
+    "from": {
+     "eglink": 136
+    },
+    "items": {
+     "2318": {
+      "drops": 53,
+      "qty": 53
+     },
+     "2934": {
+      "drops": 83,
+      "qty": 83
+     }
+    },
+    "skinned": 136
+   },
    "spots": {
     "1429": {
      "1034": 2,
@@ -4000,6 +4359,27 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Young Wendigo",
+   "skins": {
+    "from": {
+     "everloot-2791c1a5": 1,
+     "everloot-86f7f239": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "1426": {
      "1076": 1,
@@ -4063,6 +4443,26 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Wendigo",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "1426": {
      "1022": 2,
@@ -4487,6 +4887,27 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "River Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 7,
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2319": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     },
+     "4234": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1434": {
      "1005": 2,
@@ -4729,6 +5150,30 @@
    "maxLevel": 36,
    "minLevel": 35,
    "name": "Snapjaw Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 9
+    },
+    "items": {
+     "2319": {
+      "drops": 4,
+      "qty": 4
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 9
+   },
    "spots": {
     "1434": {
      "1007": 2,
@@ -6096,6 +6541,22 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Prowler",
+   "skins": {
+    "from": {
+     "eglink": 19
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "qty": 6
+     },
+     "2934": {
+      "drops": 13,
+      "qty": 13
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1429": {
      "1719": 1,
@@ -6385,6 +6846,33 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Elder Black Bear",
+   "skins": {
+    "from": {
+     "eglink": 3,
+     "everloot-86f7f239": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1432": {
      "776": 1,
@@ -6463,6 +6951,31 @@
    "maxLevel": 14,
    "minLevel": 13,
    "name": "Grizzled Black Bear",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-86f7f239": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 8,
+      "max": 2,
+      "min": 1,
+      "qty": 11
+     },
+     "2934": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1432": {
      "1028": 1,
@@ -6502,7 +7015,39 @@
     "everloot-86f7f239": 1
    },
    "maps": {},
-   "name": "Black Bear Patriarch"
+   "name": "Black Bear Patriarch",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
+  },
+  "119": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Longsnout",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "1190": {
    "buckets": {
@@ -6601,6 +7146,31 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Mangy Mountain Boar",
+   "skins": {
+    "from": {
+     "eglink": 20,
+     "everloot-86f7f239": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 22,
+      "max": 2,
+      "min": 1,
+      "qty": 28
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 28
+   },
    "spots": {
     "1432": {
      "1025": 1,
@@ -6951,6 +7521,26 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Elder Mountain Boar",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 2,
+      "min": 1,
+      "qty": 6
+     },
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1432": {
      "1468": 1,
@@ -6993,6 +7583,26 @@
      "1335": 1,
      "1337": 1
     }
+   }
+  },
+  "1193": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1432": 1
+   },
+   "name": "Loch Frenzy",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "17057": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "11937": {
@@ -7209,7 +7819,27 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "Ice Claw Bear"
+   "name": "Ice Claw Bear",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 17
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "2934": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     }
+    },
+    "skinned": 17
+   }
   },
   "1197": {
    "buckets": {
@@ -7289,6 +7919,30 @@
     }
    }
   },
+  "1199": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1426": 1
+   },
+   "maxLevel": 6,
+   "minLevel": 5,
+   "name": "Juvenile Snow Leopard",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
+  },
   "1201": {
    "buckets": {
     "1": {
@@ -7329,7 +7983,27 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "Snow Leopard"
+   "name": "Snow Leopard",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     }
+    },
+    "skinned": 10
+   }
   },
   "1202": {
    "buckets": {
@@ -7791,6 +8465,20 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Young Threshadon",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1432": {
      "1231": 1
@@ -7860,6 +8548,27 @@
    "maxLevel": 3,
    "minLevel": 3,
    "name": "Sickly Gazelle",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 34
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 33,
+      "max": 1,
+      "min": 1,
+      "qty": 33
+     }
+    },
+    "skinned": 36
+   },
    "spots": {
     "1413": {
      "1269": 1,
@@ -8162,6 +8871,26 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Black Ravager Mastiff",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1431": {
      "1616": 1,
@@ -8317,6 +9046,21 @@
    "maxLevel": 31,
    "minLevel": 31,
    "name": "Sharptalon",
+   "skins": {
+    "from": {
+     "eglink": 3,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1440": {
      "1784": 1,
@@ -8351,6 +9095,20 @@
    "maxLevel": 28,
    "minLevel": 28,
    "name": "Shadumbra",
+   "skins": {
+    "from": {
+     "everloot-33b01e3c": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1440": {
      "1476": 1,
@@ -8401,6 +9159,22 @@
    "maxLevel": 25,
    "minLevel": 25,
    "name": "Ursangous",
+   "skins": {
+    "from": {
+     "eglink": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "qty": 7
+     },
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "1440": {
      "1033": 4,
@@ -8971,6 +9745,18 @@
    "maxLevel": 22,
    "minLevel": 22,
    "name": "Vorsha the Lasher",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1440": {
      "213": 2
@@ -9176,7 +9962,21 @@
    },
    "maxLevel": 11,
    "minLevel": 11,
-   "name": "Vagash"
+   "name": "Vagash",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 2
+   }
   },
   "1393": {
    "buckets": {
@@ -9449,6 +10249,26 @@
    },
    "maps": {},
    "name": "Ro'Bark"
+  },
+  "14357": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1433": 1
+   },
+   "name": "Lake Thresher",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   }
   },
   "1501": {
    "buckets": {
@@ -10563,6 +11383,18 @@
    "maxLevel": 1,
    "minLevel": 1,
    "name": "Young Scavenger",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2934": {
+      "drops": 7,
+      "qty": 7
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1420": {
      "679": 1,
@@ -10677,6 +11509,21 @@
    "maxLevel": 3,
    "minLevel": 2,
    "name": "Ragged Scavenger",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-9d1cf70d": 7
+    },
+    "items": {
+     "2934": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "1420": {
      "831": 1,
@@ -10841,6 +11688,21 @@
    "maxLevel": 2,
    "minLevel": 1,
    "name": "Duskbat",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1420": {
      "729": 1,
@@ -10976,6 +11838,22 @@
    "maxLevel": 4,
    "minLevel": 3,
    "name": "Mangy Duskbat",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-933e529a": 1,
+     "everloot-9d1cf70d": 18
+    },
+    "items": {
+     "2934": {
+      "drops": 23,
+      "max": 1,
+      "min": 1,
+      "qty": 23
+     }
+    },
+    "skinned": 23
+   },
    "spots": {
     "1420": {
      "828": 1,
@@ -13203,6 +14081,28 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Decrepit Darkhound",
+   "skins": {
+    "from": {
+     "eglink": 49,
+     "everloot-933e529a": 28,
+     "everloot-9d1cf70d": 16
+    },
+    "items": {
+     "2318": {
+      "drops": 33,
+      "max": 1,
+      "min": 1,
+      "qty": 33
+     },
+     "2934": {
+      "drops": 60,
+      "max": 1,
+      "min": 1,
+      "qty": 60
+     }
+    },
+    "skinned": 93
+   },
    "spots": {
     "1420": {
      "1019": 1,
@@ -13322,6 +14222,28 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Cursed Darkhound",
+   "skins": {
+    "from": {
+     "eglink": 37,
+     "everloot-933e529a": 9,
+     "everloot-9d1cf70d": 19
+    },
+    "items": {
+     "2318": {
+      "drops": 20,
+      "max": 1,
+      "min": 1,
+      "qty": 20
+     },
+     "2934": {
+      "drops": 45,
+      "max": 1,
+      "min": 1,
+      "qty": 45
+     }
+    },
+    "skinned": 65
+   },
    "spots": {
     "1420": {
      "1070": 2,
@@ -13477,6 +14399,28 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Ravenous Darkhound",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-933e529a": 1,
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1420": {
      "1973": 1,
@@ -13594,6 +14538,28 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Greater Duskbat",
+   "skins": {
+    "from": {
+     "eglink": 91,
+     "everloot-933e529a": 37,
+     "everloot-9d1cf70d": 35
+    },
+    "items": {
+     "2318": {
+      "drops": 72,
+      "max": 1,
+      "min": 1,
+      "qty": 72
+     },
+     "2934": {
+      "drops": 91,
+      "max": 1,
+      "min": 1,
+      "qty": 91
+     }
+    },
+    "skinned": 163
+   },
    "spots": {
     "1420": {
      "1026": 2,
@@ -13764,6 +14730,28 @@
    "maxLevel": 9,
    "minLevel": 8,
    "name": "Vampiric Duskbat",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-933e529a": 6,
+     "everloot-9d1cf70d": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "2934": {
+      "drops": 12,
+      "max": 1,
+      "min": 1,
+      "qty": 12
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1420": {
      "1179": 22,
@@ -14022,6 +15010,37 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Goretusk",
+   "skins": {
+    "from": {
+     "eglink": 42,
+     "everloot-86f7f239": 19
+    },
+    "items": {
+     "2318": {
+      "drops": 36,
+      "max": 2,
+      "min": 1,
+      "qty": 48
+     },
+     "249427": {
+      "drops": 3,
+      "max": 3,
+      "min": 3,
+      "qty": 8
+     },
+     "2934": {
+      "drops": 19,
+      "max": 1,
+      "min": 1,
+      "qty": 19
+     },
+     "783": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 61
+   },
    "spots": {
     "1436": {
      "1019": 1,
@@ -14986,7 +16005,19 @@
    },
    "maxLevel": 10,
    "minLevel": 9,
-   "name": "Scarred Crag Boar"
+   "name": "Scarred Crag Boar",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "1693": {
    "buckets": {
@@ -15029,6 +16060,33 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Loch Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 6,
+     "everloot-86f7f239": 20
+    },
+    "items": {
+     "2318": {
+      "drops": 14,
+      "max": 2,
+      "min": 1,
+      "qty": 17
+     },
+     "2934": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 26
+   },
    "spots": {
     "1432": {
      "1377": 1,
@@ -16177,6 +17235,25 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Worg",
+   "skins": {
+    "from": {
+     "eglink": 7,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "1420": {
      "1337": 2
@@ -16273,6 +17350,31 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Mottled Worg",
+   "skins": {
+    "from": {
+     "eglink": 31,
+     "everloot-9d1cf70d": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 18,
+      "max": 2,
+      "min": 1,
+      "qty": 25
+     },
+     "2934": {
+      "drops": 16,
+      "max": 1,
+      "min": 1,
+      "qty": 16
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 35
+   },
    "spots": {
     "1421": {
      "1112": 7,
@@ -16600,6 +17702,25 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Moonrage Whitescalp",
+   "skins": {
+    "from": {
+     "eglink": 8,
+     "everloot-9d1cf70d": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "2934": {
+      "drops": 5,
+      "qty": 5
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1421": {
      "1169": 1,
@@ -16687,6 +17808,26 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Moonrage Darkrunner",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1421": {
      "1162": 1,
@@ -16925,6 +18066,33 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Ferocious Grizzled Bear",
+   "skins": {
+    "from": {
+     "eglink": 19,
+     "everloot-9d1cf70d": 19
+    },
+    "items": {
+     "2318": {
+      "drops": 23,
+      "max": 2,
+      "min": 1,
+      "qty": 27
+     },
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 38
+   },
    "spots": {
     "1421": {
      "1111": 1,
@@ -17141,6 +18309,35 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Moonrage Glutton",
+   "skins": {
+    "from": {
+     "eglink": 36,
+     "everloot-9d1cf70d": 13
+    },
+    "items": {
+     "2318": {
+      "drops": 32,
+      "max": 1,
+      "min": 1,
+      "qty": 32
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 49
+   },
    "spots": {
     "1421": {
      "1011": 12,
@@ -17529,6 +18726,31 @@
    "maxLevel": 14,
    "minLevel": 13,
    "name": "Moonrage Darksoul",
+   "skins": {
+    "from": {
+     "eglink": 25,
+     "everloot-9d1cf70d": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 19,
+      "max": 1,
+      "min": 1,
+      "qty": 19
+     },
+     "2934": {
+      "drops": 13,
+      "max": 1,
+      "min": 1,
+      "qty": 13
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 34
+   },
    "spots": {
     "1421": {
      "1012": 2,
@@ -17662,6 +18884,37 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Giant Grizzled Bear",
+   "skins": {
+    "from": {
+     "eglink": 56,
+     "everloot-9d1cf70d": 38
+    },
+    "items": {
+     "2318": {
+      "drops": 57,
+      "max": 2,
+      "min": 1,
+      "qty": 69
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 31,
+      "max": 1,
+      "min": 1,
+      "qty": 31
+     },
+     "783": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 94
+   },
    "spots": {
     "1421": {
      "1007": 2,
@@ -18692,11 +19945,49 @@
    "maxLevel": 14,
    "minLevel": 13,
    "name": "Moonrage Watcher",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1421": {
      "1186": 1,
      "1235": 1
     }
+   }
+  },
+  "1893": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1421": 1
+   },
+   "maxLevel": 15,
+   "minLevel": 14,
+   "name": "Moonrage Sentry",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "1895": {
@@ -18730,6 +20021,26 @@
     "1421": {
      "1137": 1
     }
+   }
+  },
+  "1896": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Moonrage Elder",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "1909": {
@@ -19376,6 +20687,22 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Gray Forest Wolf",
+   "skins": {
+    "from": {
+     "eglink": 16
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 12,
+      "qty": 12
+     }
+    },
+    "skinned": 16
+   },
    "spots": {
     "1429": {
      "1480": 1,
@@ -19441,6 +20768,18 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Bloodsnout Worg",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1421": {
      "1140": 4,
@@ -20603,6 +21942,18 @@
    "maxLevel": 15,
    "minLevel": 15,
    "name": "Grimson the Pale",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1421": {
      "1422": 7,
@@ -20862,6 +22213,18 @@
    "maxLevel": 2,
    "minLevel": 1,
    "name": "Young Thistle Boar",
+   "skins": {
+    "from": {
+     "eglink": 13
+    },
+    "items": {
+     "2934": {
+      "drops": 13,
+      "qty": 13
+     }
+    },
+    "skinned": 13
+   },
    "spots": {
     "1438": {
      "1471": 3,
@@ -20913,6 +22276,18 @@
    "maxLevel": 3,
    "minLevel": 2,
    "name": "Thistle Boar",
+   "skins": {
+    "from": {
+     "eglink": 13
+    },
+    "items": {
+     "2934": {
+      "drops": 13,
+      "qty": 13
+     }
+    },
+    "skinned": 13
+   },
    "spots": {
     "1438": {
      "1519": 1,
@@ -22024,6 +23399,18 @@
    "maxLevel": 1,
    "minLevel": 1,
    "name": "Young Nightsaber",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2934": {
+      "drops": 7,
+      "qty": 7
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1438": {
      "1521": 5,
@@ -22063,6 +23450,25 @@
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Son of Arugal",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1421": {
      "1166": 1
@@ -22121,6 +23527,18 @@
    "maxLevel": 2,
    "minLevel": 2,
    "name": "Mangy Nightsaber",
+   "skins": {
+    "from": {
+     "eglink": 14
+    },
+    "items": {
+     "2934": {
+      "drops": 14,
+      "qty": 14
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1438": {
      "1468": 1,
@@ -22162,6 +23580,27 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Nightsaber",
+   "skins": {
+    "from": {
+     "eglink": 21,
+     "everloot-02ecf937": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "2934": {
+      "drops": 15,
+      "max": 1,
+      "min": 1,
+      "qty": 15
+     }
+    },
+    "skinned": 24
+   },
    "spots": {
     "1438": {
      "1225": 4,
@@ -22209,6 +23648,22 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Nightsaber Stalker",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "qty": 5
+     },
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1438": {
      "1028": 1,
@@ -22294,6 +23749,30 @@
    "maxLevel": 29,
    "minLevel": 28,
    "name": "Nightbane Dark Runner",
+   "skins": {
+    "from": {
+     "eglink": 30
+    },
+    "items": {
+     "2319": {
+      "drops": 18,
+      "qty": 18
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 5,
+      "qty": 5
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 30
+   },
    "spots": {
     "1431": {
      "1522": 1,
@@ -22421,6 +23900,30 @@
    "maxLevel": 30,
    "minLevel": 29,
    "name": "Nightbane Vile Fang",
+   "skins": {
+    "from": {
+     "eglink": 11
+    },
+    "items": {
+     "2319": {
+      "drops": 7,
+      "qty": 7
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1431": {
      "1831": 2,
@@ -22461,6 +23964,22 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Moonstalker",
+   "skins": {
+    "from": {
+     "eglink": 11
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "qty": 6
+     },
+     "2934": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1439": {
      "929": 1,
@@ -22495,6 +24014,18 @@
    "maxLevel": 11,
    "minLevel": 11,
    "name": "Moonstalker Runt",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1439": {
      "973": 2,
@@ -22745,6 +24276,33 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Starving Dire Wolf",
+   "skins": {
+    "from": {
+     "eglink": 61,
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 41,
+      "max": 1,
+      "min": 1,
+      "qty": 66
+     },
+     "2319": {
+      "drops": 11,
+      "qty": 11
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 9,
+      "qty": 9
+     }
+    },
+    "skinned": 62
+   },
    "spots": {
     "1431": {
      "1060": 1,
@@ -22913,6 +24471,22 @@
    "maxLevel": 12,
    "minLevel": 12,
    "name": "Thistle Bear",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1439": {
      "973": 1
@@ -22954,6 +24528,26 @@
    "maxLevel": 14,
    "minLevel": 13,
    "name": "Rabid Thistle Bear",
+   "skins": {
+    "from": {
+     "eglink": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "qty": 4
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1439": {
      "983": 1,
@@ -23049,6 +24643,18 @@
    "maxLevel": 16,
    "minLevel": 16,
    "name": "Grizzled Thistle Bear",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1439": {
      "986": 1
@@ -23241,6 +24847,26 @@
    "maxLevel": 14,
    "minLevel": 12,
    "name": "Darkshore Thresher",
+   "skins": {
+    "from": {
+     "eglink": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "qty": 5
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "1439": {
      "824": 1,
@@ -23581,6 +25207,18 @@
    "maxLevel": 17,
    "minLevel": 17,
    "name": "Moonstalker Sire",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1439": {
      "939": 1
@@ -24037,6 +25675,30 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Cave Yeti",
+   "skins": {
+    "from": {
+     "eglink": 91
+    },
+    "items": {
+     "2319": {
+      "drops": 67,
+      "qty": 67
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 20,
+      "qty": 20
+     },
+     "4235": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 91
+   },
    "spots": {
     "1424": {
      "1016": 1,
@@ -24090,6 +25752,34 @@
    "maxLevel": 32,
    "minLevel": 31,
    "name": "Ferocious Yeti",
+   "skins": {
+    "from": {
+     "eglink": 74
+    },
+    "items": {
+     "2319": {
+      "drops": 25,
+      "qty": 25
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 5,
+      "qty": 5
+     },
+     "4234": {
+      "drops": 41,
+      "qty": 41
+     },
+     "4235": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 74
+   },
    "spots": {
     "1424": {
      "1015": 1,
@@ -24149,6 +25839,30 @@
    "maxLevel": 33,
    "minLevel": 32,
    "name": "Mountain Yeti",
+   "skins": {
+    "from": {
+     "eglink": 18
+    },
+    "items": {
+     "2319": {
+      "drops": 8,
+      "qty": 8
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 7,
+      "qty": 7
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 18
+   },
    "spots": {
     "1416": {
      "1033": 4,
@@ -24204,6 +25918,30 @@
    "maxLevel": 34,
    "minLevel": 33,
    "name": "Giant Yeti",
+   "skins": {
+    "from": {
+     "eglink": 19
+    },
+    "items": {
+     "2319": {
+      "drops": 10,
+      "qty": 10
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1416": {
      "1031": 2,
@@ -25519,6 +27257,18 @@
    "maxLevel": 12,
    "minLevel": 12,
    "name": "Foreststrider Fledgling",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1439": {
      "982": 1
@@ -26048,6 +27798,27 @@
    "maxLevel": 22,
    "minLevel": 21,
    "name": "Gray Bear",
+   "skins": {
+    "from": {
+     "eglink": 23,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 17,
+      "max": 2,
+      "min": 2,
+      "qty": 29
+     },
+     "2319": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 25
+   },
    "spots": {
     "1424": {
      "1362": 1,
@@ -26165,6 +27936,33 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Vicious Gray Bear",
+   "skins": {
+    "from": {
+     "eglink": 17,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 2,
+      "min": 2,
+      "qty": 13
+     },
+     "2319": {
+      "drops": 7,
+      "qty": 7
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 18
+   },
    "spots": {
     "1424": {
      "1017": 1,
@@ -26262,6 +28060,30 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Elder Gray Bear",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "qty": 9
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1424": {
      "1127": 1,
@@ -27005,6 +28827,30 @@
    "maxLevel": 24,
    "minLevel": 23,
    "name": "Starving Mountain Lion",
+   "skins": {
+    "from": {
+     "eglink": 53
+    },
+    "items": {
+     "2318": {
+      "drops": 31,
+      "qty": 44
+     },
+     "2319": {
+      "drops": 16,
+      "qty": 16
+     },
+     "4232": {
+      "drops": 5,
+      "qty": 5
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 53
+   },
    "spots": {
     "1424": {
      "1018": 2,
@@ -27342,6 +29188,22 @@
    "maxLevel": 33,
    "minLevel": 32,
    "name": "Mountain Lion",
+   "skins": {
+    "from": {
+     "eglink": 5
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1416": {
      "1188": 1,
@@ -27473,6 +29335,34 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Snapjaw",
+   "skins": {
+    "from": {
+     "eglink": 145
+    },
+    "items": {
+     "2319": {
+      "drops": 95,
+      "qty": 95
+     },
+     "249428": {
+      "drops": 4,
+      "qty": 8
+     },
+     "4232": {
+      "drops": 10,
+      "qty": 10
+     },
+     "4234": {
+      "drops": 33,
+      "qty": 33
+     },
+     "4235": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 145
+   },
    "spots": {
     "1416": {
      "1832": 1,
@@ -27872,6 +29762,28 @@
    },
    "maps": {},
    "name": "Jailor Borhuin"
+  },
+  "2442": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Cow",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 3
+   }
   },
   "2448": {
    "buckets": {
@@ -29404,6 +31316,38 @@
    "maps": {},
    "name": "Tarantula"
   },
+  "2505": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1425": 10
+   },
+   "name": "Saltwater Snapjaw",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "4304": {
+      "drops": 6,
+      "qty": 6
+     },
+     "8167": {
+      "drops": 4,
+      "qty": 8
+     },
+     "8169": {
+      "drops": 1,
+      "qty": 1
+     },
+     "8170": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 10
+   }
+  },
   "250618": {
    "buckets": {
     "1": {
@@ -30854,6 +32798,22 @@
    "maxLevel": 6,
    "minLevel": 6,
    "name": "Vuldren",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "2521": {
      "1028": 1,
@@ -30958,6 +32918,18 @@
    "maxLevel": 1,
    "minLevel": 1,
    "name": "Juvenile Vuldren",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2934": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "2521": {
      "1061": 1,
@@ -31001,7 +32973,19 @@
    },
    "maxLevel": 10,
    "minLevel": 10,
-   "name": "Vuldren Alpha"
+   "name": "Vuldren Alpha",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "250926": {
    "buckets": {
@@ -31121,6 +33105,18 @@
    "maxLevel": 4,
    "minLevel": 3,
    "name": "Scrawny Ursera",
+   "skins": {
+    "from": {
+     "eglink": 25
+    },
+    "items": {
+     "2934": {
+      "drops": 25,
+      "qty": 25
+     }
+    },
+    "skinned": 25
+   },
    "spots": {
     "2521": {
      "1012": 25,
@@ -31299,6 +33295,18 @@
    "maxLevel": 4,
    "minLevel": 4,
    "name": "Ursera Scavenger",
+   "skins": {
+    "from": {
+     "eglink": 28
+    },
+    "items": {
+     "2934": {
+      "drops": 28,
+      "qty": 28
+     }
+    },
+    "skinned": 28
+   },
    "spots": {
     "2521": {
      "861": 2,
@@ -31353,6 +33361,21 @@
    "maxLevel": 5,
    "minLevel": 5,
    "name": "Urs'anah",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-ab59cb20": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "2521": {
      "862": 2,
@@ -31812,6 +33835,22 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Prideclaw",
+   "skins": {
+    "from": {
+     "eglink": 49
+    },
+    "items": {
+     "2318": {
+      "drops": 29,
+      "qty": 29
+     },
+     "2934": {
+      "drops": 20,
+      "qty": 20
+     }
+    },
+    "skinned": 49
+   },
    "spots": {
     "2521": {
      "1018": 2,
@@ -31860,6 +33899,22 @@
    "maxLevel": 7,
    "minLevel": 7,
    "name": "Hippogryph Matriarch",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "2521": {
      "875": 1,
@@ -31906,6 +33961,22 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Hippogryph Protector",
+   "skins": {
+    "from": {
+     "eglink": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 4,
+      "qty": 4
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "2521": {
      "875": 1,
@@ -31960,6 +34031,21 @@
    "maxLevel": 6,
    "minLevel": 6,
    "name": "Hippogryph Youth",
+   "skins": {
+    "from": {
+     "eglink": 13,
+     "everloot-ab59cb20": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "2521": {
      "1026": 1,
@@ -32336,6 +34422,18 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Galestrider",
+   "skins": {
+    "from": {
+     "eglink": 36
+    },
+    "items": {
+     "2934": {
+      "drops": 36,
+      "qty": 36
+     }
+    },
+    "skinned": 36
+   },
    "spots": {
     "2521": {
      "1019": 4,
@@ -33118,7 +35216,32 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Son of Arugal"
+   "name": "Son of Arugal",
+   "skins": {
+    "from": {
+     "eglink": 10,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "2319": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 12
+   }
   },
   "253272": {
    "buckets": {
@@ -33539,6 +35662,22 @@
    "maxLevel": 8,
    "minLevel": 8,
    "name": "Vulgara the Insatiable",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "2521": {
      "1076": 2
@@ -34510,6 +36649,39 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Highland Strider",
+   "skins": {
+    "from": {
+     "eglink": 46,
+     "everloot-f8c829b9": 7
+    },
+    "items": {
+     "2319": {
+      "drops": 39,
+      "max": 1,
+      "min": 1,
+      "qty": 39
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 7,
+      "qty": 7
+     },
+     "4235": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 53
+   },
    "spots": {
     "1417": {
      "1021": 2,
@@ -34706,6 +36878,26 @@
    "maxLevel": 34,
    "minLevel": 33,
    "name": "Highland Thrasher",
+   "skins": {
+    "from": {
+     "eglink": 32
+    },
+    "items": {
+     "2319": {
+      "drops": 14,
+      "qty": 14
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 16,
+      "qty": 16
+     }
+    },
+    "skinned": 32
+   },
    "spots": {
     "1417": {
      "1014": 1,
@@ -34941,6 +37133,25 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Shadowgale Shriekling",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-ab59cb20": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "2521": {
      "1322": 1,
@@ -35061,6 +37272,22 @@
    "maxLevel": 37,
    "minLevel": 36,
    "name": "Highland Fleshstalker",
+   "skins": {
+    "from": {
+     "eglink": 14
+    },
+    "items": {
+     "4234": {
+      "drops": 13,
+      "qty": 13
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1417": {
      "1086": 6,
@@ -36041,6 +38268,21 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Twilight Worg",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-cde2ce19": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "2548": {
      "1073": 1,
@@ -37192,6 +39434,22 @@
    "maxLevel": 39,
    "minLevel": 39,
    "name": "Freshwater Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4304": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "2548": {
      "1075": 1,
@@ -37243,6 +39501,22 @@
    "maxLevel": 39,
    "minLevel": 38,
    "name": "Wildplains Patriarch",
+   "skins": {
+    "from": {
+     "eglink": 8
+    },
+    "items": {
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     },
+     "4304": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "2548": {
      "1425": 1,
@@ -37284,6 +39558,26 @@
    "maxLevel": 39,
    "minLevel": 38,
    "name": "Wildplains Huntress",
+   "skins": {
+    "from": {
+     "eglink": 17
+    },
+    "items": {
+     "249428": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 15,
+      "qty": 15
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 17
+   },
    "spots": {
     "2548": {
      "1426": 2,
@@ -37436,6 +39730,30 @@
     "2548": {
      "1322": 2
     }
+   }
+  },
+  "259269": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "2548": 2
+   },
+   "name": "High Plains Buzzard",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
    }
   },
   "259281": {
@@ -37857,6 +40175,22 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Elder Snow Leopard",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1426": {
      "1878": 1
@@ -37922,7 +40256,19 @@
     "everloot-c8df3474": 1
    },
    "maps": {},
-   "name": "Saltspine"
+   "name": "Saltspine",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "260325": {
    "buckets": {
@@ -37957,7 +40303,19 @@
     "everloot-c8ee0b15": 1
    },
    "maps": {},
-   "name": "Shadetooth"
+   "name": "Shadetooth",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "249428": {
+      "drops": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 1
+   }
   },
   "260326": {
    "buckets": {
@@ -38409,7 +40767,19 @@
     "everloot-c8ee0b15": 4
    },
    "maps": {},
-   "name": "Marsh Crocolisk"
+   "name": "Marsh Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2319": {
+      "drops": 7,
+      "qty": 7
+     }
+    },
+    "skinned": 7
+   }
   },
   "260797": {
    "buckets": {
@@ -38454,7 +40824,23 @@
     "everloot-bab301d5": 1
    },
    "maps": {},
-   "name": "Elder Crocolisk"
+   "name": "Elder Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 4
+   }
   },
   "260798": {
    "buckets": {
@@ -38493,7 +40879,19 @@
     "everloot-bab301d5": 1
    },
    "maps": {},
-   "name": "Young Crocolisk"
+   "name": "Young Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
   },
   "260799": {
    "buckets": {
@@ -38576,7 +40974,23 @@
     "everloot-c8ee0b15": 6
    },
    "maps": {},
-   "name": "Young Riptooth"
+   "name": "Young Riptooth",
+   "skins": {
+    "from": {
+     "eglink": 8
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 5,
+      "qty": 5
+     }
+    },
+    "skinned": 8
+   }
   },
   "260800": {
    "buckets": {
@@ -38671,7 +41085,27 @@
     "everloot-c8ee0b15": 7
    },
    "maps": {},
-   "name": "Thicket Lurker"
+   "name": "Thicket Lurker",
+   "skins": {
+    "from": {
+     "eglink": 12
+    },
+    "items": {
+     "2319": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 12
+   }
   },
   "260801": {
    "buckets": {
@@ -38743,7 +41177,31 @@
     "everloot-c8ee0b15": 4
    },
    "maps": {},
-   "name": "Thicket Hunter"
+   "name": "Thicket Hunter",
+   "skins": {
+    "from": {
+     "eglink": 9
+    },
+    "items": {
+     "2319": {
+      "drops": 6,
+      "qty": 6
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 9
+   }
   },
   "260802": {
    "buckets": {
@@ -38776,7 +41234,23 @@
     "everloot-c8ee0b15": 1
    },
    "maps": {},
-   "name": "Thicket Matriarch"
+   "name": "Thicket Matriarch",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   }
   },
   "260803": {
    "buckets": {
@@ -38947,6 +41421,37 @@
    "maxLevel": 26,
    "minLevel": 26,
    "name": "Highland Tortoise",
+   "skins": {
+    "from": {
+     "eglink": 16,
+     "everloot-84174d5f": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 12,
+      "max": 1,
+      "min": 1,
+      "qty": 12
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1437": {
      "1228": 2,
@@ -38984,7 +41489,19 @@
     "everloot-c8ee0b15": 1
    },
    "maps": {},
-   "name": "Highland Snapper"
+   "name": "Highland Snapper",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
   },
   "261306": {
    "buckets": {
@@ -39356,6 +41873,22 @@
    "maxLevel": 40,
    "minLevel": 39,
    "name": "Cinderscale Whelp",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "4234": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4304": {
+      "drops": 7,
+      "qty": 7
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "2548": {
      "735": 2,
@@ -39394,6 +41927,26 @@
    "maxLevel": 42,
    "minLevel": 41,
    "name": "Cinderscale Warrior",
+   "skins": {
+    "from": {
+     "eglink": 6
+    },
+    "items": {
+     "4234": {
+      "drops": 2,
+      "qty": 3
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4304": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "2548": {
      "735": 1,
@@ -39461,6 +42014,22 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Glade Viper",
+   "skins": {
+    "from": {
+     "eglink": 12
+    },
+    "items": {
+     "4234": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4304": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "2548": {
      "1478": 2,
@@ -39474,6 +42043,30 @@
      "1581": 3,
      "1630": 2
     }
+   }
+  },
+  "263315": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "2548": 2
+   },
+   "name": "Ombassa",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
    }
   },
   "263343": {
@@ -39523,6 +42116,22 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Low Plains Buzzard",
+   "skins": {
+    "from": {
+     "eglink": 19
+    },
+    "items": {
+     "4234": {
+      "drops": 14,
+      "qty": 14
+     },
+     "4304": {
+      "drops": 5,
+      "qty": 5
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "2548": {
      "1378": 3,
@@ -39591,6 +42200,18 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Roving Tallstrider",
+   "skins": {
+    "from": {
+     "eglink": 13
+    },
+    "items": {
+     "4234": {
+      "drops": 13,
+      "qty": 13
+     }
+    },
+    "skinned": 13
+   },
    "spots": {
     "2548": {
      "1378": 1,
@@ -39641,6 +42262,18 @@
    "maxLevel": 42,
    "minLevel": 42,
    "name": "Ghostmaw",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "2548": {
      "1032": 1,
@@ -39972,7 +42605,23 @@
     "everloot-58610e24": 1
    },
    "maps": {},
-   "name": "Bloodhound Runt"
+   "name": "Bloodhound Runt",
+   "skins": {
+    "from": {
+     "eglink": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "qty": 6
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   }
   },
   "263899": {
    "buckets": {
@@ -40568,6 +43217,18 @@
    "maxLevel": 12,
    "minLevel": 12,
    "name": "Halikor",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1411": {
      "1014": 1,
@@ -40898,6 +43559,18 @@
    "maxLevel": 9,
    "minLevel": 9,
    "name": "Bloodtalon Matriarch",
+   "skins": {
+    "from": {
+     "eglink": 5
+    },
+    "items": {
+     "2934": {
+      "drops": 5,
+      "qty": 5
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1411": {
      "1686": 1,
@@ -41291,6 +43964,22 @@
    "maxLevel": 30,
    "minLevel": 30,
    "name": "Stormheart",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1441": {
      "1276": 1,
@@ -41424,6 +44113,21 @@
    "maxLevel": 15,
    "minLevel": 15,
    "name": "Daggerfang",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-86f7f239": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "max": 2,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1432": {
      "1521": 1,
@@ -41525,7 +44229,27 @@
    },
    "maxLevel": 26,
    "minLevel": 25,
-   "name": "Maddened Rotclaw"
+   "name": "Maddened Rotclaw",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 4
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   }
   },
   "271486": {
    "buckets": {
@@ -41583,6 +44307,20 @@
    "maxLevel": 8,
    "minLevel": 6,
    "name": "Wendigo Shaman",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1426": {
      "1022": 2,
@@ -41732,6 +44470,20 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Elder Wendigo",
+   "skins": {
+    "from": {
+     "everloot-86f7f239": 2
+    },
+    "items": {
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1426": {
      "1022": 12,
@@ -41784,6 +44536,23 @@
      "1025": 1,
      "1321": 1
     }
+   }
+  },
+  "271732": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "271749": {
@@ -42087,7 +44856,19 @@
     "everloot-933e529a": 1
    },
    "maps": {},
-   "name": "Feral Crag Coyote"
+   "name": "Feral Crag Coyote",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "2729": {
    "buckets": {
@@ -42137,6 +44918,22 @@
    "maxLevel": 39,
    "minLevel": 39,
    "name": "Elder Crag Coyote",
+   "skins": {
+    "from": {
+     "eglink": 31
+    },
+    "items": {
+     "4234": {
+      "drops": 27,
+      "qty": 27
+     },
+     "4304": {
+      "drops": 4,
+      "qty": 4
+     }
+    },
+    "skinned": 31
+   },
    "spots": {
     "1418": {
      "675": 1,
@@ -42268,7 +45065,19 @@
     "everloot-c8ee0b15": 1
    },
    "maps": {},
-   "name": "Marsh Skulker"
+   "name": "Marsh Skulker",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   }
   },
   "275044": {
    "buckets": {
@@ -43190,6 +45999,18 @@
    "maxLevel": 10,
    "minLevel": 10,
    "name": "Matriarch Bristlefur",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1429": {
      "1638": 1
@@ -43371,6 +46192,22 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Gray Fox",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1431": {
      "267": 1,
@@ -43497,6 +46334,20 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Foothills Duskbat",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1420": {
      "1338": 1
@@ -44594,6 +47445,21 @@
    "maxLevel": 5,
    "minLevel": 4,
    "name": "Bristleback Battleboar",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 1,
+     "everloot-c8df3474": 6
+    },
+    "items": {
+     "2934": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1412": {
      "1388": 1,
@@ -44701,6 +47567,21 @@
    "maxLevel": 2,
    "minLevel": 1,
    "name": "Plainstrider",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 4,
+     "everloot-c8df3474": 7
+    },
+    "items": {
+     "2934": {
+      "drops": 11,
+      "max": 1,
+      "min": 1,
+      "qty": 11
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1412": {
      "1138": 3,
@@ -44764,6 +47645,27 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Adult Plainstrider",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 2,
+     "everloot-c8df3474": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     },
+     "2934": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 9
+   },
    "spots": {
     "1412": {
      "1029": 2,
@@ -44826,6 +47728,26 @@
    "maxLevel": 9,
    "minLevel": 8,
    "name": "Elder Plainstrider",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1412": {
      "1075": 1,
@@ -44878,6 +47800,27 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Prairie Wolf",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 5,
+     "everloot-c8df3474": 12
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 17
+   },
    "spots": {
     "1412": {
      "1028": 1,
@@ -44957,6 +47900,28 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Prairie Stalker",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 9,
+     "everloot-9d1cf70d": 4,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1412": {
      "1022": 1,
@@ -45051,6 +48016,26 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Prairie Wolf Alpha",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1412": {
      "1119": 2,
@@ -45166,6 +48151,21 @@
    "maxLevel": 3,
    "minLevel": 3,
    "name": "Mountain Cougar",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 14,
+     "everloot-c8df3474": 10
+    },
+    "items": {
+     "2934": {
+      "drops": 24,
+      "max": 1,
+      "min": 1,
+      "qty": 24
+     }
+    },
+    "skinned": 24
+   },
    "spots": {
     "1412": {
      "1041": 2,
@@ -45575,6 +48575,21 @@
    "maxLevel": 4,
    "minLevel": 3,
    "name": "Battleboar",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 10,
+     "everloot-c8df3474": 10
+    },
+    "items": {
+     "2934": {
+      "drops": 20,
+      "max": 1,
+      "min": 1,
+      "qty": 20
+     }
+    },
+    "skinned": 20
+   },
    "spots": {
     "1412": {
      "1290": 3,
@@ -45950,6 +48965,27 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Kodo Calf",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 4,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1412": {
      "1127": 2,
@@ -46008,6 +49044,21 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Kodo Matriarch",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 4,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1412": {
      "1127": 1,
@@ -46481,6 +49532,18 @@
    "maxLevel": 1,
    "minLevel": 1,
    "name": "Young Wolf",
+   "skins": {
+    "from": {
+     "eglink": 41
+    },
+    "items": {
+     "2934": {
+      "drops": 41,
+      "qty": 41
+     }
+    },
+    "skinned": 41
+   },
    "spots": {
     "1429": {
      "1118": 1,
@@ -46781,6 +49844,27 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Flatland Cougar",
+   "skins": {
+    "from": {
+     "everloot-4518d2cc": 9,
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1412": {
      "1022": 1,
@@ -47239,6 +50323,21 @@
    "maxLevel": 2,
    "minLevel": 1,
    "name": "Mottled Boar",
+   "skins": {
+    "from": {
+     "eglink": 26,
+     "everloot-c8df3474": 6
+    },
+    "items": {
+     "2934": {
+      "drops": 32,
+      "max": 1,
+      "min": 1,
+      "qty": 32
+     }
+    },
+    "skinned": 32
+   },
    "spots": {
     "1411": {
      "1031": 3,
@@ -47310,6 +50409,27 @@
    "maxLevel": 7,
    "minLevel": 6,
    "name": "Dire Mottled Boar",
+   "skins": {
+    "from": {
+     "eglink": 15,
+     "everloot-9d1cf70d": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1411": {
      "1117": 1,
@@ -47410,6 +50530,28 @@
    "maxLevel": 9,
    "minLevel": 8,
    "name": "Elder Mottled Boar",
+   "skins": {
+    "from": {
+     "eglink": 15,
+     "everloot-933e529a": 7,
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     }
+    },
+    "skinned": 24
+   },
    "spots": {
     "1411": {
      "1008": 6,
@@ -47777,6 +50919,18 @@
    "maxLevel": 4,
    "minLevel": 3,
    "name": "Felstalker",
+   "skins": {
+    "from": {
+     "eglink": 8
+    },
+    "items": {
+     "2934": {
+      "drops": 8,
+      "qty": 8
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "1411": {
      "1075": 1,
@@ -48194,6 +51348,18 @@
    "maxLevel": 11,
    "minLevel": 9,
    "name": "Dreadmaw Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2934": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1411": {
      "861": 1,
@@ -49325,6 +52491,22 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Durotar Tiger",
+   "skins": {
+    "from": {
+     "eglink": 22
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 12,
+      "qty": 12
+     }
+    },
+    "skinned": 22
+   },
    "spots": {
     "1411": {
      "1491": 3,
@@ -49402,6 +52584,22 @@
    "maxLevel": 8,
    "minLevel": 6,
    "name": "Bloodtalon Taillasher",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1411": {
      "1110": 3,
@@ -49461,6 +52659,28 @@
    "maxLevel": 10,
    "minLevel": 8,
    "name": "Bloodtalon Scythemaw",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-933e529a": 7,
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1411": {
      "1110": 11,
@@ -49652,6 +52872,21 @@
    "maxLevel": 3,
    "minLevel": 3,
    "name": "Scorpid Worker",
+   "skins": {
+    "from": {
+     "eglink": 41,
+     "everloot-c8df3474": 6
+    },
+    "items": {
+     "2934": {
+      "drops": 47,
+      "max": 1,
+      "min": 1,
+      "qty": 47
+     }
+    },
+    "skinned": 47
+   },
    "spots": {
     "1411": {
      "1030": 4,
@@ -49720,6 +52955,27 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Clattering Scorpid",
+   "skins": {
+    "from": {
+     "eglink": 58,
+     "everloot-9d1cf70d": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 30,
+      "max": 1,
+      "min": 1,
+      "qty": 30
+     },
+     "2934": {
+      "drops": 32,
+      "max": 1,
+      "min": 1,
+      "qty": 32
+     }
+    },
+    "skinned": 62
+   },
    "spots": {
     "1411": {
      "1237": 2,
@@ -49797,6 +53053,20 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Armored Scorpid",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1411": {
      "1019": 1,
@@ -49893,6 +53163,25 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Venomtail Scorpid",
+   "skins": {
+    "from": {
+     "eglink": 13,
+     "everloot-933e529a": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "qty": 5
+     },
+     "2934": {
+      "drops": 13,
+      "max": 1,
+      "min": 1,
+      "qty": 13
+     }
+    },
+    "skinned": 18
+   },
    "spots": {
     "1411": {
      "1007": 1,
@@ -50312,6 +53601,22 @@
    "maxLevel": 10,
    "minLevel": 9,
    "name": "Thunder Lizard",
+   "skins": {
+    "from": {
+     "eglink": 27
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 17,
+      "qty": 17
+     }
+    },
+    "skinned": 27
+   },
    "spots": {
     "1411": {
      "1011": 2,
@@ -50364,6 +53669,22 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Lightning Hide",
+   "skins": {
+    "from": {
+     "eglink": 7
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 4,
+      "qty": 4
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1411": {
      "1011": 3,
@@ -51407,6 +54728,18 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Corrupted Mottled Boar",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1411": {
      "1060": 2,
@@ -51495,6 +54828,22 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Corrupted Bloodtalon Scythemaw",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1411": {
      "1010": 4,
@@ -51631,6 +54980,18 @@
    "maxLevel": 11,
    "minLevel": 11,
    "name": "Corrupted Dreadmaw Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1411": {
      "875": 1
@@ -51768,6 +55129,33 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Lost Barrens Kodo",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-9d1cf70d": 16
+    },
+    "items": {
+     "2318": {
+      "drops": 15,
+      "max": 2,
+      "min": 1,
+      "qty": 18
+     },
+     "2934": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1413": {
      "1010": 3,
@@ -51827,6 +55215,25 @@
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Greater Barrens Kodo",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 2,
+      "min": 1,
+      "qty": 4
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1413": {
      "1184": 1,
@@ -51856,6 +55263,20 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Barrens Kodo",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1227": 1
@@ -51890,7 +55311,26 @@
    },
    "maxLevel": 26,
    "minLevel": 25,
-   "name": "Wooly Kodo"
+   "name": "Wooly Kodo",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 3
+   }
   },
   "3238": {
    "buckets": {
@@ -51957,6 +55397,45 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Stormhide",
+   "skins": {
+    "from": {
+     "eglink": 54,
+     "everloot-84174d5f": 19,
+     "everloot-9d1cf70d": 1,
+     "everloot-f8c829b9": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 31,
+      "max": 2,
+      "min": 1,
+      "qty": 45
+     },
+     "2319": {
+      "drops": 39,
+      "max": 1,
+      "min": 1,
+      "qty": 39
+     },
+     "249427": {
+      "drops": 3,
+      "qty": 7
+     },
+     "4232": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 79
+   },
    "spots": {
     "1413": {
      "1138": 7,
@@ -52050,6 +55529,43 @@
    "maxLevel": 21,
    "minLevel": 20,
    "name": "Thunderhead",
+   "skins": {
+    "from": {
+     "eglink": 6,
+     "everloot-84174d5f": 1,
+     "everloot-9d1cf70d": 9,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 2,
+      "min": 1,
+      "qty": 18
+     },
+     "2319": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 17
+   },
    "spots": {
     "1413": {
      "1130": 24,
@@ -52132,6 +55648,27 @@
    "maxLevel": 19,
    "minLevel": 18,
    "name": "Stormsnout",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-9d1cf70d": 15
+    },
+    "items": {
+     "2318": {
+      "drops": 15,
+      "max": 2,
+      "min": 1,
+      "qty": 19
+     },
+     "2319": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 19
+   },
    "spots": {
     "1413": {
      "1074": 1,
@@ -52195,6 +55732,33 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Savannah Patriarch",
+   "skins": {
+    "from": {
+     "eglink": 17,
+     "everloot-9d1cf70d": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 16,
+      "max": 2,
+      "min": 1,
+      "qty": 20
+     },
+     "2934": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 26
+   },
    "spots": {
     "1413": {
      "1057": 1,
@@ -52330,6 +55894,33 @@
    "maxLevel": 14,
    "minLevel": 13,
    "name": "Zhevra Runner",
+   "skins": {
+    "from": {
+     "eglink": 33,
+     "everloot-9d1cf70d": 33
+    },
+    "items": {
+     "2318": {
+      "drops": 41,
+      "max": 2,
+      "min": 1,
+      "qty": 51
+     },
+     "2934": {
+      "drops": 18,
+      "max": 1,
+      "min": 1,
+      "qty": 18
+     },
+     "783": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 66
+   },
    "spots": {
     "1413": {
      "1061": 1,
@@ -52394,6 +55985,28 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Savannah Highmane",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 1,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1413": {
      "1213": 1,
@@ -52550,6 +56163,40 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Greater Plainstrider",
+   "skins": {
+    "from": {
+     "eglink": 44,
+     "everloot-9d1cf70d": 55,
+     "everloot-f8c829b9": 17
+    },
+    "items": {
+     "2318": {
+      "drops": 68,
+      "max": 2,
+      "min": 1,
+      "qty": 85
+     },
+     "249427": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     },
+     "2934": {
+      "drops": 39,
+      "max": 1,
+      "min": 1,
+      "qty": 39
+     },
+     "783": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 116
+   },
    "spots": {
     "1413": {
      "1163": 3,
@@ -52654,6 +56301,43 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Ornery Plainstrider",
+   "skins": {
+    "from": {
+     "eglink": 58,
+     "everloot-9d1cf70d": 48
+    },
+    "items": {
+     "2318": {
+      "drops": 79,
+      "max": 2,
+      "min": 1,
+      "qty": 112
+     },
+     "2319": {
+      "drops": 20,
+      "max": 1,
+      "min": 1,
+      "qty": 20
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "783": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 106
+   },
    "spots": {
     "1413": {
      "1057": 3,
@@ -52801,6 +56485,40 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Fleeting Plainstrider",
+   "skins": {
+    "from": {
+     "eglink": 19,
+     "everloot-9d1cf70d": 29,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 31,
+      "max": 2,
+      "min": 1,
+      "qty": 37
+     },
+     "249427": {
+      "drops": 1,
+      "max": 3,
+      "min": 3,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 17,
+      "max": 1,
+      "min": 1,
+      "qty": 17
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 50
+   },
    "spots": {
     "1413": {
      "1116": 1,
@@ -52900,6 +56618,20 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Barrens Giraffe",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1468": 4
@@ -52956,6 +56688,28 @@
    "maxLevel": 24,
    "minLevel": 23,
    "name": "Greater Thunderhawk",
+   "skins": {
+    "from": {
+     "eglink": 10,
+     "everloot-84174d5f": 9,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 2,
+      "min": 1,
+      "qty": 14
+     },
+     "2319": {
+      "drops": 12,
+      "max": 1,
+      "min": 1,
+      "qty": 12
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1413": {
      "1088": 1,
@@ -53179,6 +56933,22 @@
    "maxLevel": 22,
    "minLevel": 21,
    "name": "Silithid Swarmer",
+   "skins": {
+    "from": {
+     "eglink": 12
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "qty": 8
+     },
+     "2319": {
+      "drops": 7,
+      "qty": 7
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "1413": {
      "1084": 4,
@@ -53254,6 +57024,27 @@
    "maxLevel": 13,
    "minLevel": 11,
    "name": "Sunscale Lashtail",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-9d1cf70d": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 12
+     },
+     "2934": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1413": {
      "1163": 2,
@@ -53340,6 +57131,40 @@
    "maxLevel": 15,
    "minLevel": 13,
    "name": "Sunscale Screecher",
+   "skins": {
+    "from": {
+     "eglink": 24,
+     "everloot-9d1cf70d": 48,
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 42,
+      "max": 2,
+      "min": 1,
+      "qty": 55
+     },
+     "249427": {
+      "drops": 2,
+      "max": 3,
+      "min": 3,
+      "qty": 5
+     },
+     "2934": {
+      "drops": 29,
+      "max": 1,
+      "min": 1,
+      "qty": 29
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 76
+   },
    "spots": {
     "1413": {
      "1010": 1,
@@ -53479,6 +57304,40 @@
    "maxLevel": 18,
    "minLevel": 16,
    "name": "Sunscale Scytheclaw",
+   "skins": {
+    "from": {
+     "eglink": 62,
+     "everloot-9d1cf70d": 37,
+     "everloot-f8c829b9": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 78,
+      "max": 2,
+      "min": 1,
+      "qty": 108
+     },
+     "2319": {
+      "drops": 21,
+      "max": 1,
+      "min": 1,
+      "qty": 21
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "783": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 109
+   },
    "spots": {
     "1413": {
      "1057": 4,
@@ -53582,6 +57441,21 @@
    "maxLevel": 19,
    "minLevel": 19,
    "name": "Ishamuhale",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1465": 3
@@ -56237,6 +60111,30 @@
     }
    }
   },
+  "330": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1429": 2
+   },
+   "name": "Princess",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
+  },
   "334": {
    "buckets": {
     "1": {
@@ -58027,6 +61925,34 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Savannah Huntress",
+   "skins": {
+    "from": {
+     "eglink": 14,
+     "everloot-9d1cf70d": 20,
+     "everloot-f8c829b9": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 25,
+      "max": 2,
+      "min": 1,
+      "qty": 31
+     },
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 40
+   },
    "spots": {
     "1413": {
      "1213": 5,
@@ -58081,6 +62007,37 @@
    "maxLevel": 18,
    "minLevel": 17,
    "name": "Savannah Matriarch",
+   "skins": {
+    "from": {
+     "eglink": 29,
+     "everloot-9d1cf70d": 30
+    },
+    "items": {
+     "2318": {
+      "drops": 48,
+      "max": 2,
+      "min": 1,
+      "qty": 70
+     },
+     "2319": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 59
+   },
    "spots": {
     "1413": {
      "1465": 3,
@@ -58177,6 +62134,21 @@
    "maxLevel": 22,
    "minLevel": 20,
    "name": "Thunderhawk Cloudscraper",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 1,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1130": 2,
@@ -58279,6 +62251,34 @@
    "maxLevel": 15,
    "minLevel": 14,
    "name": "Savannah Prowler",
+   "skins": {
+    "from": {
+     "eglink": 19,
+     "everloot-9d1cf70d": 43,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 33,
+      "max": 2,
+      "min": 1,
+      "qty": 39
+     },
+     "2934": {
+      "drops": 26,
+      "max": 1,
+      "min": 1,
+      "qty": 26
+     },
+     "783": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 64
+   },
    "spots": {
     "1413": {
      "1011": 3,
@@ -58345,6 +62345,31 @@
    "maxLevel": 18,
    "minLevel": 17,
    "name": "Zhevra Charger",
+   "skins": {
+    "from": {
+     "eglink": 13,
+     "everloot-9d1cf70d": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 15,
+      "max": 2,
+      "min": 1,
+      "qty": 23
+     },
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 18
+   },
    "spots": {
     "1413": {
      "1056": 1,
@@ -58642,7 +62667,23 @@
    },
    "maxLevel": 24,
    "minLevel": 24,
-   "name": "Bellygrub"
+   "name": "Bellygrub",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
   },
   "3452": {
    "buckets": {
@@ -59388,6 +63429,34 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Oasis Snapjaw",
+   "skins": {
+    "from": {
+     "eglink": 39,
+     "everloot-9d1cf70d": 31,
+     "everloot-f8c829b9": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 51,
+      "max": 2,
+      "min": 1,
+      "qty": 63
+     },
+     "2934": {
+      "drops": 24,
+      "max": 1,
+      "min": 1,
+      "qty": 24
+     },
+     "783": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 79
+   },
    "spots": {
     "1413": {
      "1119": 6,
@@ -59666,6 +63735,22 @@
    "maxLevel": 25,
    "minLevel": 25,
    "name": "Washte Pawne",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1413": {
      "1139": 1,
@@ -59739,6 +63824,25 @@
    "maxLevel": 24,
    "minLevel": 24,
    "name": "Owatanka",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1413": {
      "1131": 2,
@@ -59786,6 +63890,25 @@
    "maxLevel": 22,
    "minLevel": 22,
    "name": "Lakota'mani",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1413": {
      "1126": 1,
@@ -59831,6 +63954,21 @@
    "maxLevel": 16,
    "minLevel": 16,
    "name": "Echeyakee",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-9d1cf70d": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 3
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1358": 2,
@@ -59887,6 +64025,22 @@
    "maxLevel": 27,
    "minLevel": 27,
    "name": "Isha Awak",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1413": {
      "1623": 1,
@@ -60196,6 +64350,36 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Deviate Coiler",
+   "skins": {
+    "from": {
+     "eglink": 7,
+     "everloot-9d1cf70d": 3,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 2,
+      "min": 1,
+      "qty": 14
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "6470": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "1413": {
      "1168": 1
@@ -60255,6 +64439,32 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Deviate Stinglash",
+   "skins": {
+    "from": {
+     "eglink": 8,
+     "everloot-9d1cf70d": 1,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 2,
+      "min": 1,
+      "qty": 8
+     },
+     "2319": {
+      "drops": 3,
+      "qty": 5
+     },
+     "249427": {
+      "drops": 1,
+      "max": 3,
+      "min": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1414": {
      "1327": 6
@@ -60346,6 +64556,48 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Deviate Creeper",
+   "skins": {
+    "from": {
+     "eglink": 20,
+     "everloot-9d1cf70d": 5,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 13
+     },
+     "2319": {
+      "drops": 8,
+      "max": 2,
+      "min": 1,
+      "qty": 13
+     },
+     "4232": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "6470": {
+      "drops": 2,
+      "qty": 2
+     },
+     "6471": {
+      "drops": 3,
+      "qty": 3
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 28
+   },
    "spots": {
     "1413": {
      "1168": 1
@@ -60400,6 +64652,44 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Deviate Slayer",
+   "skins": {
+    "from": {
+     "eglink": 23,
+     "everloot-9d1cf70d": 8,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 19,
+      "max": 2,
+      "min": 1,
+      "qty": 32
+     },
+     "2319": {
+      "drops": 9,
+      "max": 2,
+      "min": 1,
+      "qty": 13
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "6470": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 33
+   },
    "spots": {
     "1414": {
      "1327": 7
@@ -60444,6 +64734,42 @@
    "maxLevel": 17,
    "minLevel": 15,
    "name": "Deviate Stalker",
+   "skins": {
+    "from": {
+     "eglink": 8,
+     "everloot-9d1cf70d": 5,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 2,
+      "min": 1,
+      "qty": 9
+     },
+     "2319": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "6470": {
+      "drops": 4,
+      "qty": 4
+     },
+     "6471": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1414": {
      "1277": 3,
@@ -60540,7 +64866,55 @@
     "everloot-f8c829b9": 14
    },
    "maps": {},
-   "name": "Deviate Ravager"
+   "name": "Deviate Ravager",
+   "skins": {
+    "from": {
+     "eglink": 29,
+     "everloot-9d1cf70d": 24,
+     "everloot-f8c829b9": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 34,
+      "max": 2,
+      "min": 1,
+      "qty": 47
+     },
+     "2319": {
+      "drops": 15,
+      "max": 2,
+      "min": 1,
+      "qty": 24
+     },
+     "249427": {
+      "drops": 1,
+      "max": 3,
+      "min": 3,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "6470": {
+      "drops": 8,
+      "max": 1,
+      "min": 1,
+      "qty": 8
+     },
+     "6471": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 63
+   }
   },
   "3637": {
    "buckets": {
@@ -60643,7 +65017,55 @@
     "everloot-f8c829b9": 8
    },
    "maps": {},
-   "name": "Deviate Guardian"
+   "name": "Deviate Guardian",
+   "skins": {
+    "from": {
+     "eglink": 29,
+     "everloot-9d1cf70d": 28,
+     "everloot-f8c829b9": 9
+    },
+    "items": {
+     "2318": {
+      "drops": 42,
+      "max": 2,
+      "min": 1,
+      "qty": 65
+     },
+     "2319": {
+      "drops": 10,
+      "max": 2,
+      "min": 1,
+      "qty": 17
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "6470": {
+      "drops": 3,
+      "qty": 3
+     },
+     "6471": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "783": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 66
+   }
   },
   "3638": {
    "buckets": {
@@ -60917,6 +65339,39 @@
    "maxLevel": 17,
    "minLevel": 17,
    "name": "Deviate Lurker",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-9d1cf70d": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "max": 2,
+      "min": 1,
+      "qty": 9
+     },
+     "2319": {
+      "drops": 3,
+      "max": 2,
+      "min": 1,
+      "qty": 5
+     },
+     "6471": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "1414": {
      "1327": 7
@@ -60994,7 +65449,28 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Kresh"
+   "name": "Kresh",
+   "skins": {
+    "from": {
+     "everloot-9d1cf70d": 3,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 2,
+      "min": 2,
+      "qty": 6
+     },
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 4
+   }
   },
   "3654": {
    "buckets": {
@@ -61541,7 +66017,19 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Skum"
+   "name": "Skum",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 1
+   }
   },
   "3680": {
    "buckets": {
@@ -62066,6 +66554,18 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Mystlash Hydra",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1440": {
      "263": 24
@@ -63351,6 +67851,22 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Felslayer",
+   "skins": {
+    "from": {
+     "eglink": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 3
+     },
+     "2319": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "1440": {
      "529": 2,
@@ -63493,6 +68009,30 @@
      "1779": 1,
      "1826": 1
     }
+   }
+  },
+  "3789": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1440": 1
+   },
+   "maxLevel": 29,
+   "minLevel": 28,
+   "name": "Terrowulf Fleshripper",
+   "skins": {
+    "from": {
+     "everloot-33b01e3c": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "3797": {
@@ -63811,6 +68351,29 @@
    "maxLevel": 22,
    "minLevel": 21,
    "name": "Ashenvale Bear",
+   "skins": {
+    "from": {
+     "eglink": 20,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 11,
+      "max": 1,
+      "min": 1,
+      "qty": 16
+     },
+     "2319": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1440": {
      "1032": 1,
@@ -63891,6 +68454,18 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Elder Ashenvale Bear",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1440": {
      "1531": 1,
@@ -64202,6 +68777,30 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Shadowhorn Stag",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "qty": 5
+     },
+     "2319": {
+      "drops": 5,
+      "qty": 5
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1440": {
      "1079": 1,
@@ -64426,6 +69025,29 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Ghostpaw Runner",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 2,
+      "min": 2,
+      "qty": 6
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 6
+   },
    "spots": {
     "1440": {
      "1737": 1,
@@ -64469,7 +69091,23 @@
    },
    "maxLevel": 24,
    "minLevel": 23,
-   "name": "Ghostpaw Howler"
+   "name": "Ghostpaw Howler",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
   },
   "3825": {
    "buckets": {
@@ -64937,7 +69575,26 @@
     "everloot-f8c829b9": 5
    },
    "maps": {},
-   "name": "Shadowfang Whitescalp"
+   "name": "Shadowfang Whitescalp",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 2,
+      "min": 1,
+      "qty": 10
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 8
+   }
   },
   "3853": {
    "buckets": {
@@ -65060,7 +69717,38 @@
     "everloot-f8c829b9": 8
    },
    "maps": {},
-   "name": "Shadowfang Moonwalker"
+   "name": "Shadowfang Moonwalker",
+   "skins": {
+    "from": {
+     "eglink": 11,
+     "everloot-f8c829b9": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 11,
+      "max": 2,
+      "min": 1,
+      "qty": 17
+     },
+     "2319": {
+      "drops": 6,
+      "max": 2,
+      "min": 2,
+      "qty": 10
+     },
+     "4232": {
+      "drops": 3,
+      "qty": 3
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 21
+   }
   },
   "3854": {
    "buckets": {
@@ -65096,7 +69784,22 @@
     "everloot-f139eb59": 1
    },
    "maps": {},
-   "name": "Shadowfang Wolfguard"
+   "name": "Shadowfang Wolfguard",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 2
+   }
   },
   "3855": {
    "buckets": {
@@ -65171,7 +69874,32 @@
     "everloot-f8c829b9": 7
    },
    "maps": {},
-   "name": "Shadowfang Darksoul"
+   "name": "Shadowfang Darksoul",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-f8c829b9": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 13,
+      "max": 2,
+      "min": 1,
+      "qty": 23
+     },
+     "2319": {
+      "drops": 6,
+      "max": 2,
+      "min": 1,
+      "qty": 9
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 20
+   }
   },
   "3857": {
    "buckets": {
@@ -65226,7 +69954,28 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Shadowfang Glutton"
+   "name": "Shadowfang Glutton",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 2,
+      "min": 1,
+      "qty": 4
+     },
+     "2319": {
+      "drops": 6,
+      "max": 2,
+      "min": 1,
+      "qty": 8
+     }
+    },
+    "skinned": 9
+   }
   },
   "3859": {
    "buckets": {
@@ -65288,7 +70037,28 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Shadowfang Ragetooth"
+   "name": "Shadowfang Ragetooth",
+   "skins": {
+    "from": {
+     "eglink": 9,
+     "everloot-f8c829b9": 5
+    },
+    "items": {
+     "2319": {
+      "drops": 13,
+      "max": 2,
+      "min": 1,
+      "qty": 19
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 14
+   }
   },
   "3861": {
    "buckets": {
@@ -65327,7 +70097,36 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Bleak Worg"
+   "name": "Bleak Worg",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 2,
+      "min": 2,
+      "qty": 8
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 7
+   }
   },
   "3862": {
    "buckets": {
@@ -65417,7 +70216,36 @@
     "everloot-f8c829b9": 3
    },
    "maps": {},
-   "name": "Slavering Worg"
+   "name": "Slavering Worg",
+   "skins": {
+    "from": {
+     "eglink": 10,
+     "everloot-f8c829b9": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 2,
+      "min": 1,
+      "qty": 14
+     },
+     "2319": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 16
+   }
   },
   "3863": {
    "buckets": {
@@ -65518,7 +70346,19 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Fel Steed"
+   "name": "Fel Steed",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 3
+     }
+    },
+    "skinned": 2
+   }
   },
   "3865": {
    "buckets": {
@@ -65544,7 +70384,27 @@
     "everloot-c8df3474": 1
    },
    "maps": {},
-   "name": "Shadow Charger"
+   "name": "Shadow Charger",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   }
   },
   "3866": {
    "buckets": {
@@ -65583,7 +70443,21 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Vile Bat"
+   "name": "Vile Bat",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   }
   },
   "3868": {
    "buckets": {
@@ -65896,7 +70770,22 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Razorclaw the Butcher"
+   "name": "Razorclaw the Butcher",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 3
+   }
   },
   "3887": {
    "buckets": {
@@ -65959,6 +70848,30 @@
    },
    "maps": {},
    "name": "Baron Silverlaine"
+  },
+  "390": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1429": 4
+   },
+   "name": "Porcine Entourage",
+   "skins": {
+    "from": {
+     "eglink": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 4
+   }
   },
   "391": {
    "buckets": {
@@ -66054,7 +70967,21 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Rethilgore"
+   "name": "Rethilgore",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   }
   },
   "3917": {
    "buckets": {
@@ -66684,7 +71611,26 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Wolf Master Nandos"
+   "name": "Wolf Master Nandos",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   }
   },
   "3928": {
    "buckets": {
@@ -67871,6 +72817,24 @@
     }
    }
   },
+  "4009": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Raging Cliff Stormer",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 2
+   }
+  },
   "4011": {
    "buckets": {
     "1": {
@@ -67893,10 +72857,91 @@
    "maxLevel": 20,
    "minLevel": 19,
    "name": "Young Pridewing",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1442": {
      "1529": 1
     }
+   }
+  },
+  "4012": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1442": 3
+   },
+   "maxLevel": 22,
+   "minLevel": 21,
+   "name": "Pridewing Wyvern",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     },
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   }
+  },
+  "4014": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 22,
+   "minLevel": 22,
+   "name": "Pridewing Consort",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 1
    }
   },
   "4016": {
@@ -67921,6 +72966,22 @@
    "maxLevel": 25,
    "minLevel": 25,
    "name": "Fey Dragon",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1442": {
      "909": 1
@@ -67958,6 +73019,20 @@
    "maxLevel": 26,
    "minLevel": 26,
    "name": "Wily Fey Dragon",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1442": {
      "755": 1
@@ -68011,6 +73086,33 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Antlered Courser",
+   "skins": {
+    "from": {
+     "eglink": 42,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 20,
+      "max": 1,
+      "min": 1,
+      "qty": 27
+     },
+     "2319": {
+      "drops": 21,
+      "qty": 21
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 44
+   },
    "spots": {
     "1442": {
      "1006": 1,
@@ -68064,6 +73166,21 @@
    "maxLevel": 24,
    "minLevel": 24,
    "name": "Great Courser",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1442": {
      "908": 1
@@ -68759,6 +73876,22 @@
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Young Chimaera",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1442": {
      "782": 1,
@@ -69049,6 +74182,18 @@
    "maxLevel": 28,
    "minLevel": 27,
    "name": "Scorched Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1442": {
      "786": 1,
@@ -69057,6 +74202,24 @@
      "885": 1,
      "886": 5
     }
+   }
+  },
+  "4042": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Singed Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "4044": {
@@ -69088,6 +74251,22 @@
    "maxLevel": 23,
    "minLevel": 23,
    "name": "Blackened Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 2
+     },
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1442": {
      "879": 1,
@@ -69441,6 +74620,39 @@
    "maxLevel": 24,
    "minLevel": 23,
    "name": "Twilight Runner",
+   "skins": {
+    "from": {
+     "eglink": 28,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     },
+     "2319": {
+      "drops": 17,
+      "max": 1,
+      "min": 1,
+      "qty": 17
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 30
+   },
    "spots": {
     "1442": {
      "754": 2,
@@ -70377,6 +75589,33 @@
    "maxLevel": 29,
    "minLevel": 28,
    "name": "Highperch Wyvern",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-f8c829b9": 11
+    },
+    "items": {
+     "2319": {
+      "drops": 19,
+      "max": 1,
+      "min": 1,
+      "qty": 19
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 23
+   },
    "spots": {
     "1441": {
      "266": 1,
@@ -70432,6 +75671,27 @@
    "maxLevel": 29,
    "minLevel": 28,
    "name": "Highperch Consort",
+   "skins": {
+    "from": {
+     "eglink": 7,
+     "everloot-f8c829b9": 7
+    },
+    "items": {
+     "2319": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "4234": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1441": {
      "420": 5,
@@ -70467,7 +75727,21 @@
    },
    "maxLevel": 31,
    "minLevel": 30,
-   "name": "Highperch Patriarch"
+   "name": "Highperch Patriarch",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
   },
   "4111": {
    "buckets": {
@@ -70649,6 +75923,18 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Cloud Serpent",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1441": {
      "1327": 2,
@@ -70678,6 +75964,25 @@
    "maxLevel": 28,
    "minLevel": 28,
    "name": "Venomous Cloud Serpent",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1441": {
      "619": 1
@@ -70718,6 +76023,22 @@
    "maxLevel": 28,
    "minLevel": 27,
    "name": "Elder Cloud Serpent",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "2319": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1441": {
      "1271": 1,
@@ -70822,6 +76143,33 @@
    "maxLevel": 28,
    "minLevel": 27,
    "name": "Needles Cougar",
+   "skins": {
+    "from": {
+     "eglink": 10,
+     "everloot-f8c829b9": 7
+    },
+    "items": {
+     "2319": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 17
+   },
    "spots": {
     "1441": {
      "1323": 1,
@@ -70870,6 +76218,21 @@
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Crag Stalker",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1441": {
      "818": 1,
@@ -70947,6 +76310,40 @@
    "maxLevel": 16,
    "minLevel": 15,
    "name": "Hecklefang Hyena",
+   "skins": {
+    "from": {
+     "eglink": 8,
+     "everloot-9d1cf70d": 20,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 17,
+      "max": 2,
+      "min": 1,
+      "qty": 20
+     },
+     "249427": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 30
+   },
    "spots": {
     "1413": {
      "1013": 1,
@@ -71053,6 +76450,42 @@
    "maxLevel": 23,
    "minLevel": 22,
    "name": "Hecklefang Stalker",
+   "skins": {
+    "from": {
+     "eglink": 29,
+     "everloot-84174d5f": 18,
+     "everloot-f8c829b9": 10
+    },
+    "items": {
+     "2318": {
+      "drops": 20,
+      "max": 2,
+      "min": 1,
+      "qty": 30
+     },
+     "2319": {
+      "drops": 31,
+      "max": 1,
+      "min": 1,
+      "qty": 31
+     },
+     "249427": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 57
+   },
    "spots": {
     "1413": {
      "1137": 1,
@@ -71135,6 +76568,31 @@
    "maxLevel": 19,
    "minLevel": 18,
    "name": "Hecklefang Snarler",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 2,
+      "min": 1,
+      "qty": 3
+     },
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 5
+   },
    "spots": {
     "1413": {
      "1078": 1,
@@ -71282,6 +76740,22 @@
    "maxLevel": 34,
    "minLevel": 34,
    "name": "Scorpid Terror",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1441": {
      "1836": 1
@@ -71319,6 +76793,22 @@
    "maxLevel": 32,
    "minLevel": 31,
    "name": "Scorpid Reaver",
+   "skins": {
+    "from": {
+     "eglink": 11
+    },
+    "items": {
+     "2319": {
+      "drops": 5,
+      "qty": 5
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1441": {
      "1731": 1,
@@ -71383,6 +76873,26 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Sparkleshell Tortoise",
+   "skins": {
+    "from": {
+     "eglink": 28
+    },
+    "items": {
+     "2319": {
+      "drops": 21,
+      "qty": 21
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 28
+   },
    "spots": {
     "1441": {
      "1729": 1,
@@ -71449,6 +76959,30 @@
    "maxLevel": 35,
    "minLevel": 34,
    "name": "Sparkleshell Snapper",
+   "skins": {
+    "from": {
+     "eglink": 21
+    },
+    "items": {
+     "2319": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 10,
+      "qty": 10
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1441": {
      "1882": 1,
@@ -71504,6 +77038,26 @@
    "maxLevel": 33,
    "minLevel": 32,
    "name": "Sparkleshell Borer",
+   "skins": {
+    "from": {
+     "eglink": 9
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "qty": 2
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 9
+   },
    "spots": {
     "1441": {
      "1844": 1,
@@ -71551,6 +77105,26 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Saltstone Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 16
+    },
+    "items": {
+     "2319": {
+      "drops": 12,
+      "qty": 12
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 16
+   },
    "spots": {
     "1441": {
      "1732": 1,
@@ -71605,6 +77179,26 @@
    "maxLevel": 35,
    "minLevel": 34,
    "name": "Saltstone Gazer",
+   "skins": {
+    "from": {
+     "eglink": 10
+    },
+    "items": {
+     "2319": {
+      "drops": 4,
+      "qty": 4
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 5,
+      "qty": 5
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1441": {
      "1795": 1,
@@ -71656,6 +77250,26 @@
    "maxLevel": 33,
    "minLevel": 32,
    "name": "Saltstone Crystalhide",
+   "skins": {
+    "from": {
+     "eglink": 15
+    },
+    "items": {
+     "2319": {
+      "drops": 7,
+      "qty": 7
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     },
+     "4235": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 15
+   },
    "spots": {
     "1441": {
      "1932": 1,
@@ -71784,7 +77398,28 @@
    },
    "maxLevel": 3,
    "minLevel": 3,
-   "name": "Gazelle"
+   "name": "Gazelle",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-9d1cf70d": 23
+    },
+    "items": {
+     "2318": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "2934": {
+      "drops": 21,
+      "max": 1,
+      "min": 1,
+      "qty": 21
+     }
+    },
+    "skinned": 24
+   }
   },
   "4196": {
    "buckets": {
@@ -72155,6 +77790,27 @@
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Pesterhide Hyena",
+   "skins": {
+    "from": {
+     "eglink": 8,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "4234": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1441": {
      "664": 1,
@@ -72202,6 +77858,31 @@
    "maxLevel": 29,
    "minLevel": 28,
    "name": "Pesterhide Snarler",
+   "skins": {
+    "from": {
+     "eglink": 23,
+     "everloot-f8c829b9": 8
+    },
+    "items": {
+     "2319": {
+      "drops": 25,
+      "max": 1,
+      "min": 1,
+      "qty": 25
+     },
+     "4232": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 31
+   },
    "spots": {
     "1441": {
      "1479": 1,
@@ -72463,7 +78144,19 @@
     "everloot-f139eb59": 1
    },
    "maps": {},
-   "name": "Fenrus the Devourer"
+   "name": "Fenrus the Devourer",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   }
   },
   "4275": {
    "buckets": {
@@ -72630,7 +78323,21 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Odo the Blindwatcher"
+   "name": "Odo the Blindwatcher",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "428": {
    "buckets": {
@@ -73741,7 +79448,23 @@
     "everloot-83ea498a": 1
    },
    "maps": {},
-   "name": "Scarlet Tracking Hound"
+   "name": "Scarlet Tracking Hound",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
   },
   "4306": {
    "buckets": {
@@ -73920,6 +79643,33 @@
    "maxLevel": 13,
    "minLevel": 13,
    "name": "Kolkar Packhound",
+   "skins": {
+    "from": {
+     "eglink": 6,
+     "everloot-9d1cf70d": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 5,
+      "max": 2,
+      "min": 1,
+      "qty": 7
+     },
+     "249427": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "1413": {
      "1319": 1,
@@ -74900,6 +80650,38 @@
    "maxLevel": 18,
    "minLevel": 17,
    "name": "Black Dragon Whelp",
+   "skins": {
+    "from": {
+     "eglink": 105,
+     "everloot-58610e24": 1,
+     "everloot-86f7f239": 21
+    },
+    "items": {
+     "2318": {
+      "drops": 78,
+      "max": 2,
+      "min": 1,
+      "qty": 109
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "7286": {
+      "drops": 42,
+      "max": 2,
+      "min": 1,
+      "qty": 63
+     },
+     "783": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 127
+   },
    "spots": {
     "1433": {
      "1018": 2,
@@ -75336,7 +81118,23 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Agathelos the Raging"
+   "name": "Agathelos the Raging",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 4
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "4424": {
    "buckets": {
@@ -76201,6 +81999,26 @@
     }
    }
   },
+  "4504": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1416": 2
+   },
+   "name": "Frostmaw",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
+  },
   "4511": {
    "buckets": {
     "1": {
@@ -76282,7 +82100,38 @@
     "everloot-f8c829b9": 5
    },
    "maps": {},
-   "name": "Agam'ar"
+   "name": "Agam'ar",
+   "skins": {
+    "from": {
+     "eglink": 18,
+     "everloot-f8c829b9": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 12,
+      "max": 2,
+      "min": 1,
+      "qty": 17
+     },
+     "2319": {
+      "drops": 8,
+      "max": 2,
+      "min": 2,
+      "qty": 13
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 23
+   }
   },
   "4512": {
    "buckets": {
@@ -76321,7 +82170,23 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Rotting Agam'ar"
+   "name": "Rotting Agam'ar",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
   },
   "4514": {
    "buckets": {
@@ -76386,7 +82251,28 @@
     "everloot-f8c829b9": 3
    },
    "maps": {},
-   "name": "Raging Agam'ar"
+   "name": "Raging Agam'ar",
+   "skins": {
+    "from": {
+     "eglink": 19,
+     "everloot-f8c829b9": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 2,
+      "min": 1,
+      "qty": 16
+     },
+     "2319": {
+      "drops": 15,
+      "max": 2,
+      "min": 1,
+      "qty": 22
+     }
+    },
+    "skinned": 25
+   }
   },
   "4515": {
    "buckets": {
@@ -77033,7 +82919,38 @@
     "everloot-f8c829b9": 5
    },
    "maps": {},
-   "name": "Kraul Bat"
+   "name": "Kraul Bat",
+   "skins": {
+    "from": {
+     "eglink": 15,
+     "everloot-f8c829b9": 5
+    },
+    "items": {
+     "2319": {
+      "drops": 13,
+      "max": 2,
+      "min": 2,
+      "qty": 20
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     }
+    },
+    "skinned": 20
+   }
   },
   "4539": {
    "buckets": {
@@ -77073,7 +82990,26 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Greater Kraul Bat"
+   "name": "Greater Kraul Bat",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 5
+   }
   },
   "454": {
    "buckets": {
@@ -77155,6 +83091,36 @@
    "maxLevel": 13,
    "minLevel": 12,
    "name": "Young Goretusk",
+   "skins": {
+    "from": {
+     "eglink": 80,
+     "everloot-58610e24": 1,
+     "everloot-86f7f239": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 52,
+      "max": 1,
+      "min": 1,
+      "qty": 62
+     },
+     "249427": {
+      "drops": 2,
+      "qty": 5
+     },
+     "2934": {
+      "drops": 27,
+      "max": 1,
+      "min": 1,
+      "qty": 27
+     },
+     "783": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 84
+   },
    "spots": {
     "1436": {
      "1015": 1,
@@ -77340,6 +83306,25 @@
    "maxLevel": 30,
    "minLevel": 30,
    "name": "Steelsnap",
+   "skins": {
+    "from": {
+     "eglink": 4,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 7
+   },
    "spots": {
     "1441": {
      "461": 2
@@ -79236,6 +85221,18 @@
    "maxLevel": 39,
    "minLevel": 39,
    "name": "Ley Hunter",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1443": {
      "1988": 1
@@ -79427,6 +85424,42 @@
     }
    }
   },
+  "4696": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Scorpashi Snapper",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 2
+   }
+  },
+  "4697": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Scorpashi Lasher",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
+  },
   "4701": {
    "buckets": {
     "1": {
@@ -79449,6 +85482,18 @@
    "maxLevel": 36,
    "minLevel": 36,
    "name": "Dying Kodo",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1443": {
      "1328": 1
@@ -79943,7 +85988,41 @@
    },
    "maxLevel": 32,
    "minLevel": 31,
-   "name": "Gritjaw Basilisk"
+   "name": "Gritjaw Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
+  },
+  "4729": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Hulking Gritjaw Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "474": {
    "buckets": {
@@ -82327,7 +88406,29 @@
     "everloot-f8c829b9": 2
    },
    "maps": {},
-   "name": "Aku'mai Snapjaw"
+   "name": "Aku'mai Snapjaw",
+   "skins": {
+    "from": {
+     "eglink": 9,
+     "everloot-84174d5f": 3,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2319": {
+      "drops": 12,
+      "max": 2,
+      "min": 1,
+      "qty": 16
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 14
+   }
   },
   "4827": {
    "buckets": {
@@ -82386,7 +88487,19 @@
     "everloot-f139eb59": 1
    },
    "maps": {},
-   "name": "Deep Pool Threshfin"
+   "name": "Deep Pool Threshfin",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 1
+   }
   },
   "4829": {
    "buckets": {
@@ -82441,7 +88554,21 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Aku'mai"
+   "name": "Aku'mai",
+   "skins": {
+    "from": {
+     "everloot-84174d5f": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
   },
   "4830": {
    "buckets": {
@@ -82507,7 +88634,23 @@
     "everloot-f139eb59": 2
    },
    "maps": {},
-   "name": "Old Serra'kis"
+   "name": "Old Serra'kis",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 3
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   }
   },
   "4831": {
    "buckets": {
@@ -82828,7 +88971,22 @@
     "everloot-f8c829b9": 1
    },
    "maps": {},
-   "name": "Ghamoo-ra"
+   "name": "Ghamoo-ra",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 4
+     }
+    },
+    "skinned": 2
+   }
   },
   "500": {
    "buckets": {
@@ -83277,7 +89435,39 @@
     "everloot-f8c829b9": 6
    },
    "maps": {},
-   "name": "Deviate Adder"
+   "name": "Deviate Adder",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-9d1cf70d": 8,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 9,
+      "max": 2,
+      "min": 1,
+      "qty": 15
+     },
+     "2319": {
+      "drops": 9,
+      "max": 2,
+      "min": 1,
+      "qty": 16
+     },
+     "6470": {
+      "drops": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 22
+   }
   },
   "505": {
    "buckets": {
@@ -83443,7 +89633,39 @@
     "everloot-f8c829b9": 9
    },
    "maps": {},
-   "name": "Deviate Crocolisk"
+   "name": "Deviate Crocolisk",
+   "skins": {
+    "from": {
+     "eglink": 26,
+     "everloot-9d1cf70d": 12,
+     "everloot-f8c829b9": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 29,
+      "max": 2,
+      "min": 1,
+      "qty": 39
+     },
+     "2319": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "249427": {
+      "drops": 1,
+      "max": 2,
+      "min": 2,
+      "qty": 2
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 42
+   }
   },
   "5055": {
    "buckets": {
@@ -83568,7 +89790,45 @@
     "everloot-f8c829b9": 9
    },
    "maps": {},
-   "name": "Deviate Dreadfang"
+   "name": "Deviate Dreadfang",
+   "skins": {
+    "from": {
+     "eglink": 10,
+     "everloot-9d1cf70d": 2,
+     "everloot-f8c829b9": 6
+    },
+    "items": {
+     "2318": {
+      "drops": 12,
+      "max": 2,
+      "min": 1,
+      "qty": 16
+     },
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "6470": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 18
+   }
   },
   "511": {
    "buckets": {
@@ -83819,6 +90079,22 @@
    "maxLevel": 8,
    "minLevel": 7,
    "name": "Rockhide Boar",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 1,
+      "qty": 1
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1429": {
      "1093": 1,
@@ -83881,6 +90157,25 @@
    "maxLevel": 6,
    "minLevel": 5,
    "name": "Mangy Wolf",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1429": {
      "1134": 1,
@@ -83990,6 +90285,22 @@
    "maxLevel": 28,
    "minLevel": 27,
    "name": "Nightbane Shadow Weaver",
+   "skins": {
+    "from": {
+     "eglink": 11
+    },
+    "items": {
+     "2319": {
+      "drops": 10,
+      "qty": 10
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1431": {
      "1475": 1,
@@ -84166,6 +90477,44 @@
    "maxLevel": 17,
    "minLevel": 16,
    "name": "Great Goretusk",
+   "skins": {
+    "from": {
+     "eglink": 110,
+     "everloot-86f7f239": 10,
+     "everloot-adbb963c": 4
+    },
+    "items": {
+     "2318": {
+      "drops": 93,
+      "max": 2,
+      "min": 1,
+      "qty": 137
+     },
+     "2319": {
+      "drops": 21,
+      "max": 1,
+      "min": 1,
+      "qty": 21
+     },
+     "249427": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 5
+     },
+     "4232": {
+      "drops": 4,
+      "qty": 4
+     },
+     "783": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 124
+   },
    "spots": {
     "1433": {
      "1011": 1,
@@ -84573,6 +90922,30 @@
    "maxLevel": 21,
    "minLevel": 20,
    "name": "Rabid Dire Wolf",
+   "skins": {
+    "from": {
+     "eglink": 66
+    },
+    "items": {
+     "2318": {
+      "drops": 48,
+      "qty": 72
+     },
+     "2319": {
+      "drops": 15,
+      "qty": 15
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 66
+   },
    "spots": {
     "1431": {
      "1010": 2,
@@ -84901,7 +91274,37 @@
     "everloot-f8c829b9": 12
    },
    "maps": {},
-   "name": "Deviate Viper"
+   "name": "Deviate Viper",
+   "skins": {
+    "from": {
+     "eglink": 20,
+     "everloot-9d1cf70d": 9,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 22,
+      "max": 2,
+      "min": 1,
+      "qty": 37
+     },
+     "2319": {
+      "drops": 3,
+      "qty": 5
+     },
+     "6470": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     },
+     "783": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 32
+   }
   },
   "5756": {
    "buckets": {
@@ -84973,7 +91376,39 @@
     "everloot-f8c829b9": 4
    },
    "maps": {},
-   "name": "Deviate Venomwing"
+   "name": "Deviate Venomwing",
+   "skins": {
+    "from": {
+     "eglink": 7,
+     "everloot-9d1cf70d": 1,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "2319": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "6470": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 11
+   }
   },
   "5761": {
    "buckets": {
@@ -85173,7 +91608,37 @@
     "everloot-f8c829b9": 3
    },
    "maps": {},
-   "name": "Deviate Moccasin"
+   "name": "Deviate Moccasin",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-9d1cf70d": 5,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 2,
+      "min": 1,
+      "qty": 12
+     },
+     "2319": {
+      "drops": 3,
+      "max": 2,
+      "min": 1,
+      "qty": 4
+     },
+     "6471": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 12
+   }
   },
   "5763": {
    "buckets": {
@@ -86371,6 +92836,24 @@
     }
    }
   },
+  "5951": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Hare",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
+  },
   "597": {
    "buckets": {
     "1": {
@@ -87003,6 +93486,30 @@
    "maxLevel": 32,
    "minLevel": 32,
    "name": "Gutspill",
+   "skins": {
+    "from": {
+     "eglink": 12
+    },
+    "items": {
+     "2319": {
+      "drops": 6,
+      "qty": 6
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 4,
+      "qty": 4
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 12
+   },
    "spots": {
     "1431": {
      "1837": 1,
@@ -87973,6 +94480,30 @@
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Black Ravager",
+   "skins": {
+    "from": {
+     "eglink": 23
+    },
+    "items": {
+     "2318": {
+      "drops": 12,
+      "qty": 16
+     },
+     "2319": {
+      "drops": 9,
+      "qty": 9
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 23
+   },
    "spots": {
     "1431": {
      "1280": 3,
@@ -89289,6 +95820,31 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Young Stranglethorn Tiger",
+   "skins": {
+    "from": {
+     "eglink": 9,
+     "everloot-f8c829b9": 6
+    },
+    "items": {
+     "2319": {
+      "drops": 11,
+      "max": 1,
+      "min": 1,
+      "qty": 11
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 15
+   },
    "spots": {
     "1434": {
      "753": 1,
@@ -89354,6 +95910,31 @@
    "maxLevel": 33,
    "minLevel": 32,
    "name": "Stranglethorn Tiger",
+   "skins": {
+    "from": {
+     "eglink": 5,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4232": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 8
+   },
    "spots": {
     "1434": {
      "1058": 1,
@@ -89406,6 +95987,18 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Young Panther",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1434": {
      "1004": 4,
@@ -89471,6 +96064,33 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Shadowmaw Panther",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-f8c829b9": 16
+    },
+    "items": {
+     "4234": {
+      "drops": 17,
+      "max": 1,
+      "min": 1,
+      "qty": 17
+     },
+     "4304": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "7428": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 28
+   },
    "spots": {
     "1434": {
      "1015": 1,
@@ -89532,6 +96152,22 @@
    "maxLevel": 34,
    "minLevel": 33,
    "name": "Stranglethorn Raptor",
+   "skins": {
+    "from": {
+     "eglink": 11
+    },
+    "items": {
+     "2319": {
+      "drops": 5,
+      "qty": 5
+     },
+     "4234": {
+      "drops": 6,
+      "qty": 6
+     }
+    },
+    "skinned": 11
+   },
    "spots": {
     "1434": {
      "608": 1,
@@ -89620,6 +96256,45 @@
    "maxLevel": 36,
    "minLevel": 35,
    "name": "Lashtail Raptor",
+   "skins": {
+    "from": {
+     "eglink": 22,
+     "everloot-f8c829b9": 22
+    },
+    "items": {
+     "2319": {
+      "drops": 21,
+      "max": 1,
+      "min": 1,
+      "qty": 21
+     },
+     "249428": {
+      "drops": 2,
+      "max": 2,
+      "min": 2,
+      "qty": 5
+     },
+     "4232": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 18,
+      "max": 1,
+      "min": 1,
+      "qty": 18
+     },
+     "4235": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 44
+   },
    "spots": {
     "1434": {
      "710": 2,
@@ -89713,6 +96388,26 @@
    "maxLevel": 41,
    "minLevel": 40,
    "name": "Jungle Stalker",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 10
+    },
+    "items": {
+     "4234": {
+      "drops": 9,
+      "max": 1,
+      "min": 1,
+      "qty": 9
+     },
+     "4304": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 10
+   },
    "spots": {
     "1434": {
      "574": 9,
@@ -89760,6 +96455,20 @@
    "maxLevel": 31,
    "minLevel": 31,
    "name": "Stone Maw Basilisk",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1434": {
      "853": 1,
@@ -89834,6 +96543,26 @@
    "maxLevel": 35,
    "minLevel": 34,
    "name": "Crystal Spine Basilisk",
+   "skins": {
+    "from": {
+     "eglink": 32
+    },
+    "items": {
+     "2319": {
+      "drops": 15,
+      "qty": 15
+     },
+     "4232": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 14,
+      "qty": 14
+     }
+    },
+    "skinned": 32
+   },
    "spots": {
     "1434": {
      "1154": 3,
@@ -89937,6 +96666,18 @@
    "maxLevel": 2,
    "minLevel": 2,
    "name": "Timber Wolf",
+   "skins": {
+    "from": {
+     "eglink": 21
+    },
+    "items": {
+     "2934": {
+      "drops": 21,
+      "qty": 21
+     }
+    },
+    "skinned": 21
+   },
    "spots": {
     "1429": {
      "1167": 3,
@@ -90559,6 +97300,38 @@
     }
    }
   },
+  "721": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1420": 2,
+    "1426": 2,
+    "1429": 2,
+    "1433": 2,
+    "1438": 2,
+    "1442": 2,
+    "2548": 2
+   },
+   "maxLevel": 1,
+   "minLevel": 1,
+   "name": "Rabbit",
+   "skins": {
+    "from": {
+     "eglink": 2,
+     "everloot-9d1cf70d": 2,
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 5,
+      "max": 1,
+      "min": 1,
+      "qty": 5
+     }
+    },
+    "skinned": 5
+   }
+  },
   "728": {
    "buckets": {
     "1": {
@@ -90586,6 +97359,22 @@
    "maxLevel": 40,
    "minLevel": 40,
    "name": "Bhag'thera",
+   "skins": {
+    "from": {
+     "eglink": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 2
+   },
    "spots": {
     "1434": {
      "1210": 1,
@@ -90625,11 +97414,56 @@
    "maxLevel": 37,
    "minLevel": 37,
    "name": "Sin'Dall",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-f8c829b9": 2
+    },
+    "items": {
+     "4234": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "4304": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 3
+   },
    "spots": {
     "1434": {
      "807": 1,
      "808": 3
     }
+   }
+  },
+  "731": {
+   "buckets": {},
+   "from": {},
+   "maps": {
+    "1434": 1
+   },
+   "maxLevel": 43,
+   "minLevel": 43,
+   "name": "King Bangalash",
+   "skins": {
+    "from": {
+     "everloot-f8c829b9": 1
+    },
+    "items": {
+     "8170": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
    }
   },
   "732": {
@@ -90882,7 +97716,27 @@
     "everloot-933e529a": 2
    },
    "maps": {},
-   "name": "Withered Battle Boar"
+   "name": "Withered Battle Boar",
+   "skins": {
+    "from": {
+     "eglink": 12
+    },
+    "items": {
+     "2319": {
+      "drops": 6,
+      "qty": 8
+     },
+     "4232": {
+      "drops": 2,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 4,
+      "qty": 4
+     }
+    },
+    "skinned": 12
+   }
   },
   "7334": {
    "buckets": {
@@ -90908,7 +97762,23 @@
     "everloot-933e529a": 1
    },
    "maps": {},
-   "name": "Battle Boar Horror"
+   "name": "Battle Boar Horror",
+   "skins": {
+    "from": {
+     "eglink": 9
+    },
+    "items": {
+     "4234": {
+      "drops": 8,
+      "qty": 11
+     },
+     "4304": {
+      "drops": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 9
+   }
   },
   "7335": {
    "buckets": {
@@ -91338,7 +98208,31 @@
    },
    "maxLevel": 33,
    "minLevel": 32,
-   "name": "Panther"
+   "name": "Panther",
+   "skins": {
+    "from": {
+     "eglink": 13
+    },
+    "items": {
+     "2319": {
+      "drops": 4,
+      "qty": 4
+     },
+     "249428": {
+      "drops": 1,
+      "qty": 2
+     },
+     "4234": {
+      "drops": 7,
+      "qty": 7
+     },
+     "4235": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 13
+   }
   },
   "7360": {
    "buckets": {
@@ -91434,6 +98328,18 @@
    "maxLevel": 35,
    "minLevel": 35,
    "name": "Adolescent Whelp",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1435": {
      "429": 1
@@ -91930,6 +98836,24 @@
     }
    }
   },
+  "767": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Swamp Jaguar",
+   "skins": {
+    "from": {
+     "eglink": 3
+    },
+    "items": {
+     "4234": {
+      "drops": 3,
+      "qty": 3
+     }
+    },
+    "skinned": 3
+   }
+  },
   "772": {
    "buckets": {
     "1": {
@@ -91987,6 +98911,27 @@
    "maxLevel": 38,
    "minLevel": 37,
    "name": "Stranglethorn Tigress",
+   "skins": {
+    "from": {
+     "eglink": 12,
+     "everloot-f8c829b9": 12
+    },
+    "items": {
+     "4234": {
+      "drops": 20,
+      "max": 1,
+      "min": 1,
+      "qty": 20
+     },
+     "4304": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 4
+     }
+    },
+    "skinned": 24
+   },
    "spots": {
     "1434": {
      "1015": 1,
@@ -92359,6 +99304,28 @@
     }
    }
   },
+  "7977": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Gammerita",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "4304": {
+      "drops": 1,
+      "qty": 1
+     },
+     "8167": {
+      "drops": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 1
+   }
+  },
   "80": {
    "buckets": {
     "1": {
@@ -92538,6 +99505,25 @@
    "maxLevel": 9,
    "minLevel": 8,
    "name": "Young Forest Bear",
+   "skins": {
+    "from": {
+     "eglink": 16,
+     "everloot-86f7f239": 1
+    },
+    "items": {
+     "2318": {
+      "drops": 7,
+      "max": 1,
+      "min": 1,
+      "qty": 7
+     },
+     "2934": {
+      "drops": 10,
+      "qty": 10
+     }
+    },
+    "skinned": 17
+   },
    "spots": {
     "1429": {
      "1045": 1,
@@ -92634,6 +99620,27 @@
    "maxLevel": 12,
    "minLevel": 11,
    "name": "Coyote Packleader",
+   "skins": {
+    "from": {
+     "eglink": 6,
+     "everloot-86f7f239": 3
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "2934": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 9
+   },
    "spots": {
     "1436": {
      "1064": 1,
@@ -92695,6 +99702,27 @@
    "maxLevel": 11,
    "minLevel": 10,
    "name": "Coyote",
+   "skins": {
+    "from": {
+     "eglink": 19,
+     "everloot-86f7f239": 5
+    },
+    "items": {
+     "2318": {
+      "drops": 10,
+      "max": 1,
+      "min": 1,
+      "qty": 10
+     },
+     "2934": {
+      "drops": 14,
+      "max": 1,
+      "min": 1,
+      "qty": 14
+     }
+    },
+    "skinned": 24
+   },
    "spots": {
     "1436": {
      "1012": 1,
@@ -92799,6 +99827,18 @@
    "maxLevel": 30,
    "minLevel": 30,
    "name": "Young Stranglethorn Raptor",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   },
    "spots": {
     "1434": {
      "607": 1
@@ -92899,6 +99939,33 @@
    "maxLevel": 34,
    "minLevel": 33,
    "name": "Young Lashtail Raptor",
+   "skins": {
+    "from": {
+     "eglink": 1,
+     "everloot-f8c829b9": 3
+    },
+    "items": {
+     "2319": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4232": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "4234": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     }
+    },
+    "skinned": 4
+   },
    "spots": {
     "1434": {
      "710": 1,
@@ -93087,6 +100154,24 @@
     }
    }
   },
+  "883": {
+   "buckets": {},
+   "from": {},
+   "maps": {},
+   "name": "Deer",
+   "skins": {
+    "from": {
+     "eglink": 1
+    },
+    "items": {
+     "2934": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 1
+   }
+  },
   "8886": {
    "buckets": {
     "1": {
@@ -93151,7 +100236,53 @@
     "everloot-f8c829b9": 8
    },
    "maps": {},
-   "name": "Deviate Python"
+   "name": "Deviate Python",
+   "skins": {
+    "from": {
+     "eglink": 22,
+     "everloot-9d1cf70d": 13,
+     "everloot-f8c829b9": 8
+    },
+    "items": {
+     "2318": {
+      "drops": 24,
+      "max": 2,
+      "min": 1,
+      "qty": 36
+     },
+     "2319": {
+      "drops": 10,
+      "max": 2,
+      "min": 1,
+      "qty": 14
+     },
+     "4232": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     },
+     "6470": {
+      "drops": 2,
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "6471": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
+     },
+     "783": {
+      "drops": 3,
+      "max": 1,
+      "min": 1,
+      "qty": 3
+     }
+    },
+    "skinned": 43
+   }
   },
   "889": {
    "buckets": {
@@ -93315,6 +100446,22 @@
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Nightbane Worgen",
+   "skins": {
+    "from": {
+     "eglink": 14
+    },
+    "items": {
+     "2319": {
+      "drops": 13,
+      "qty": 13
+     },
+     "4234": {
+      "drops": 1,
+      "qty": 1
+     }
+    },
+    "skinned": 14
+   },
    "spots": {
     "1431": {
      "1462": 1,
@@ -93448,6 +100595,26 @@
    "maxLevel": 31,
    "minLevel": 30,
    "name": "Nightbane Tainted One",
+   "skins": {
+    "from": {
+     "eglink": 15
+    },
+    "items": {
+     "2319": {
+      "drops": 10,
+      "qty": 10
+     },
+     "4232": {
+      "drops": 3,
+      "qty": 3
+     },
+     "4234": {
+      "drops": 2,
+      "qty": 2
+     }
+    },
+    "skinned": 15
+   },
    "spots": {
     "1431": {
      "1837": 2,
@@ -93529,6 +100696,22 @@
    "maxLevel": 24,
    "minLevel": 23,
    "name": "Young Black Ravager",
+   "skins": {
+    "from": {
+     "eglink": 16
+    },
+    "items": {
+     "2318": {
+      "drops": 6,
+      "qty": 9
+     },
+     "2319": {
+      "drops": 10,
+      "qty": 10
+     }
+    },
+    "skinned": 16
+   },
    "spots": {
     "1431": {
      "1181": 1,

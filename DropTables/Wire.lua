@@ -8,7 +8,11 @@ local _, ns = ...
 --   Z<npc>.<map>.<kills>
 --   P<npc>.<map>.<cell>.<kills>
 --   N<npc>.<mob name>
--- Numbers are base 36, and an empty field means the value is missing (min/max, an unknown level).
+--   K<npc>.<skinned corpses>
+--   U<npc>.<item>.<drops>.<qty>.<min>.<max>     an item skinning gave
+-- Numbers are base 36, and an empty field means the value is missing (min/max, an unknown level). Versions before
+-- 0.5.0 refuse a whole message with a record kind they don't know, so K and U records only travel in messages of their
+-- own (S| in Share.lua) and in the export string.
 local Wire = {}
 ns.Wire = Wire
 
@@ -142,6 +146,44 @@ function Wire.SourceRecords(npc, source, name)
     return records
 end
 
+-- True when skinning counts can be passed on: something was skinned and no item came more often than that.
+function Wire.SkinsComplete(skins)
+    if not skins or (skins.skinned or 0) == 0 then
+        return false
+    end
+    for _, item in pairs(skins.items) do
+        if item.drops > skins.skinned then
+            return false
+        end
+    end
+    return true
+end
+
+-- One install's skinning records of a mob, the count first and the most frequent items after it, or nothing.
+function Wire.SkinRecords(npc, skins)
+    local records, items = {}, {}
+    if not Wire.SkinsComplete(skins) then
+        return records
+    end
+    records[1] = "K" .. encodeNumber(npc) .. "." .. encodeNumber(skins.skinned)
+    for itemId, item in pairs(skins.items) do
+        table.insert(items, { drops = item.drops, record = "U" .. table.concat({
+            encodeNumber(npc), encodeNumber(itemId), encodeNumber(item.drops), encodeNumber(item.qty),
+            encodeNumber(item.min), encodeNumber(item.max),
+        }, ".") })
+    end
+    table.sort(items, function(a, b)
+        if a.drops ~= b.drops then
+            return a.drops > b.drops
+        end
+        return a.record < b.record
+    end)
+    for _, item in ipairs(items) do
+        table.insert(records, item.record)
+    end
+    return records
+end
+
 local function split(text, sep)
     local parts = {}
     for part in (text .. sep):gmatch("(.-)" .. sep:gsub("%p", "%%%0")) do
@@ -156,9 +198,11 @@ local FIELDS = {
     L = { "npc", "minLevel", "maxLevel" },
     Z = { "npc", "map", "kills" },
     P = { "npc", "map", "cell", "kills" },
+    K = { "npc", "skinned" },
+    U = { "npc", "item", "drops", "qty", "min", "max" },
 }
 local REQUIRED = { npc = true, bucket = true, kills = true, lootable = true, opened = true, moneyDrops = true,
-    copper = true, item = true, drops = true, qty = true, map = true, cell = true }
+    copper = true, item = true, drops = true, qty = true, map = true, cell = true, skinned = true }
 
 -- A stack range is either missing or 1 <= min <= max.
 local function range(min, max)
@@ -174,8 +218,10 @@ local function consistent(r)
     if r.kind == "M" then
         return r.lootable <= r.kills and r.opened <= r.lootable and r.moneyDrops <= r.opened
             and (r.moneyDrops > 0 or r.copper == 0) and range(r.moneyMin, r.moneyMax)
-    elseif r.kind == "I" then
+    elseif r.kind == "I" or r.kind == "U" then
         return r.drops >= 1 and r.qty >= r.drops and range(r.min, r.max)
+    elseif r.kind == "K" then
+        return r.skinned >= 1
     elseif r.kind == "L" then
         return (r.minLevel == nil) == (r.maxLevel == nil) and (r.minLevel or 0) <= (r.maxLevel or 0)
     end

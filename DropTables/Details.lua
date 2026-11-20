@@ -243,13 +243,14 @@ local function rowEnter(self)
     end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:SetItemByID(self.itemId)
-    GameTooltip:AddLine("Click: which other mobs drop it", 0.5, 0.5, 0.5)
+    GameTooltip:AddLine(self.skin and "Click: which other mobs give it when skinned" or "Click: which other mobs drop it",
+        0.5, 0.5, 0.5)
     GameTooltip:Show()
 end
 
 local function rowClick(self)
     if self.itemId and not ns.TryLinkItem(self.itemId) then
-        ns.OpenFinder(self.itemId)
+        ns.OpenFinder(self.itemId, self.skin and "skin" or nil)
     end
 end
 
@@ -303,10 +304,11 @@ local function setSection(row, isSection)
     row:EnableMouse(not isSection)
 end
 
-local function fillEntry(index, entry, small)
+local function fillEntry(index, entry, small, skin)
     local row = getRow(index)
     setSection(row, false)
     Style.SetRowState(row, index, false)
+    row.skin = skin
     if entry.money then
         row.itemId = nil
         row.icon:SetItem("Interface\\Icons\\INV_Misc_Coin_01")
@@ -336,16 +338,61 @@ local function fillSection(index, label, note)
     row:Show()
 end
 
+-- "Level 5-7  |  Elwynn Forest", from the mob's level range and the map with the most kills.
+local function mobSubtitle(npc)
+    local parts = {}
+    local info = ns.MobInfo(npc)
+    if info and info.minLevel then
+        local level = info.minLevel == info.maxLevel and info.minLevel or (info.minLevel .. "-" .. info.maxLevel)
+        table.insert(parts, "Level " .. level)
+    end
+    local bestMap, bestKills
+    for mapId, place in pairs(info and info.maps or {}) do
+        if not bestKills or place.kills > bestKills then
+            bestMap, bestKills = mapId, place.kills
+        end
+    end
+    if bestMap then
+        table.insert(parts, ns.MapName(bestMap))
+    end
+    return table.concat(parts, "  |  ")
+end
+
+-- What skinning the mob gives, under a section of its own below the loot, since its chances are per skinned corpse.
+-- The group plays no part in skinning, so the section is the same on every tab.
+local function fillSkins(used, skin)
+    used = used + 1
+    fillSection(used, "SKINNING", ("%d skinned corpses"):format(skin.skinned))
+    local scarce = false
+    for _, entry in ipairs(skin.list) do
+        used = used + 1
+        fillEntry(used, entry, skin.small, true)
+        scarce = scarce or entry.scarce
+    end
+    if skin.small then
+        used = used + 1
+        fillSection(used, "", ("Rates from %d skinned corpses are rough."):format(skin.skinned))
+    end
+    if scarce then
+        used = used + 1
+        fillSection(used, "", "Pristine materials depend on the Bountiful Harvest perk.")
+    end
+    return used
+end
+
 function render()
     for key, tab in pairs(tabs) do
         tab:SetChosen(key == mode)
     end
     frame.title:SetText(shownNpc and ns.MobName(shownNpc) or "Drop Tables")
     local stats = shownNpc and ns.GetStats(shownNpc, mode)
+    local skin = shownNpc and ns.GetSkinStats(shownNpc)
     shownItems = {}
-    for _, entry in ipairs(stats and stats.list or {}) do
-        if entry.itemId then
-            shownItems[entry.itemId] = true
+    for _, list in ipairs({ stats and stats.list or {}, skin and skin.list or {} }) do
+        for _, entry in ipairs(list) do
+            if entry.itemId then
+                shownItems[entry.itemId] = true
+            end
         end
     end
     local used = 0
@@ -356,26 +403,14 @@ function render()
         emptyTitle:SetText("Target a mob")
         emptyText:SetText("Its drop table shows up here.")
     elseif not stats then
-        frame.subtitle:SetText("")
+        frame.subtitle:SetText(skin and mobSubtitle(shownNpc) or "")
         emptyTitle:SetText(mode == "all" and "No data yet" or ("No " .. mode .. " kills yet"))
         emptyText:SetText(mode == "all" and "Kill and loot this mob to start its table." or "Switch to All to see every kill.")
+        if skin then
+            used = fillSkins(used, skin)
+        end
     else
-        local parts = {}
-        local info = ns.MobInfo(shownNpc)
-        if info and info.minLevel then
-            local level = info.minLevel == info.maxLevel and info.minLevel or (info.minLevel .. "-" .. info.maxLevel)
-            table.insert(parts, "Level " .. level)
-        end
-        local bestMap, bestKills
-        for mapId, place in pairs(info and info.maps or {}) do
-            if not bestKills or place.kills > bestKills then
-                bestMap, bestKills = mapId, place.kills
-            end
-        end
-        if bestMap then
-            table.insert(parts, ns.MapName(bestMap))
-        end
-        frame.subtitle:SetText(table.concat(parts, "  |  "))
+        frame.subtitle:SetText(mobSubtitle(shownNpc))
         local world = {}
         for _, entry in ipairs(stats.list) do
             if entry.world then
@@ -400,6 +435,9 @@ function render()
         elseif stats.small then
             used = used + 1
             fillSection(used, "", ("Rates from %d looted corpses are rough."):format(stats.opened))
+        end
+        if skin then
+            used = fillSkins(used, skin)
         end
     end
     emptyTitle:SetShown(used == 0)

@@ -212,6 +212,18 @@ function ns.ItemName(itemId)
     return meta and meta.name or ("item:" .. itemId)
 end
 
+-- The Skinning skill a mob of this level needs: 1 up to level 10, then 10 more per level up to 20, then level x 5.
+function ns.SkinningSkill(level)
+    if not level then
+        return nil
+    elseif level <= 10 then
+        return 1
+    elseif level <= 20 then
+        return (level - 10) * 10
+    end
+    return level * 5
+end
+
 function ns.FormatRate(rate)
     if rate >= 0.995 then
         return "100%"
@@ -223,8 +235,8 @@ function ns.FormatRate(rate)
     return ("%.2f%%"):format(rate * 100)
 end
 
--- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name }, kept in the same shape
--- as the player's own counts. It comes with the addon, and nothing ever saves, sends or exports it.
+-- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name, skins }, kept in the same
+-- shape as the player's own counts. It comes with the addon, and nothing ever saves, sends or exports it.
 ns.shared = {}
 
 function ns.AddSharedData(chunk)
@@ -282,6 +294,7 @@ ns.On("ADDON_LOADED", function(name)
     db.version = 1
     db.installId = db.installId or newInstallId()
     db.mobs = db.mobs or {}
+    db.skins = db.skins or {}  -- npc -> { skinned, items }, what skinning its corpses gave
     db.items = db.items or {}
     db.names = db.names or {}
     db.info = db.info or {}

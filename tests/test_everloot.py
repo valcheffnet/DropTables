@@ -56,6 +56,9 @@ def fake_corpus(folder):
         {"installId": a, "eventId": "x", "capturedAt": DAY, "kind": "loot", "sourceNpcId": 10, "items": []},
         # npc 11: only install b, never seen.
         loot(b, 11, [(300, 1)]),
+        # Skinning: two corpses of npc 10 for a, and npc 15 that b only skinned.
+        loot(a, 10, [(2318, 2)], loot_type="skinning"),
+        loot(b, 15, [(2934, 1), (QUEST_ITEM, 1)], loot_type="skinning"),
     ]
     save(folder, "loot", "records", records)
     sightings = []
@@ -84,7 +87,12 @@ def conversion(folder):
     sources = imp["result"]["sources"]
     expect("one source per install, with a short id", sorted(sources), ["everloot-aaaaaaaa", "everloot-bbbbbbbb"])
     a = sources["everloot-aaaaaaaa"]["mobs"]
-    expect("only the kill windows of the live servers", sorted(a), ["10"])
+    expect("only the kill and skinning windows of the live servers", sorted(a), ["10"])
+    expect("skinning windows count per install", a["10"]["skins"],
+           {"skinned": 2, "items": {"2318": {"drops": 2, "qty": 3, "min": 1, "max": 2}}})
+    only = sources["everloot-bbbbbbbb"]["mobs"]["15"]
+    expect("a mob only skinned has no loot, and no quest items", (only["buckets"], only["skins"]["items"]),
+           ({}, {"2934": {"drops": 1, "qty": 1, "min": 1, "max": 1}}))
     b = a["10"]["buckets"]["1"]
     expect("every kill window is an opened corpse, empty or with only a quest item too", b["opened"], 4)
     expect("a partial source counts each corpse as a kill with loot", (b["kills"], b["lootable"]), (4, 4))
@@ -109,6 +117,9 @@ def conversion(folder):
            "Forest Thing")
     expect("QuestieDB's npc rows work as a names file",
            import_everloot.read_names(write_names(folder, {"npcs": {"11": {"name": "Dungeon Thing", "lo": 1}}})),
+           {"11": "Dungeon Thing"})
+    expect("so does shared.json, which keeps the names given before",
+           import_everloot.read_names(write_names(folder, {"mobs": {"11": {"name": "Dungeon Thing"}, "12": {}}})),
            {"11": "Dungeon Thing"})
     expect("the import is partial with its own money and stacks", (imp["partial"], imp["own"]),
            (True, ["money", "qty"]))

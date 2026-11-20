@@ -33,9 +33,11 @@ FIELDS = {
     "L": ("npc", "minLevel", "maxLevel"),
     "Z": ("npc", "map", "kills"),
     "P": ("npc", "map", "cell", "kills"),
+    "K": ("npc", "skinned"),
+    "U": ("npc", "item", "drops", "qty", "min", "max"),
 }
 REQUIRED = {"npc", "bucket", "kills", "lootable", "opened", "moneyDrops", "copper", "item", "drops", "qty", "map",
-            "cell"}
+            "cell", "skinned"}
 
 
 class Invalid(Exception):
@@ -64,8 +66,10 @@ def consistent(r):
     if kind == "M":
         return (r["lootable"] <= r["kills"] and r["opened"] <= r["lootable"] and r["moneyDrops"] <= r["opened"]
                 and (r["moneyDrops"] > 0 or r["copper"] == 0) and stack_range(r["moneyMin"], r["moneyMax"]))
-    if kind == "I":
+    if kind in ("I", "U"):
         return r["drops"] >= 1 and r["qty"] >= r["drops"] and stack_range(r["min"], r["max"])
+    if kind == "K":
+        return r["skinned"] >= 1
     if kind == "L":
         return (r["minLevel"] is None) == (r["maxLevel"] is None) and or_zero(r["minLevel"]) <= or_zero(r["maxLevel"])
     if kind == "P":
@@ -159,7 +163,7 @@ def parse(text):
 
 
 def new_mob():
-    return {"buckets": {}, "levels": None, "maps": {}, "cells": {}, "name": None}
+    return {"buckets": {}, "levels": None, "maps": {}, "cells": {}, "name": None, "skins": None}
 
 
 def add_mob(mob, records):
@@ -183,6 +187,19 @@ def add_mob(mob, records):
             mob["cells"].setdefault(str(r["map"]), {})[str(r["cell"])] = r["kills"]
         elif kind == "N":
             mob["name"] = r["name"]
+        elif kind in ("K", "U"):
+            skins = mob["skins"] = mob["skins"] or {"skinned": 0, "items": {}}
+            if kind == "K":
+                skins["skinned"] = r["skinned"]
+            else:
+                skins["items"][str(r["item"])] = {"drops": r["drops"], "qty": r["qty"], "min": r["min"],
+                                                  "max": r["max"]}
+    skins = mob["skins"]
+    if skins is not None:
+        if skins["skinned"] == 0:
+            raise Invalid("skinned items without a skinned count")
+        if any(item["drops"] > skins["skinned"] for item in skins["items"].values()):
+            raise Invalid("an item came from more corpses than were skinned")
     for bucket in mob["buckets"].values():
         for item in bucket["items"].values():
             if item["drops"] > bucket["opened"]:
@@ -204,9 +221,10 @@ def summary(result):
                 for b in m["buckets"].values())
     items = {i for s in result["sources"].values() for m in s["mobs"].values() for b in m["buckets"].values()
              for i in b["items"]}
-    return ("valid: part %d/%d from %s (addon %s), %d installs, %d mobs, %d kills, %d different items"
+    skinned = sum((m["skins"] or {}).get("skinned", 0) for s in result["sources"].values() for m in s["mobs"].values())
+    return ("valid: part %d/%d from %s (addon %s), %d installs, %d mobs, %d kills, %d different items, %d skinned"
             % (result["part"], result["parts"], result["exporter"], result["version"], len(result["sources"]), mobs,
-               kills, len(items)))
+               kills, len(items), skinned))
 
 
 def main(argv):

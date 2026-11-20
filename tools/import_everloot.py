@@ -6,12 +6,14 @@ observation, under CC BY-SA 4.0. Copying the corpus in bulk takes a free API key
 What goes in:
 - the loot windows of killed creatures (lootType "kill"), each install of the corpus as a source of its own;
 - the items in them with their stack sizes, and money;
+- the skinning windows (lootType "skinning"), each a skinned corpse, with the items and stack sizes skinning gave;
 - names, levels and places from the NPC sightings of the same corpus. Mobs nobody saw that way, mostly in dungeons,
   where Everloot records no sightings, can get their English name from a names file (--names, npc id -> name, or
   QuestieDB's npc rows with a "name" field).
 
-What stays out: quest items, skinning, gathering, fishing, disenchanting and containers, and anything recorded
-before the live servers opened.
+What stays out: quest items, gathering, fishing, disenchanting and containers, and anything recorded before the live
+servers opened. The corpus doesn't say who had the Bountiful Harvest perk, so its skinning counts the scarce Pristine
+materials as they came.
 
 The quest items are item class 12 in Everloot's item list, which it reads from the game client of the current build.
 The import also writes them to data/quest-items.json, so tools/build_data.py leaves them out of every source.
@@ -41,9 +43,9 @@ GRID = 50  # DropTables/Places.lua
 QUEST_CLASS = 12  # DropTables/Collector.lua
 LAUNCH = "2026-11-04"  # the live servers opened that day; earlier records are from the beta
 DATASETS = {"loot": "corpus/public?kinds=loot", "sightings": "corpus/public?kinds=npc_sighting", "items": "items"}
-NOTICE = ("Data from Everloot (https://everloot.app), CC BY-SA 4.0. Drop Tables changed it: only the loot windows\n"
-          "of killed creatures, without quest items, counted per install and turned into Drop Tables counts, with\n"
-          "names, levels and places from the NPC sightings.")
+NOTICE = ("Data from Everloot (https://everloot.app), CC BY-SA 4.0. Drop Tables changed it: only the loot and\n"
+          "skinning windows of creatures, without quest items, counted per install and turned into Drop Tables\n"
+          "counts, with names, levels and places from the NPC sightings.")
 
 
 def fetch(folder, key):
@@ -108,6 +110,24 @@ def tally(loot, quest_items):
             if t["money"] is None:
                 t["money"] = {"drops": 0, "copper": 0, "min": None, "max": None}
             add_stack(t["money"], "copper", rec["copper"])
+    return counts
+
+
+def tally_skins(loot, quest_items):
+    """(install, npc) -> {skinned, items} from the skinning windows. Every one is a skinned corpse, whoever killed it."""
+    counts = {}
+    for rec in loot:
+        npc = rec.get("sourceNpcId")
+        if rec.get("lootType") != "skinning" or not isinstance(npc, int) or rec["capturedAt"] < LAUNCH:
+            continue
+        t = counts.setdefault((rec["installId"], npc), {"skinned": 0, "items": {}})
+        t["skinned"] += 1
+        stacks = {}
+        for item in rec["items"]:
+            if item["itemId"] not in quest_items:
+                stacks[item["itemId"]] = stacks.get(item["itemId"], 0) + item.get("count", 1)
+        for item, amount in stacks.items():
+            add_stack(t["items"].setdefault(str(item), {"drops": 0, "qty": 0, "min": None, "max": None}), "qty", amount)
     return counts
 
 
@@ -181,19 +201,26 @@ def places(info, opened):
     return maps, cells
 
 
-def convert(counts, sightings, names=None):
-    ids = origin_ids({install for install, _npc in counts})
+def convert(counts, sightings, names=None, skins=None):
+    skins = skins or {}
+    ids = origin_ids({install for install, _npc in set(counts) | set(skins)})
     sources = {}
-    for (install, npc), t in sorted(counts.items(), key=lambda kv: (kv[0][0], kv[0][1])):
+    for install, npc in sorted(set(counts) | set(skins)):
         info = sightings.get(npc)
-        maps, cells = places(info, t["opened"])
-        money = t["money"] or {"drops": 0, "copper": 0, "min": None, "max": None}
-        bucket = {"kills": t["opened"], "lootable": t["opened"], "opened": t["opened"], "money": money,
-                  "items": dict(sorted(t["items"].items(), key=lambda kv: int(kv[0])))}
+        t, s = counts.get((install, npc)), skins.get((install, npc))
+        maps, cells = places(info, t["opened"] if t else s["skinned"])
+        buckets = {}
+        if t:
+            money = t["money"] or {"drops": 0, "copper": 0, "min": None, "max": None}
+            buckets["1"] = {"kills": t["opened"], "lootable": t["opened"], "opened": t["opened"], "money": money,
+                            "items": dict(sorted(t["items"].items(), key=lambda kv: int(kv[0])))}
         mobs = sources.setdefault(ids[install], {"mobs": {}})["mobs"]
         name = (info and info["name"]) or (names or {}).get(str(npc))
-        mobs[str(npc)] = {"buckets": {"1": bucket}, "cells": cells, "levels": info and info["levels"], "maps": maps,
+        mobs[str(npc)] = {"buckets": buckets, "cells": cells, "levels": info and info["levels"], "maps": maps,
                           "name": name}
+        if s:
+            mobs[str(npc)]["skins"] = {"skinned": s["skinned"],
+                                       "items": dict(sorted(s["items"].items(), key=lambda kv: int(kv[0])))}
     return sources
 
 
@@ -202,16 +229,23 @@ def unix(stamp):
 
 
 def read_names(path):
+    """npc id -> name from a names file: plain {npc: name}, QuestieDB's npc rows ({"npcs": {npc: {"name": ...}}}), or
+    data/shared.json, whose mobs keep the names they were given before."""
     rows = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
-    rows = rows.get("npcs", rows)
-    return {npc: row["name"] if isinstance(row, dict) else row for npc, row in rows.items()}
+    rows = rows.get("npcs") or rows.get("mobs") or rows
+    names = {}
+    for npc, row in rows.items():
+        name = row.get("name") if isinstance(row, dict) else row
+        if name:
+            names[npc] = name
+    return names
 
 
 def make_import(folder, names=None):
     loot_pages = pages(folder, "loot")
     loot = [rec for page in loot_pages for rec in page["records"]]
-    counts = tally(loot, quest_items(folder))
-    sources = convert(counts, about(rows(folder, "sightings", "records")), names)
+    quest = quest_items(folder)
+    sources = convert(tally(loot, quest), about(rows(folder, "sightings", "records")), names, tally_skins(loot, quest))
     as_of = loot_pages[0]["dataAsOf"]
     return {
         "index": 3, "issue": 0, "partial": True, "own": ["money", "qty"], "received": unix(as_of),
@@ -258,8 +292,11 @@ def main(argv):
                       newline="\n")
     sources = imp["result"]["sources"]
     npcs = {npc for s in sources.values() for npc in s["mobs"]}
-    opened = sum(m["buckets"]["1"]["opened"] for s in sources.values() for m in s["mobs"].values())
-    print("%d installs, %d mobs, %d opened corpses -> %s" % (len(sources), len(npcs), opened, target))
+    mobs = [m for s in sources.values() for m in s["mobs"].values()]
+    opened = sum(m["buckets"]["1"]["opened"] for m in mobs if m["buckets"])
+    skinned = sum(m["skins"]["skinned"] for m in mobs if m.get("skins"))
+    print("%d installs, %d mobs, %d opened and %d skinned corpses -> %s" % (len(sources), len(npcs), opened, skinned,
+                                                                          target))
     return 0
 
 

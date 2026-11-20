@@ -10,6 +10,12 @@ local PENDING_TTL = 900
 -- needs no cast. So loot opened this soon after a cast is profession loot, unless the corpse was already known to hold
 -- loot, since a caster may loot one corpse right after casting at the next mob.
 local CAST_LOOT_WINDOW = 1
+-- Skinning at its four ranks. A cast of a spell with the same name counts too, in case another source of the skill
+-- has its own spell id.
+local SKINNING_SPELLS = { [8613] = true, [8617] = true, [8618] = true, [10768] = true }
+-- A corpse is skinned once, but its window opens again when the bags were full, so skinned corpses are remembered for
+-- this long and counted once.
+local SKINNED_TTL = 600
 -- Units that can show the corpse whose loot window is open.
 local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 
@@ -21,7 +27,8 @@ local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 --   unclaimed  in a group, no loot for the player at the last check, often someone else's corpse; nothing counted
 --   done       the corpse is recorded
 local pending = {}
-local casting, lastCastEnd = false, -math.huge
+local casting, lastCastEnd, lastCastSkinning, lastSpell = false, -math.huge, false, nil
+local skinned = {}  -- corpse GUID -> GetTime() of its skinning
 
 local function groupBucket()
     local members = GetNumGroupMembers()
@@ -224,13 +231,62 @@ local function addStack(entry, totalKey, amount)
     entry.max = math.max(entry.max or amount, amount)
 end
 
+-- What one skinned corpse gave, counted for its mob. The counts have no group size, since a corpse is skinned once
+-- whoever killed it, and the group plays no part in what it gives. Returns the npc, or nil when the corpse was counted
+-- already.
+local function addSkins(guid, items)
+    local npc = ns.NpcFromGuid(guid)
+    local now = GetTime()
+    for seen, at in pairs(skinned) do
+        if now - at > SKINNED_TTL then
+            skinned[seen] = nil
+        end
+    end
+    if not npc or skinned[guid] then
+        return nil
+    end
+    skinned[guid] = now
+    ns.Fire("DT_COUNTS_CHANGED", npc)
+    local data = ns.db.skins[npc]
+    if not data then
+        data = { skinned = 0, items = {} }
+        ns.db.skins[npc] = data
+    end
+    data.skinned = data.skinned + 1
+    for itemId, quantity in pairs(items) do
+        local item = data.items[itemId]
+        if not item then
+            item = { drops = 0, qty = 0 }
+            data.items[itemId] = item
+        end
+        addStack(item, "qty", quantity)
+    end
+    return npc
+end
+
+local function spellName(spellId)
+    return C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(spellId) or nil
+end
+
+local function isSkinning(spellId)
+    if spellId == nil or ns.IsSecret(spellId) then
+        return false
+    end
+    if SKINNING_SPELLS[spellId] then
+        return true
+    end
+    local name = spellName(spellId)
+    return name ~= nil and name == spellName(8613)
+end
+
 ns.On("UNIT_SPELLCAST_START", function()
     casting = true
 end, "player")
 
-ns.On("UNIT_SPELLCAST_SUCCEEDED", function()
+ns.On("UNIT_SPELLCAST_SUCCEEDED", function(_, _, spellId)
     if casting then
         casting, lastCastEnd = false, GetTime()
+        lastCastSkinning, lastSpell = isSkinning(spellId), spellId
     end
 end, "player")
 
@@ -247,8 +303,9 @@ ns.On("LOOT_OPENED", function(_, fromItem)
     end
     local afterCast = GetTime() - lastCastEnd < CAST_LOOT_WINDOW
     -- found[guid] collects one corpse's items and money across all slots before they are counted,
-    -- so an item split over two slots still counts as one drop with its full stack.
-    local claims, found, changed = {}, {}, {}
+    -- so an item split over two slots still counts as one drop with its full stack. skins[guid] does the same for a
+    -- corpse that is being skinned.
+    local claims, found, changed, skins = {}, {}, {}, {}
 
     local function corpse(guid)
         if type(guid) ~= "string" or ns.IsSecret(guid) then
@@ -258,7 +315,11 @@ ns.On("LOOT_OPENED", function(_, fromItem)
             local kill = pending[guid]
             if afterCast and not (kill and kill.state == "lootable") then
                 claims[guid] = false
-                ns.Debug("  loot right after a cast (skinning) left out")
+                if lastCastSkinning and ns.NpcFromGuid(guid) then
+                    skins[guid] = {}
+                else
+                    ns.Debug("  loot right after spell %s left out", tostring(lastSpell))
+                end
                 return nil
             end
             if not kill then
@@ -290,10 +351,17 @@ ns.On("LOOT_OPENED", function(_, fromItem)
             local guid, quantity = sources[s], sources[s + 1]
             if ns.IsSecret(quantity) then
                 ns.Debug("  a slot with a hidden stack size left out")
-            elseif corpse(guid) then
+            elseif corpse(guid) or skins[guid] then
                 quantity = quantity or 1
                 local loot = found[guid]
-                if slotType == MONEY_SLOT then
+                if not loot then
+                    -- Skinning gives items only. Quest items stay out here too.
+                    if itemId and slotType ~= MONEY_SLOT and not isQuestItem(itemId, questFlag) then
+                        skins[guid][itemId] = (skins[guid][itemId] or 0) + quantity
+                        local known = ns.db.items[itemId] or {}
+                        ns.db.items[itemId] = { name = name or known.name, quality = quality or known.quality }
+                    end
+                elseif slotType == MONEY_SLOT then
                     loot.money = loot.money + quantity
                 elseif itemId and not isQuestItem(itemId, questFlag) then
                     loot.items[itemId] = (loot.items[itemId] or 0) + quantity
@@ -303,6 +371,14 @@ ns.On("LOOT_OPENED", function(_, fromItem)
                     ns.Debug("  quest item %s left out", tostring(name))
                 end
             end
+        end
+    end
+
+    for guid, items in pairs(skins) do
+        local npc = addSkins(guid, items)
+        if npc then
+            changed[npc] = true
+            ns.Debug("skinned %s", ns.MobName(npc))
         end
     end
 
@@ -344,7 +420,7 @@ ns.On("LOOT_OPENED", function(_, fromItem)
         elseif candidates > 1 then
             ns.Debug("loot window empty: the interact key and the mouse are on two corpses, neither counted")
         end
-    elseif not next(found) then
+    elseif not next(found) and not next(skins) then
         ns.Debug("loot window with %d slots from no kill of yours", count)
     end
 

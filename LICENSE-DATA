@@ -46,8 +46,9 @@ tools/import_eglink.py made the file from the commit named in its source url. Th
     Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0
     (https://creativecommons.org/licenses/by/4.0/).
 
-Drop Tables changed it. The import keeps only corpses looted solo on the live servers, leaves out quest items,
-adds up the client builds and turns the counts into the Drop Tables format. The changed counts are shared under
+Drop Tables changed it. The import keeps only corpses looted solo and corpses skinned without the Bountiful
+Harvest perk on the live servers, leaves out quest items, adds up the client builds and turns the counts into the
+Drop Tables format. The changed counts are shared under
 CC BY-SA 4.0 with the rest, which CC BY 4.0 allows.
 
 data/imports/everloot.json holds loot from Everloot's public corpus (https://everloot.app/database), which the
@@ -57,8 +58,8 @@ as:
 
     Data from Everloot (https://everloot.app), CC BY-SA 4.0.
 
-Drop Tables changed it. The import keeps only the loot windows of killed creatures on the live servers, leaves out
-quest items, counts the windows per install, and takes names, levels and places from the NPC sightings in the same
+Drop Tables changed it. The import keeps only the loot and skinning windows of creatures on the live servers,
+leaves out quest items, counts the windows per install, and takes names, levels and places from the NPC sightings in the same
 corpus. Mobs nobody saw there get the name QuestieDB has for their npc id. The changed counts are shared under the same license, CC BY-SA 4.0.
 
 data/quest-items.json is a list of item ids, the quest items of the game client, as Everloot reads them from the
