@@ -65,6 +65,8 @@ local newMobsBySender = {}  -- mobs the player knew nothing of, from group membe
 local groupOrigins = {}     -- group member -> the one install they send; this session only
 local groupDirty = {}  -- npc -> true: the player's own counts changed since the last group send
 local lastGroupSend = 0
+local whispered = {}  -- player key (see playerKey) -> GetTime() of the last whisper sent to them
+local playerKey
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
 
 -- The player's own counts of a mob in the same shape as another install's, with buckets, levels and kills per map.
@@ -568,10 +570,77 @@ local function refreshChannel()
     return channelId
 end
 
+-- A player who asked and logged off before the answer went out makes the server say "No player named ... is currently
+-- playing" in the chat for every whisper the addon sends them. The player never wrote to anyone, so that line is
+-- hidden for the names the addon whispered a moment ago, and whatever else waits for that player is dropped.
+local WHISPER_ERROR_WINDOW = 10
+
+-- Forever names players "First Last" and the server may give them back as "First-Last", so both are the same key.
+function playerKey(name)
+    return (name:gsub("-", " "):lower())
+end
+
+local function stopWhispers(name)
+    local key, dropped = playerKey(name), 0
+    for i = #queue, 1, -1 do
+        if queue[i].chatType == "WHISPER" and playerKey(queue[i].target) == key then
+            table.remove(queue, i)
+            dropped = dropped + 1
+        end
+    end
+    for sender, plan in pairs(planned) do
+        if playerKey(plan.target) == key then
+            planned[sender] = nil
+        end
+    end
+    return dropped
+end
+
+-- The game's own "No player named '%s' is currently playing." turned into a pattern that captures the name.
+local function notFoundPattern()
+    local text = ERR_CHAT_PLAYER_NOT_FOUND_S
+    if type(text) ~= "string" or not text:find("%%s") then
+        return nil
+    end
+    local before, after = text:match("^(.-)%%s(.*)$")
+    local function escape(s)
+        return (s:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%0"))
+    end
+    return "^" .. escape(before) .. "(.+)" .. escape(after) .. "$"
+end
+
+-- The chat filter: true hides the line.
+function ns.HideWhisperError(_, _, text)
+    if type(text) ~= "string" or ns.IsSecret(text) then
+        return false
+    end
+    local pattern = notFoundPattern()
+    local name = pattern and text:match(pattern)
+    local at = name and whispered[playerKey(name)]
+    if not at or GetTime() - at > WHISPER_ERROR_WINDOW then
+        return false
+    end
+    local dropped = stopWhispers(name)
+    ns.Debug("%s is offline: the error was hidden and %d waiting whispers to them dropped", name, dropped)
+    return true
+end
+
+ns.On("DT_READY", function()
+    local addFilter = (ChatFrameUtil and ChatFrameUtil.AddMessageEventFilter) or ChatFrame_AddMessageEventFilter
+    if addFilter then
+        addFilter("CHAT_MSG_SYSTEM", ns.HideWhisperError)
+    end
+end)
+
 -- Sends up to one channel message, one group message and a few whispers per tick. Whispers outside instances have no
 -- addon throttle, so a few at once are fine.
 local function tick()
     local now = GetTime()
+    for key, at in pairs(whispered) do
+        if now - at > WHISPER_ERROR_WINDOW then
+            whispered[key] = nil
+        end
+    end
     refreshChannel()
     askWaiting(now)
     sendDueAnswers(now)
@@ -598,6 +667,9 @@ local function tick()
             if result == SUCCESS then
                 ns.Debug("sent %s%s %s", message.chatType,
                     message.chatType == "WHISPER" and " to " .. message.target or "", shown(message.text))
+                if message.chatType == "WHISPER" then
+                    whispered[playerKey(message.target)] = now
+                end
                 table.remove(queue, i)
                 budget[key] = budget[key] - 1
             elseif RETRY[result] or result == false then

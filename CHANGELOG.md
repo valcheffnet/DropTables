@@ -12,6 +12,10 @@
 - The shared database holds skinning from EG Link and Everloot: 6,105 skinned corpses of 352 mobs. Corpses EG Link's players skinned with Bountiful Harvest are left out. 29 of those mobs had no loot counts at all, and the database now knows 1,602 mobs.
 - Engineers' target dummies are left out of the shared database. Looting your own dummy gives back what it was made of, which made Target Dummy look like a mob that drops Linen Cloth and Bronze Bars.
 
+### Fixed
+
+- When a player asks about a mob and logs off before your answer goes out, the server's "No player named ... is currently playing" no longer shows up in your chat, and the rest of the answers to that player are dropped.
+
 ### Changed
 
 - The best mob the Loot Finder shows for an item now needs at least 3 kills, so one lucky kill no longer makes it 100%. A mob with fewer kills only shows there when no other mob drops the item.

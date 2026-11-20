@@ -409,6 +409,17 @@ def main():
     expect("restore defaults brings the first theme back", (ns.Style.CurrentTheme(),
            tuple(colors.gold[i] for i in (1, 2, 3))), ("ledger", ledger_gold))
 
+    # Forever hides the server and spawn ids in GUIDs since 1.60.1, and a hotfix hides the realm id too. Only the npc
+    # id, the sixth field, is ever read; the rest only has to stay the same for one corpse within the session.
+    npc_of = reader.ns.NpcFromGuid
+    for label, guid_text, npc in (
+            ("a plain creature GUID", "Creature-0-4447-0-12-448-000043F59F", 448),
+            ("hidden realm, server and spawn ids", "Creature-7f3a-9c21e-0-1b2c-448-a1b2c3d4e5", 448),
+            ("a vehicle", "Vehicle-5e1d-3a3a-0-1b2c-3000-ffee11", 3000),
+            ("a player", "Player-4447-0A1B2C3D", None),
+            ("an object", "GameObject-0-4447-0-12-19021-000043F59F", None)):
+        expect("npc id of " + label, npc_of(guid_text), npc)
+
     report("collector")
 
 

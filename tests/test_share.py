@@ -138,6 +138,45 @@ def hold(client, npc, sources):
         client.fire("DT_DATA_CHANGED", npc)
 
 
+ERROR_STUBS = """
+ERR_CHAT_PLAYER_NOT_FOUND_S = "No player named '%s' is currently playing."
+chatFilters = {}
+function ChatFrame_AddMessageEventFilter(event, fn) chatFilters[event] = fn end
+"""
+
+
+def offline_asker():
+    """An asker who logs off before every answer went out: the server's "No player named" line for the addon's own
+    whisper is hidden, and the answers still waiting for that player are dropped."""
+    ann, bob = Client("Ann Lee", saved=ERROR_STUBS), Client("Bob", saved=ERROR_STUBS)
+    fixed_random(bob, 0)
+    net = Net(ann, bob)
+    net.run(10)
+    for spawn in ("A1", "A2", "A3"):
+        loot_mob(bob, 1, spawn, [(100, 1)])
+    # A bigger install's answer goes out first, Bob's own small one a couple of seconds later. Neither makes 100
+    # corpses, so Ann doesn't call the answers off.
+    hold(bob, 1, {origin_id(500): (70, [(100, 30)], 60)})
+    start = len(net.log)
+    ann.see(1, "X", 5)
+    for _ in range(10):
+        net.run(1)
+        if net.sent("Bob", "D|", start):
+            break
+    expect("the big install's answer went out first", len(net.sent("Bob", "D|", start)), 1)
+    hide = bob.g.chatFilters["CHAT_MSG_SYSTEM"]
+    expect("the error for a player just whispered is hidden",
+           hide(None, "CHAT_MSG_SYSTEM", "No player named 'Ann-Lee' is currently playing."), True)
+    net.run(10)
+    expect("the answers still waiting for that player are dropped", len(net.sent("Bob", "D|", start)), 1)
+    expect("the error for anyone else stays",
+           hide(None, "CHAT_MSG_SYSTEM", "No player named 'Carl' is currently playing."), False)
+    expect("other system lines stay", hide(None, "CHAT_MSG_SYSTEM", "Ann Lee has gone offline."), False)
+    bob.advance(11)
+    expect("an error long after the whisper stays",
+           hide(None, "CHAT_MSG_SYSTEM", "No player named 'Ann-Lee' is currently playing."), False)
+
+
 def main():
     alice, bob, carol = Client("Alice"), Client("Bob"), Client("Carol")
     fixed_random(alice, 0)
@@ -672,6 +711,7 @@ def main():
                "PARTY", "Stranger")
     expect("debug off is quiet", debug_lines(quinn) + debug_lines(quinn, 3), [])
 
+    offline_asker()
     report("sharing")
 
 
