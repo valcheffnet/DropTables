@@ -137,6 +137,7 @@ local function skinnersOf(npc)
             minLevel = info and info.minLevel,
             maxLevel = info and info.maxLevel,
             skill = ns.SkinningSkill(info and info.minLevel),
+            skin = true,
             maps = maps,
             spots = spots,
             zone = zone,
@@ -172,6 +173,11 @@ local function droppersOf(npc)
         end
     end
     return found
+end
+
+-- What a dropper's mob brings in an hour: its loot, or for a skinner what skinning it brings.
+function ns.MobGoldPerHour(dropper)
+    return dropper.skin and ns.SkinGoldPerHour(dropper.npc) or ns.GoldPerHour(dropper.npc)
 end
 
 -- itemId -> { dropper, ... } from npc -> { [itemId] = dropper }.
@@ -253,14 +259,22 @@ end
 -- A mob needs this many kills to be an item's best mob, unless no mob that drops it has that many.
 local BEST_MIN_KILLS = 3
 
--- The dropper with the best chance (on a tie, the one with more kills behind it). One or two lucky kills make a
--- chance of 100%, so mobs with fewer than BEST_MIN_KILLS kills only count when no other mob drops the item.
+-- The dropper that brings the most gold an hour, and among mobs worth the same (without any prices, say) the one with
+-- the best chance and then the most kills behind it. One or two lucky kills say little, so mobs with fewer than
+-- BEST_MIN_KILLS kills only count when no other mob drops the item.
 function ns.BestDropper(droppers)
     local best, bestFew
     for _, dropper in ipairs(droppers) do
+        local gold = ns.GoldPerHour(dropper.npc)
         local better = function(current)
-            return not current or dropper.rate > current.rate
-                or dropper.rate == current.rate and dropper.kills > current.kills
+            if not current then
+                return true
+            end
+            local currentGold = ns.GoldPerHour(current.npc)
+            if gold ~= currentGold then
+                return gold > currentGold
+            end
+            return dropper.rate > current.rate or dropper.rate == current.rate and dropper.kills > current.kills
         end
         if dropper.kills >= BEST_MIN_KILLS then
             if better(best) then
@@ -329,6 +343,7 @@ local function summarize(items, filters, find, pick)
                 summary.rate, summary.best, summary.bestNpc = best.rate, best.name, best.npc
                 summary.kills, summary.small = best.kills, best.small
                 summary.minLevel, summary.maxLevel = best.minLevel, best.maxLevel
+                summary.gph = ns.MobGoldPerHour(best)
             end
             table.insert(results, summary)
         end
@@ -395,6 +410,7 @@ local SUMMARY_SORT = {
     rate = function(s) return s.rate end,
     kills = function(s) return s.kills end,
     level = function(s) return s.minLevel or math.huge end,
+    gph = function(s) return s.gph or 0 end,
 }
 
 function ns.SortSummaries(summaries, sortKey, descending)
@@ -434,6 +450,7 @@ local SORT_VALUES = {
     zone = function(d) return d.zone end,
     rate = function(d) return d.rate end,
     drops = function(d) return d.drops end,
+    gph = function(d) return ns.MobGoldPerHour(d) end,
 }
 
 -- filters can hold mapId, minLevel and maxLevel, all optional. A level filter leaves out mobs whose level is unknown.

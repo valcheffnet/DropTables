@@ -10,15 +10,17 @@
 - Skinning is counted. When you skin a corpse, Drop Tables records what it gave, whoever killed the mob, and works out the chances per skinned corpse. They have a place of their own everywhere, apart from the loot: a second row of icons under the target, a Skinning section in the drop table window, a Skinning line in the tooltip, and a Skinning category at the bottom of the Loot Finder. Pick a leather there and it lists the mobs that give it, with their level, the Skinning skill they need and the chance. The mob it shows for each item is the lowest level one with at least 3 skinned corpses, since that's where you can get it soonest. Pristine Leather, Hide and Scale are marked, because the Bountiful Harvest perk gives more of them.
 - Skinning is shared like the loot: with players who ask about the mob, with your group and in the export. It goes out in messages of its own, so older versions of the addon skip it and still read the loot.
 - The shared database holds skinning from EG Link and Everloot: 6,105 skinned corpses of 352 mobs. Corpses EG Link's players skinned with Bountiful Harvest are left out. 29 of those mobs had no loot counts at all, and the database now knows 1,602 mobs.
+- The Loot Finder has a g/ph column, roughly what farming a mob is worth in an hour, with g, s and c in the coins' colours. The list of mobs that drop an item shows it for each mob, and the item lists show it for the best mob. In Skinning it counts what skinning alone brings, with every kill skinned. The drop table window has a Price column with the price g/ph uses for each item, faded for items that don't count, and its tooltip says where the price comes from. It adds up the mob's money and items at what they sell for, the auction price from Auctionator or TradeSkillMaster when one of them is installed and knows the item, and the vendor price otherwise. Items bound on pickup count at their vendor price, and rare and epic drops are left out, so one lucky drop doesn't decide it. Random world drops are left out too, unless you tick "World drops in g/ph" above the list; then they count at their vendor price. The kills an hour come from a new setting, 70 on mobs of your level by default, more on mobs below you and fewer on mobs above. The prices stay in your game and are never shared.
 - Engineers' target dummies are left out of the shared database. Looting your own dummy gives back what it was made of, which made Target Dummy look like a mob that drops Linen Cloth and Bronze Bars.
 
 ### Fixed
 
 - When a player asks about a mob and logs off before your answer goes out, the server's "No player named ... is currently playing" no longer shows up in your chat, and the rest of the answers to that player are dropped.
+- Dragging the corner of the Loot Finder or the drop table window to resize it no longer makes it jump to its largest size, and a window never grows past the edge of the screen. One saved larger than the screen shrinks to fit when it opens.
 
 ### Changed
 
-- The best mob the Loot Finder shows for an item now needs at least 3 kills, so one lucky kill no longer makes it 100%. A mob with fewer kills only shows there when no other mob drops the item.
+- The best mob the Loot Finder shows for an item is now the one that brings the most gold an hour, among the mobs with at least 3 kills, so one lucky kill no longer puts a mob on top. Without any prices the best chance decides, and a mob with fewer kills only shows there when no other mob drops the item.
 
 ## [0.4.0] - 2026-11-19
 

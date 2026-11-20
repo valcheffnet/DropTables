@@ -72,6 +72,9 @@ ns.On("DT_READY", function()
     checkbox("collapseWorldDrops", "World drops only in the table",
         "Keep random gear and recipe drops out of the icons and the tooltip; the /dt table lists them in their own section.")
     checkbox("showMinimap", "Minimap button", "Show the Drop Tables button on the minimap edge.")
+    slider("killsPerHour", "Kills per hour",
+        "How many mobs of your level you kill in an hour, for the g/ph column of the Loot Finder. Mobs well below "
+            .. "your level count up to half as many again, mobs above it fewer.", 20, 200, 5, whole)
     checkbox("exportReminder", "Remind me to share my tables",
         "Once a session, when 25 or more mobs have new counts, a chat line points to /dt export.")
     slider("detailsAlpha", "Table window background", "Opacity of the /dt window's background; text and icons stay solid.",

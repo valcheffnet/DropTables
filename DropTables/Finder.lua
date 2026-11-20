@@ -15,8 +15,9 @@ local INDENT = 14
 local MOB_COLUMNS = {
     { key = "name", label = "Mob" },
     { key = "level", label = "Level", width = 46, justify = "CENTER" },
-    { key = "zone", label = "Zone", width = 128, justify = "LEFT" },
+    { key = "zone", label = "Zone", width = 118, justify = "LEFT" },
     { key = "rate", label = "Chance", width = 60, justify = "RIGHT" },
+    { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
     { key = "drops", label = "Drops", width = 52, justify = "RIGHT" },
 }
 local ITEM_COLUMNS = {
@@ -24,6 +25,7 @@ local ITEM_COLUMNS = {
     { key = "mobs", label = "Mobs", width = 44, justify = "CENTER" },
     { key = "best", label = "Best mob", width = 150, justify = "LEFT" },
     { key = "rate", label = "Chance", width = 60, justify = "RIGHT" },
+    { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
     { key = "kills", label = "Kills", width = 52, justify = "RIGHT" },
 }
 -- Skinning has tables of its own: its chances are per skinned corpse, and the mob worth showing for an item is the
@@ -34,13 +36,15 @@ local SKIN_ITEM_COLUMNS = {
     { key = "best", label = "Lowest mob", width = 150, justify = "LEFT" },
     { key = "level", label = "Level", width = 46, justify = "CENTER" },
     { key = "rate", label = "Chance", width = 60, justify = "RIGHT" },
+    { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
 }
 local SKIN_MOB_COLUMNS = {
     { key = "name", label = "Mob" },
     { key = "level", label = "Level", width = 46, justify = "CENTER" },
     { key = "skill", label = "Skill", width = 38, justify = "CENTER" },
-    { key = "zone", label = "Zone", width = 110, justify = "LEFT" },
+    { key = "zone", label = "Zone", width = 100, justify = "LEFT" },
     { key = "rate", label = "Chance", width = 60, justify = "RIGHT" },
+    { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
     { key = "drops", label = "Skins", width = 52, justify = "RIGHT" },
 }
 local SKIN = "skin"  -- the category key of skinning
@@ -412,6 +416,29 @@ levelDash:SetText("to")
 local levelTo = levelBox("maxLevel")
 levelTo.box:SetPoint("LEFT", levelDash, "RIGHT", 5, 0)
 
+-- Whether random world drops count in g/ph. The loot lists have that column, so the box shows there, at the right end
+-- of the filters where skinning has its result count.
+local worldDrops = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+worldDrops:SetSize(20, 20)
+worldDrops.label = Style.Text(worldDrops, "muted")
+worldDrops.label:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -16, filterY - 6)
+worldDrops.label:SetText("World drops in g/ph")
+worldDrops:SetPoint("RIGHT", worldDrops.label, "LEFT", -1, 0)
+worldDrops:SetHitRectInsets(0, -worldDrops.label:GetStringWidth() - 4, 0, 0)
+worldDrops:SetScript("OnClick", function(self)
+    ns.settings.gphWorldDrops = self:GetChecked() and true or false
+    ns.Fire("DT_SETTINGS_CHANGED")
+end)
+worldDrops:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText("World drops in g/ph")
+    GameTooltip:AddLine("Count random gear and recipes in the gold per hour, at their vendor price. Off by default, "
+        .. "because any mob of the level can drop them and one lucky drop can make a mob look worth far more.",
+        1, 1, 1, true)
+    GameTooltip:Show()
+end)
+worldDrops:SetScript("OnLeave", GameTooltip_Hide)
+
 local resultCount = Style.Text(frame, "muted")
 resultCount:SetPoint("TOPRIGHT", -16, filterY - 6)
 resultCount:SetJustifyH("RIGHT")
@@ -524,7 +551,7 @@ local itemTable = makeTable(ITEM_COLUMNS, 8, function(key)
     if itemSort == key then
         itemDescending = not itemDescending
     else
-        itemSort, itemDescending = key, key == "rate" or key == "mobs" or key == "kills"
+        itemSort, itemDescending = key, key == "rate" or key == "mobs" or key == "kills" or key == "gph"
     end
     renderMain()
 end)
@@ -533,7 +560,7 @@ local mobTable = makeTable(MOB_COLUMNS, MAP_BUTTON + 8, function(key)
     if mobSort == key then
         mobDescending = not mobDescending
     else
-        mobSort, mobDescending = key, key == "rate" or key == "drops"
+        mobSort, mobDescending = key, key == "rate" or key == "drops" or key == "gph"
     end
     renderMain()
 end)
@@ -542,7 +569,7 @@ local skinItemTable = makeTable(SKIN_ITEM_COLUMNS, 8, function(key)
     if skinItemSort == key then
         skinItemDescending = not skinItemDescending
     else
-        skinItemSort, skinItemDescending = key, key == "rate" or key == "mobs"
+        skinItemSort, skinItemDescending = key, key == "rate" or key == "mobs" or key == "gph"
     end
     renderMain()
 end)
@@ -551,7 +578,7 @@ local skinMobTable = makeTable(SKIN_MOB_COLUMNS, MAP_BUTTON + 8, function(key)
     if skinMobSort == key then
         skinMobDescending = not skinMobDescending
     else
-        skinMobSort, skinMobDescending = key, key == "rate" or key == "drops"
+        skinMobSort, skinMobDescending = key, key == "rate" or key == "drops" or key == "gph"
     end
     renderMain()
 end)
@@ -629,12 +656,24 @@ local function mobRow(tbl, index)
             if dropper.skill then
                 GameTooltip:AddLine(("Needs %d Skinning"):format(dropper.skill), 0.7, 0.7, 0.7)
             end
+            local perSkin = ns.SkinValue(dropper.npc)
+            if perSkin >= 1 then
+                GameTooltip:AddLine(("Skinning is worth %s a corpse, %s an hour at %d kills an hour"):format(
+                    ns.FormatGold(perSkin), ns.FormatGold(ns.SkinGoldPerHour(dropper.npc)),
+                    math.floor(ns.KillsPerHour(dropper.npc) + 0.5)), 0.7, 0.7, 0.7, true)
+            end
             if dropper.scarce then
                 GameTooltip:AddLine("The Bountiful Harvest perk gives more of it.", 0.7, 0.7, 0.7, true)
             end
         else
             GameTooltip:AddLine(("Dropped %d times in %d looted corpses"):format(dropper.drops, dropper.opened),
                 0.7, 0.7, 0.7)
+            local perKill = ns.ValuePerKill(dropper.npc)
+            if perKill >= 1 then
+                GameTooltip:AddLine(("Worth %s a kill, %s an hour at %d kills an hour"):format(ns.FormatGold(perKill),
+                    ns.FormatGold(ns.GoldPerHour(dropper.npc)), math.floor(ns.KillsPerHour(dropper.npc) + 0.5)),
+                    0.7, 0.7, 0.7, true)
+            end
         end
         GameTooltip:AddLine("Click for the mob's full table", 0.5, 0.5, 0.5)
         GameTooltip:Show()
@@ -701,6 +740,7 @@ local function renderCategory()
         else
             row.cells.kills:SetText(summary.kills)
         end
+        row.cells.gph:SetText(ns.FormatGold(summary.gph))
         row:Show()
     end
     tbl:Finish(#summaries, #items == 0 and "Nothing here yet" or "No item matches",
@@ -749,6 +789,7 @@ local function renderMobs()
         if skinning then
             row.cells.skill:SetText(dropper.skill or "?")
         end
+        row.cells.gph:SetText(ns.FormatGold(ns.MobGoldPerHour(dropper)))
         row.map:SetShown(dropper.spots)
         row:Show()
     end
@@ -793,6 +834,8 @@ function renderMain()
     skinItemTable:SetShown(view == "category" and skinCategory)
     mobTable:SetShown(view == "item" and not skinItem)
     skinMobTable:SetShown(view == "item" and skinItem)
+    worldDrops:SetShown(view == "item" and not skinItem or view == "category" and not skinCategory)
+    resultCount:SetShown(not worldDrops:IsShown())
     if view == "item" then
         renderMobs()
     else
@@ -872,6 +915,7 @@ local function loadSettings()
     end
     category = ns.settings.finderCategory or "all"
     openClass = ns.settings.finderOpenClass
+    worldDrops:SetChecked(ns.settings.gphWorldDrops)
     for _, button in pairs(qualityButtons) do
         button:Refresh()
     end
@@ -915,4 +959,5 @@ end
 ns.On("DT_DATA_CHANGED", refresh)
 ns.On("DT_INFO_CHANGED", refresh)
 ns.On("DT_SETTINGS_CHANGED", refresh)
+ns.On("DT_PRICES_CHANGED", refresh)
 ns.On("GET_ITEM_INFO_RECEIVED", refresh)

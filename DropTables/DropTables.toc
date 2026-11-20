@@ -5,6 +5,7 @@
 ## Version: 0.4.0
 ## IconTexture: Interface\Icons\INV_Misc_Bag_10
 ## SavedVariables: DropTablesDB
+## OptionalDeps: Auctionator, TradeSkillMaster
 ## AddonCompartmentFunc: DropTables_OnCompartmentClick
 
 Core.lua
@@ -15,6 +16,7 @@ Places.lua
 Share.lua
 Export.lua
 Stats.lua
+Value.lua
 Strip.lua
 Tooltip.lua
 Style.lua

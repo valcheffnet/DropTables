@@ -185,16 +185,40 @@ function Style.Window(name, width, height, minWidth, minHeight, positionKey, siz
     grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
     grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
     grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-    grip:SetScript("OnMouseDown", function()
-        frame:StartSizing("BOTTOMRIGHT")
+    -- The corner follows the mouse by hand rather than through StartSizing, which made the windows jump to their
+    -- largest size. The top left corner stays put, and the window never grows past the edge of the screen, so the
+    -- corner can always be reached again.
+    grip:SetScript("OnMouseDown", function(self)
+        local left, top = frame:GetLeft(), frame:GetTop()
+        if not left or not top then
+            return
+        end
+        frame:ClearAllPoints()
+        frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+        local scale = frame:GetEffectiveScale()
+        local startX, startY = GetCursorPosition()
+        local startWidth, startHeight = frame:GetWidth(), frame:GetHeight()
+        local maxWidth = math.min(1400, (UIParent:GetRight() or 1400) - left)
+        local maxHeight = math.min(1100, top - (UIParent:GetBottom() or 0))
+        self:SetScript("OnUpdate", function()
+            local x, y = GetCursorPosition()
+            local newWidth = startWidth + (x - startX) / scale
+            local newHeight = startHeight + (startY - y) / scale
+            frame:SetSize(math.max(minWidth, math.min(newWidth, maxWidth)),
+                math.max(minHeight, math.min(newHeight, maxHeight)))
+        end)
     end)
-    grip:SetScript("OnMouseUp", savePlacement)
+    grip:SetScript("OnMouseUp", function(self)
+        self:SetScript("OnUpdate", nil)
+        savePlacement()
+    end)
 
     -- Puts the window at its saved place and size, or at the defaults when nothing is saved yet, as on the first
-    -- start or after Restore defaults.
+    -- start or after Restore defaults. A saved size larger than the screen shrinks to fit it.
     function frame:RestorePlacement()
         local size, pos = ns.settings[sizeKey], ns.settings[positionKey]
-        self:SetSize(size and size[1] or width, size and size[2] or height)
+        local screenWidth, screenHeight = UIParent:GetWidth() or 1400, UIParent:GetHeight() or 1100
+        self:SetSize(math.min(size and size[1] or width, screenWidth), math.min(size and size[2] or height, screenHeight))
         self:ClearAllPoints()
         if pos then
             self:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4])

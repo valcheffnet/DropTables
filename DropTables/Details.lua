@@ -12,6 +12,7 @@ local COLUMNS = {
     { key = "rate", label = "Chance", width = 60 },
     { key = "drops", label = "Drops", width = 44 },
     { key = "qty", label = "Count", width = 44 },
+    { key = "price", label = "Price", width = 72 },
 }
 
 local SOURCE_COLORS = { own = C.gold, peer = { 0.52, 0.66, 0.74 }, shared = { 0.78, 0.5, 0.16 } }
@@ -237,12 +238,32 @@ emptyText:SetPoint("TOP", emptyTitle, "BOTTOM", 0, -6)
 
 local rows = {}
 
+local PRICE_SOURCES = {
+    Auctionator = "Auction price from Auctionator, less the 5% the auction house keeps.",
+    TradeSkillMaster = "Market value from TradeSkillMaster, less the 5% the auction house keeps.",
+    vendor = "What a vendor pays. Without Auctionator or TradeSkillMaster, and for items bound on pickup and world "
+        .. "drops, that's the price.",
+}
+
 local function rowEnter(self)
     if not self.itemId then
         return
     end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:SetItemByID(self.itemId)
+    local price, source = ns.PriceInfo(self.itemId, self.entry.world)
+    if price then
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddDoubleLine("Price for g/ph", ns.FormatGold(price) .. (price == 0 and "none" or ""),
+            1, 0.82, 0, 1, 1, 1)
+        GameTooltip:AddLine(PRICE_SOURCES[source], 0.7, 0.7, 0.7, true)
+        if (self.entry.quality or 0) >= 3 then
+            GameTooltip:AddLine("Rare and epic drops don't count in g/ph.", 0.7, 0.7, 0.7, true)
+        elseif not ns.CountsInValue(self.entry) then
+            GameTooltip:AddLine("World drops count in g/ph only with \"World drops in g/ph\" ticked in the Loot Finder.",
+                0.7, 0.7, 0.7, true)
+        end
+    end
     GameTooltip:AddLine(self.skin and "Click: which other mobs give it when skinned" or "Click: which other mobs drop it",
         0.5, 0.5, 0.5)
     GameTooltip:Show()
@@ -315,13 +336,18 @@ local function fillEntry(index, entry, small, skin)
         row.name:SetText("Money")
         row.cells.drops:SetText("")
         row.cells.qty:SetText(ns.CoinText(entry.avg))
+        row.cells.price:SetText("")
     else
         row.itemId = entry.itemId
         row.icon:SetItem(ns.ItemIcon(entry.itemId), entry.quality)
         row.name:SetText(ns.QualityColor(entry.quality) .. ns.ItemName(entry.itemId) .. "|r")
         row.cells.drops:SetText(tostring(entry.drops))
         row.cells.qty:SetText(ns.FormatStack(entry))
+        -- The price g/ph uses, faded for an item that doesn't count in it.
+        row.cells.price:SetText(ns.FormatGold(ns.UnitPrice(entry.itemId, entry.world) or 0))
+        row.cells.price:SetAlpha(ns.CountsInValue(entry) and 1 or 0.45)
     end
+    row.entry = entry
     row.cells.rate:SetText(ns.FormatRate(entry.rate))
     row.cells.rate:SetAlpha(small and 0.6 or 1)
     row.bar:SetChance(entry.rate, COLUMNS[1].width)
@@ -505,6 +531,7 @@ ns.On("DT_SETTINGS_CHANGED", function()
     syncToggles()
     redrawSoon()
 end)
+ns.On("DT_PRICES_CHANGED", redrawSoon)
 
 ns.On("PLAYER_TARGET_CHANGED", function()
     if not frame:IsShown() or not ns.settings.detailsFollow then

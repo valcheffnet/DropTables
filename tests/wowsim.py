@@ -203,7 +203,7 @@ return dump
 """
 
 ALL_FILES = ("Core.lua", "Wire.lua", "Collector.lua", "Places.lua", "Share.lua", "Export.lua", "Stats.lua",
-             "Search.lua")
+             "Value.lua", "Search.lua")
 
 
 def py_compress(text, method):

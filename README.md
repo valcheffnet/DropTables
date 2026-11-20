@@ -42,6 +42,8 @@ The addon starts with an empty table and fills it as you kill and loot. Target o
 
 Skinning is counted apart from the loot, per skinned corpse, since every skin gives something. The drop table window shows it in a section of its own, the tooltip on a line of its own, and the Loot Finder in its own category, where each leather lists the mobs that give it with the Skinning skill they need.
 
+The g/ph column in the Loot Finder says roughly what farming a mob is worth in an hour. It takes the auction prices from Auctionator or TradeSkillMaster if you have one of them, the vendor price otherwise, and the kills per hour from the options.
+
 Commands (`/droptables` works too):
 
 - `/dt` opens or closes the drop table window, on your target if you have one
