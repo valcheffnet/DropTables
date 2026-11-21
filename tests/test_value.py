@@ -8,7 +8,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, FINDER_STUBS, Client, expect, report  # noqa: E402
 
 # Items: 100 sells for 50c and goes for more at auction, 101 is bound on pickup, 103 is rare, 105 is armor (a random
 # world drop) and 106 is one the client doesn't know yet.
@@ -166,25 +166,8 @@ def main():
     expect("the skinning list shows the lowest mob's skinning g/ph",
            next(s.gph for s in skin_rows.values() if s.itemId == 100), ns.SkinGoldPerHour(50))
 
-    # The Loot Finder writes the g/ph of every mob that drops the item into its row. The stub frames keep every text
-    # set on them, so the test can look for it.
-    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=UI_STUBS + PRICES + """
-        UISpecialFrames = {}
-        function tContains(t, v) for _, x in ipairs(t) do if x == v then return true end end return false end
-        GameTooltip_Hide = function() end
-        texts = {}
-        local plain = widget
-        function widget(name)
-            local w = plain(name)
-            local meta = getmetatable(w)
-            local index = meta.__index
-            meta.__index = function(self, key)
-                if key == "SetText" then return function(_, text) texts[#texts + 1] = text end end
-                return index(self, key)
-            end
-            return w
-        end
-    """)
+    # The Loot Finder writes the g/ph of every mob that drops the item into its row.
+    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=FINDER_STUBS + PRICES)
     loot(viewer, 1, "A", [(100, 1)], 10)
     viewer.lua.execute("texts = {}")
     viewer.ns.OpenFinder(100)

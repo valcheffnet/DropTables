@@ -186,6 +186,29 @@ function CreateFont() return widget() end
 function CreateColor() return widget() end
 """
 
+# The UI stubs plus what the Loot Finder needs. Frames keep the text set on them, GetText reads it back, and texts
+# lists everything ever set, so a test can look for what a window shows.
+FINDER_STUBS = UI_STUBS + """
+UISpecialFrames = {}
+function tContains(t, v) for _, x in ipairs(t) do if x == v then return true end end return false end
+GameTooltip_Hide = function() end
+texts = {}
+local plain = widget
+function widget(name)
+    local w = plain(name)
+    local meta = getmetatable(w)
+    local index = meta.__index
+    meta.__index = function(self, key)
+        if key == "SetText" then
+            return function(self, text) rawset(self, "text", text); texts[#texts + 1] = text end
+        end
+        if key == "GetText" then return function(self) return rawget(self, "text") or "" end end
+        return index(self, key)
+    end
+    return w
+end
+"""
+
 # Lua that writes a table back as Lua source, the way the game keeps SavedVariables.
 DUMP = r"""
 local function dump(value)

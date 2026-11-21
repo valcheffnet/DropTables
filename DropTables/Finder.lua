@@ -124,11 +124,6 @@ local view, category, openClass = "category", "all", nil
 local selectedItem, itemKind = nil, "loot"
 local droppers = {}
 local filters = {}
-local mobSort, mobDescending = "rate", true
-local itemSort, itemDescending = "rate", true
-local skinMobSort, skinMobDescending = "level", false
-local skinItemSort, skinItemDescending = "name", false
-local mobListSort, mobListDescending = "name", false
 local renderTree, renderMain, selectItem, selectCategory
 local search
 
@@ -508,10 +503,15 @@ filterRule:SetHeight(1)
 filterRule:SetPoint("TOPLEFT", RIGHT, headerY + 6)
 filterRule:SetPoint("TOPRIGHT", -12, headerY + 6)
 
--- A sortable table in the main pane, with headers, a scrolling list and an empty state.
-local function makeTable(columns, reserved, onSort)
+-- Columns that put the highest first on their first click; the others start from the lowest, or from A.
+local HIGHEST_FIRST = { rate = true, mobs = true, kills = true, drops = true, gph = true }
+
+-- A sortable table in the main pane, with headers, a scrolling list and an empty state. It keeps its own sort, which
+-- starts on sortKey; a click on a header sorts by that column, and a second click turns the order around.
+local function makeTable(columns, reserved, sortKey, descending)
     local offsets, firstRight = columnOffsets(columns, reserved)
-    local tbl = { columns = columns, offsets = offsets, firstRight = firstRight, headers = {}, rows = {} }
+    local tbl = { columns = columns, offsets = offsets, firstRight = firstRight, headers = {}, rows = {},
+        sort = { key = sortKey, descending = descending } }
     for i, column in ipairs(columns) do
         local header = Style.Header(frame, column.label, column.justify)
         if column.width then
@@ -523,7 +523,13 @@ local function makeTable(columns, reserved, onSort)
         end
         header.key = column.key
         header:SetScript("OnClick", function(self)
-            onSort(self.key)
+            local sort = tbl.sort
+            if sort.key == self.key then
+                sort.descending = not sort.descending
+            else
+                sort.key, sort.descending = self.key, HIGHEST_FIRST[self.key] or false
+            end
+            renderMain()
         end)
         table.insert(tbl.headers, header)
     end
@@ -542,9 +548,9 @@ local function makeTable(columns, reserved, onSort)
             header:SetShown(shown)
         end
     end
-    function tbl:SetSort(key, descending)
+    function tbl:ShowSort()
         for _, header in ipairs(self.headers) do
-            header:SetSorted(header.key == key, descending)
+            header:SetSorted(header.key == self.sort.key, self.sort.descending)
         end
     end
     -- Creates row cells for every fixed column and a chance bar behind the "rate" column.
@@ -581,53 +587,11 @@ local function makeTable(columns, reserved, onSort)
     return tbl
 end
 
--- Columns that put the highest first on their first click; the others start from the lowest, or from A.
-local HIGHEST_FIRST = { rate = true, mobs = true, kills = true, drops = true, gph = true }
-
-local itemTable = makeTable(ITEM_COLUMNS, 8, function(key)
-    if itemSort == key then
-        itemDescending = not itemDescending
-    else
-        itemSort, itemDescending = key, HIGHEST_FIRST[key] or false
-    end
-    renderMain()
-end)
-
-local mobTable = makeTable(MOB_COLUMNS, MAP_BUTTON + 8, function(key)
-    if mobSort == key then
-        mobDescending = not mobDescending
-    else
-        mobSort, mobDescending = key, HIGHEST_FIRST[key] or false
-    end
-    renderMain()
-end)
-
-local skinItemTable = makeTable(SKIN_ITEM_COLUMNS, 8, function(key)
-    if skinItemSort == key then
-        skinItemDescending = not skinItemDescending
-    else
-        skinItemSort, skinItemDescending = key, HIGHEST_FIRST[key] or false
-    end
-    renderMain()
-end)
-
-local skinMobTable = makeTable(SKIN_MOB_COLUMNS, MAP_BUTTON + 8, function(key)
-    if skinMobSort == key then
-        skinMobDescending = not skinMobDescending
-    else
-        skinMobSort, skinMobDescending = key, HIGHEST_FIRST[key] or false
-    end
-    renderMain()
-end)
-
-local mobListTable = makeTable(MOB_LIST_COLUMNS, MAP_BUTTON + 8, function(key)
-    if mobListSort == key then
-        mobListDescending = not mobListDescending
-    else
-        mobListSort, mobListDescending = key, HIGHEST_FIRST[key] or false
-    end
-    renderMain()
-end)
+local itemTable = makeTable(ITEM_COLUMNS, 8, "rate", true)
+local mobTable = makeTable(MOB_COLUMNS, MAP_BUTTON + 8, "rate", true)
+local skinItemTable = makeTable(SKIN_ITEM_COLUMNS, 8, "name", false)
+local skinMobTable = makeTable(SKIN_MOB_COLUMNS, MAP_BUTTON + 8, "level", false)
+local mobListTable = makeTable(MOB_LIST_COLUMNS, MAP_BUTTON + 8, "name", false)
 
 local function itemRow(tbl, index)
     local row = tbl.rows[index]
@@ -741,11 +705,7 @@ end
 local function renderCategory()
     local skinning = category == SKIN
     local tbl, columns = skinning and skinItemTable or itemTable, skinning and SKIN_ITEM_COLUMNS or ITEM_COLUMNS
-    local sortKey, descending = itemSort, itemDescending
-    if skinning then
-        sortKey, descending = skinItemSort, skinItemDescending
-    end
-    tbl:SetSort(sortKey, descending)
+    tbl:ShowSort()
     local items, title, fallback = categoryContents(category)
     if fallback then
         category = "all"
@@ -755,7 +715,7 @@ local function renderCategory()
     if setupZones(maps) then
         summaries = summarize(items, filters)
     end
-    ns.SortSummaries(summaries, sortKey, descending)
+    ns.SortSummaries(summaries, tbl.sort.key, tbl.sort.descending)
     for i, summary in ipairs(summaries) do
         local row = itemRow(tbl, i)
         row.itemId = summary.itemId
@@ -801,12 +761,8 @@ end
 local function renderMobs()
     local skinning = itemKind == SKIN
     local tbl, columns = skinning and skinMobTable or mobTable, skinning and SKIN_MOB_COLUMNS or MOB_COLUMNS
-    local sortKey, descending = mobSort, mobDescending
-    if skinning then
-        sortKey, descending = skinMobSort, skinMobDescending
-    end
-    tbl:SetSort(sortKey, descending)
-    local list = ns.FilterDroppers(droppers, filters, sortKey, descending)
+    tbl:ShowSort()
+    local list = ns.FilterDroppers(droppers, filters, tbl.sort.key, tbl.sort.descending)
     for i, dropper in ipairs(list) do
         local row = mobRow(tbl, i)
         row.dropper = dropper
@@ -866,10 +822,10 @@ end
 
 -- Every mob that matches the search, with the zone and level filters; a click opens the mob's full table.
 local function renderMobList()
-    mobListTable:SetSort(mobListSort, mobListDescending)
+    mobListTable:ShowSort()
     local mobs = currentMobs()
     setupZones(ns.DropperMaps(mobs))
-    local list = ns.FilterDroppers(mobs, filters, mobListSort, mobListDescending)
+    local list = ns.FilterDroppers(mobs, filters, mobListTable.sort.key, mobListTable.sort.descending)
     for i, mob in ipairs(list) do
         local row = mobRow(mobListTable, i)
         row.dropper = mob

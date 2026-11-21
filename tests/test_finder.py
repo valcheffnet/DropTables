@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, FINDER_STUBS, Client, expect, report  # noqa: E402
 
 def count(table):
     return len(list(table.keys()))
@@ -205,27 +205,7 @@ def main():
     expect("a skinned mob in the mob search", [(m.npc, m.kills) for m in lua_list(ns.SearchMobs("50"))], [(50, 4)])
 
     # The Loot Finder goes straight to the mobs when only mobs match the search, and stays with the items otherwise.
-    # The stub frames keep the text set on them, so the test can read it back.
-    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=UI_STUBS + """
-        UISpecialFrames = {}
-        function tContains(t, v) for _, x in ipairs(t) do if x == v then return true end end return false end
-        GameTooltip_Hide = function() end
-        texts = {}
-        local plain = widget
-        function widget(name)
-            local w = plain(name)
-            local meta = getmetatable(w)
-            local index = meta.__index
-            meta.__index = function(self, key)
-                if key == "SetText" then
-                    return function(self, text) rawset(self, "text", text); texts[#texts + 1] = text end
-                end
-                if key == "GetText" then return function(self) return rawget(self, "text") or "" end end
-                return index(self, key)
-            end
-            return w
-        end
-    """)
+    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=FINDER_STUBS)
     kill_and_loot(viewer, 7, "v1", [cloth])
     viewer.ns.db.names[7] = "Kobold Miner"
     viewer.fire("DT_INFO_CHANGED", 7)
