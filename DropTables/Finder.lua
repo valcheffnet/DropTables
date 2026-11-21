@@ -47,7 +47,16 @@ local SKIN_MOB_COLUMNS = {
     { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
     { key = "drops", label = "Skins", width = 52, justify = "RIGHT" },
 }
+-- The mobs themselves, found by name: clicking one opens its full table.
+local MOB_LIST_COLUMNS = {
+    { key = "name", label = "Mob" },
+    { key = "level", label = "Level", width = 46, justify = "CENTER" },
+    { key = "zone", label = "Zone", width = 118, justify = "LEFT" },
+    { key = "gph", label = "g/ph", width = 84, justify = "RIGHT" },
+    { key = "kills", label = "Kills", width = 52, justify = "RIGHT" },
+}
 local SKIN = "skin"  -- the category key of skinning
+local MOBS = "mobs"  -- the category key of the mob search
 
 local frame = Style.Window("DropTablesFinder", 800, 500, 660, 320, "finderPos", "finderSize", "finderAlpha")
 frame:SetPoint("CENTER", 0, 40)
@@ -109,7 +118,7 @@ ns.On("DT_READY", refreshSwatches)
 ns.On("DT_SETTINGS_CHANGED", refreshSwatches)
 
 -- view is "category" (the items of a category) or "item" (the mobs that drop one item).
--- category is "all", a tree key ("c<class>" or "s<class>:<subclass>") or SKIN.
+-- category is "all", a tree key ("c<class>" or "s<class>:<subclass>"), SKIN or MOBS.
 -- itemKind says whether the item view lists the mobs that drop the item ("loot") or give it when skinned (SKIN).
 local view, category, openClass = "category", "all", nil
 local selectedItem, itemKind = nil, "loot"
@@ -119,6 +128,7 @@ local mobSort, mobDescending = "rate", true
 local itemSort, itemDescending = "rate", true
 local skinMobSort, skinMobDescending = "level", false
 local skinItemSort, skinItemDescending = "name", false
+local mobListSort, mobListDescending = "name", false
 local renderTree, renderMain, selectItem, selectCategory
 local search
 
@@ -146,16 +156,28 @@ local function currentSkinItems()
     return ns.SkinItems(search:GetText(), ns.settings.finderQualities)
 end
 
+local function currentMobs()
+    return ns.SearchMobs(search:GetText())
+end
+
+-- A search that only mobs match goes straight to them instead of an empty list of items.
+local function searchCategory(key)
+    if key == "all" and #currentItems() == 0 and #currentSkinItems() == 0 and #currentMobs() > 0 then
+        return MOBS
+    end
+    return key
+end
+
 -- The sidebar has the search, the quality switches and the category tree.
-search = Style.Input(frame, SIDEBAR - 24, "Search looted items", "Interface\\Common\\UI-Searchbox-Icon")
+search = Style.Input(frame, SIDEBAR - 24, "Search items or mobs", "Interface\\Common\\UI-Searchbox-Icon")
 search.box:SetPoint("TOPLEFT", 12, -(TOP + 12))
 -- Typing redraws once the keys pause, not on every letter.
 local SEARCH_DELAY = 0.25
 local searchPending = false
 search:HookScript("OnTextChanged", function(self, userInput)
     if userInput then
-        -- A search stays within skinning, and starts over from all items anywhere else.
-        category, view = category == SKIN and SKIN or "all", "category"
+        -- A search stays within skinning or the mobs, and starts over from all items anywhere else.
+        category, view = (category == SKIN or category == MOBS) and category or "all", "category"
     end
     if searchPending then
         return
@@ -163,7 +185,7 @@ search:HookScript("OnTextChanged", function(self, userInput)
     searchPending = true
     C_Timer.After(SEARCH_DELAY, function()
         searchPending = false
-        selectCategory(category)
+        selectCategory(searchCategory(category))
     end)
 end)
 
@@ -263,7 +285,7 @@ local function showRowParts(row, divider)
     row:EnableMouse(not divider)
 end
 
--- A row with only a line across it, between the item classes and skinning.
+-- A row with only a line across it, between the item classes, skinning and the mobs.
 local function fillTreeDivider(index)
     local row = treeRow(index)
     showRowParts(row, true)
@@ -317,12 +339,20 @@ function renderTree()
         used = used + 1
         fillTreeRow(used, SKIN, 0, "Skinning", #skinItems, false, false)
     end
+    local mobs = currentMobs()
+    if #mobs > 0 or category == MOBS then
+        used = used + 1
+        fillTreeDivider(used)
+        used = used + 1
+        fillTreeRow(used, MOBS, 0, "Mobs", #mobs, false, false)
+    end
     for i = used + 1, #treeRows do
         treeRows[i]:Hide()
     end
-    treeEmpty:SetShown(#items == 0 and #skinItems == 0)
-    treeEmpty:SetText(searching and "Nothing you have looted matches." or "Loot something first; every item you loot shows up here.")
-    treeContent:SetHeight(used * TREE_ROW_HEIGHT + (#items == 0 and #skinItems == 0 and 40 or 0))
+    local nothing = #items == 0 and #skinItems == 0 and #mobs == 0
+    treeEmpty:SetShown(nothing)
+    treeEmpty:SetText(searching and "No item or mob matches." or "Loot something first; every item you loot shows up here.")
+    treeContent:SetHeight(used * TREE_ROW_HEIGHT + (nothing and 40 or 0))
 end
 
 -- The items and title of a category. A category that no longer exists after a search or a quality switch falls back to
@@ -330,6 +360,8 @@ end
 local function categoryContents(key)
     if key == SKIN then
         return currentSkinItems(), "Skinning"
+    elseif key == MOBS then
+        return {}, "Mobs"
     end
     local items = currentItems()
     if key ~= "all" then
@@ -527,7 +559,9 @@ local function makeTable(columns, reserved, onSort)
             cell:SetJustifyH(column.justify)
             row.cells[column.key] = cell
         end
-        row.bar = Style.ChanceBar(row, row.cells.rate)
+        if row.cells.rate then
+            row.bar = Style.ChanceBar(row, row.cells.rate)
+        end
         row.name = Style.Text(row, "body")
         row.name:SetPoint("RIGHT", -self.firstRight, 0)
         row.name:SetJustifyH("LEFT")
@@ -582,6 +616,15 @@ local skinMobTable = makeTable(SKIN_MOB_COLUMNS, MAP_BUTTON + 8, function(key)
         skinMobDescending = not skinMobDescending
     else
         skinMobSort, skinMobDescending = key, HIGHEST_FIRST[key] or false
+    end
+    renderMain()
+end)
+
+local mobListTable = makeTable(MOB_LIST_COLUMNS, MAP_BUTTON + 8, function(key)
+    if mobListSort == key then
+        mobListDescending = not mobListDescending
+    else
+        mobListSort, mobListDescending = key, HIGHEST_FIRST[key] or false
     end
     renderMain()
 end)
@@ -653,7 +696,9 @@ local function mobRow(tbl, index)
         for _, map in ipairs(dropper.maps) do
             GameTooltip:AddDoubleLine(ns.MapName(map.mapId), ("%d kills"):format(map.kills), 1, 1, 1, 0.7, 0.7, 0.7)
         end
-        if tbl == skinMobTable then
+        if tbl == mobListTable then
+            GameTooltip:AddLine(("%d kills recorded"):format(dropper.kills), 0.7, 0.7, 0.7)
+        elseif tbl == skinMobTable then
             GameTooltip:AddLine(("Given %d times in %d skinned corpses"):format(dropper.drops, dropper.opened),
                 0.7, 0.7, 0.7)
             if dropper.skill then
@@ -819,16 +864,47 @@ local function renderMobs()
     back:Show()
 end
 
+-- Every mob that matches the search, with the zone and level filters; a click opens the mob's full table.
+local function renderMobList()
+    mobListTable:SetSort(mobListSort, mobListDescending)
+    local mobs = currentMobs()
+    setupZones(ns.DropperMaps(mobs))
+    local list = ns.FilterDroppers(mobs, filters, mobListSort, mobListDescending)
+    for i, mob in ipairs(list) do
+        local row = mobRow(mobListTable, i)
+        row.dropper = mob
+        Style.SetRowState(row, i, false)
+        row.name:SetText(mob.name)
+        row.cells.level:SetText(levelText(mob))
+        row.cells.zone:SetText(zoneText(mob))
+        row.cells.gph:SetText(ns.FormatGold(ns.GoldPerHour(mob.npc)))
+        row.cells.kills:SetText(mob.kills)
+        row.map:SetShown(mob.spots)
+        row:Show()
+    end
+    mobListTable:Finish(#list, "No mob matches",
+        #mobs == 0 and "Change the search." or "Widen the zone or level filter.")
+    placeTitle(false)
+    headTitle:SetText(strtrim(search:GetText()) ~= "" and "Mobs matching your search" or "Mobs")
+    headTitle:SetTextColor(unpack(C.gold))
+    headSummary:SetText(("%d mobs%s  |  click one for its full table"):format(#list, filterNote()))
+    resultCount:SetText(("%d mobs"):format(#list))
+    back:Hide()
+end
+
 function renderMain()
-    local skinItem, skinCategory = itemKind == SKIN, category == SKIN
-    itemTable:SetShown(view == "category" and not skinCategory)
+    local skinItem, skinCategory, mobCategory = itemKind == SKIN, category == SKIN, category == MOBS
+    itemTable:SetShown(view == "category" and not skinCategory and not mobCategory)
     skinItemTable:SetShown(view == "category" and skinCategory)
+    mobListTable:SetShown(view == "category" and mobCategory)
     mobTable:SetShown(view == "item" and not skinItem)
     skinMobTable:SetShown(view == "item" and skinItem)
     worldDrops:SetShown(view == "item" and not skinItem or view == "category" and not skinCategory)
     resultCount:SetShown(not worldDrops:IsShown())
     if view == "item" then
         renderMobs()
+    elseif mobCategory then
+        renderMobList()
     else
         renderCategory()
     end
@@ -849,6 +925,7 @@ function selectCategory(key)
     checkCategory()
     itemTable.scroll:SetVerticalScroll(0)
     skinItemTable.scroll:SetVerticalScroll(0)
+    mobListTable.scroll:SetVerticalScroll(0)
     renderTree()
     renderMain()
 end
@@ -883,7 +960,7 @@ function ns.OpenFinder(itemOrText, kind)
         selectItem(itemOrText, kind or "loot")
     elseif itemOrText and itemOrText ~= "" then
         search:SetText(itemOrText)
-        selectCategory("all")
+        selectCategory(searchCategory("all"))
     elseif view == "item" and selectedItem then
         selectItem(selectedItem, itemKind)
     else

@@ -94,6 +94,7 @@ end
 -- info change, and all of them after a settings change, because the Loot Finder asks for hundreds of items per redraw.
 local byNpc = {}      -- npc -> { [itemId] = dropper } from the mob's current chances
 local skinsByNpc = {} -- npc -> { [itemId] = dropper } from what skinning the mob gives
+local mobs = {}       -- npc -> the mob for the mob search, nil when it has no chances of either kind
 local dirty = {}      -- npcs whose entries are out of date
 local allDirty = true
 local index           -- itemId -> { dropper, ... }, nil while it needs rebuilding
@@ -144,6 +145,26 @@ local function skinnersOf(npc)
         }
     end
     return found
+end
+
+-- The mob itself for the mob search, in the shape of a dropper without an item: its kills are the most of its looted
+-- and its skinned corpses.
+local function mobOf(npc)
+    local stats, skin = ns.GetStats(npc, "all"), ns.GetSkinStats(npc)
+    if not stats and not skin then
+        return nil
+    end
+    local info, maps, spots, zone = placesOf(npc)
+    return {
+        npc = npc,
+        name = ns.MobName(npc),
+        kills = math.max(stats and stats.kills or 0, skin and skin.skinned or 0),
+        minLevel = info and info.minLevel,
+        maxLevel = info and info.maxLevel,
+        maps = maps,
+        spots = spots,
+        zone = zone,
+    }
 end
 
 local function droppersOf(npc)
@@ -201,16 +222,18 @@ function currentIndex()
         return index
     end
     if allDirty then
-        byNpc, skinsByNpc = {}, {}
+        byNpc, skinsByNpc, mobs = {}, {}, {}
         for npc in pairs(ns.KnownNpcs()) do
             byNpc[npc] = droppersOf(npc)
             skinsByNpc[npc] = skinnersOf(npc)
+            mobs[npc] = mobOf(npc)
         end
     else
         local known = ns.KnownNpcs()
         for npc in pairs(dirty) do
             byNpc[npc] = known[npc] and droppersOf(npc) or nil
             skinsByNpc[npc] = known[npc] and skinnersOf(npc) or nil
+            mobs[npc] = known[npc] and mobOf(npc) or nil
         end
     end
     allDirty, dirty = false, {}
@@ -253,6 +276,27 @@ function ns.FindSkinners(itemId)
     for i, skinner in ipairs(currentSkinIndex()[itemId] or {}) do
         results[i] = skinner
     end
+    return results
+end
+
+-- Mobs whose name contains the text (in any case) or whose id is the text, or all of them when the text is empty, by
+-- name. Like FindDroppers, the list is new but the mobs in it are shared.
+function ns.SearchMobs(text)
+    text = strtrim(text or ""):lower()
+    local id = tonumber(text)
+    currentIndex()
+    local results = {}
+    for npc, mob in pairs(mobs) do
+        if text == "" or npc == id or mob.name:lower():find(text, 1, true) then
+            table.insert(results, mob)
+        end
+    end
+    table.sort(results, function(a, b)
+        if a.name == b.name then
+            return a.npc < b.npc
+        end
+        return a.name < b.name
+    end)
     return results
 end
 
@@ -450,6 +494,7 @@ local SORT_VALUES = {
     zone = function(d) return d.zone end,
     rate = function(d) return d.rate end,
     drops = function(d) return d.drops end,
+    kills = function(d) return d.kills or 0 end,
     gph = function(d) return ns.MobGoldPerHour(d) end,
 }
 

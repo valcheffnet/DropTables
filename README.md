@@ -18,7 +18,7 @@ The drop table window follows your target and shows where the kills behind each 
 
 ![The drop table window for a Greater Plainstrider with item prices](screenshots/lootTable.png)
 
-The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance.
+The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance. The search box finds mobs as well: type part of a name and they show up under Mobs, where a click opens the mob's drop table.
 
 ![The Loot Finder listing all items sorted by gold per hour](screenshots/LootFinder.png)
 
@@ -47,7 +47,7 @@ The g/ph column in the Loot Finder says roughly what farming a mob is worth in a
 Commands (`/droptables` works too):
 
 - `/dt` opens or closes the drop table window, on your target if you have one
-- `/dt find` opens the loot finder, and `/dt find linen` searches for linen straight away
+- `/dt find` opens the loot finder, and `/dt find linen` searches for linen straight away (a mob's name works too)
 - `/dt options` (or `/dt config`) opens the settings. Restore defaults at the bottom puts every setting and window back the way it was on first install.
 - `/dt unlock` lets you drag the icons under the target frame somewhere else, `/dt lock` fixes them in place again. Blizzard's Edit Mode does the same.
 - `/dt reset` puts the icons back under the target frame

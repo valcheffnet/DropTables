@@ -5,6 +5,7 @@
 ### Added
 
 - The addon's version is shown in game: /dt status starts with it, and the options panel has it next to the name, so a bug report can say which version it was.
+- The Loot Finder's search finds mobs too, by name or id. They show up in a Mobs category under the items, with their level, zone, g/ph and kills, and clicking one opens its drop table. When only mobs match, the Finder goes straight to them, so `/dt find kobold` works as well.
 
 ## [0.5.2] - 2026-11-21
 

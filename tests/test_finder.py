@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
 
 def count(table):
     return len(list(table.keys()))
@@ -184,6 +184,60 @@ def main():
     tie_order = c.lua.table_from([d for d in lua_list(ns.FindDroppers(2589)) if d.npc in (7, 8)][::-1])
     expect("whichever comes first", ns.BestDropper(tie_order).npc, 8)
     expect("sorted by kills", [s.itemId for s in lua_list(ns.SortSummaries(tie_list, "kills", True))], [2589, 100])
+
+    # The mob search finds mobs by part of the name or by id, with their kills and places, and follows new names.
+    ns.db.names[7] = "Kobold Miner"
+    c.fire("DT_INFO_CHANGED", 7)
+    expect("mob search by name", [m.npc for m in lua_list(ns.SearchMobs("KOBOLD"))], [7])
+    expect("mob search by id", [(m.npc, m.kills) for m in lua_list(ns.SearchMobs("7"))], [(7, 3)])
+    everyone = [m.npc for m in lua_list(ns.SearchMobs(""))]
+    expect("an empty mob search lists every mob, by name", (everyone[0], sorted(everyone)), (7, [1, 2, 3, 4, 5, 6, 7, 8]))
+    mob_table = c.lua.table_from
+    in_zone = ns.FilterDroppers(ns.SearchMobs(""), mob_table({"mapId": 40}), "kills", True)
+    expect("the zone filter on mobs", [m.npc for m in lua_list(in_zone)], [2])
+    by_kills = ns.FilterDroppers(ns.SearchMobs(""), mob_table({}), "kills", True)
+    expect("mobs sorted by kills", [m.npc for m in lua_list(by_kills)][:2], [4, 2])
+    # A mob only ever skinned is found too, with its skinned corpses as kills.
+    c.lua.execute("""
+        DropTablesDB.skins[50] = { skinned = 4, items = { [100] = { drops = 2, qty = 4, min = 2, max = 2 } } }
+    """)
+    c.fire("DT_DATA_CHANGED", 50)
+    expect("a skinned mob in the mob search", [(m.npc, m.kills) for m in lua_list(ns.SearchMobs("50"))], [(50, 4)])
+
+    # The Loot Finder goes straight to the mobs when only mobs match the search, and stays with the items otherwise.
+    # The stub frames keep the text set on them, so the test can read it back.
+    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=UI_STUBS + """
+        UISpecialFrames = {}
+        function tContains(t, v) for _, x in ipairs(t) do if x == v then return true end end return false end
+        GameTooltip_Hide = function() end
+        texts = {}
+        local plain = widget
+        function widget(name)
+            local w = plain(name)
+            local meta = getmetatable(w)
+            local index = meta.__index
+            meta.__index = function(self, key)
+                if key == "SetText" then
+                    return function(self, text) rawset(self, "text", text); texts[#texts + 1] = text end
+                end
+                if key == "GetText" then return function(self) return rawget(self, "text") or "" end end
+                return index(self, key)
+            end
+            return w
+        end
+    """)
+    kill_and_loot(viewer, 7, "v1", [cloth])
+    viewer.ns.db.names[7] = "Kobold Miner"
+    viewer.fire("DT_INFO_CHANGED", 7)
+    viewer.lua.execute("texts = {}")
+    viewer.ns.OpenFinder("kobold")
+    shown = set(viewer.g.texts.values())
+    expect("a mob's name opens the mobs", ("Mobs matching your search" in shown, "Kobold Miner" in shown), (True, True))
+    viewer.lua.execute("texts = {}")
+    viewer.ns.OpenFinder("linen")
+    shown = set(viewer.g.texts.values())
+    expect("an item's name stays with the items", ("Search results" in shown, "Mobs matching your search" in shown),
+           (True, False))
 
     # Names and levels saved by earlier versions for creatures without any counts are dropped on login.
     old = Client("Old", saved="""DropTablesDB = {
