@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-11-21
+
 ### Added
 
 - g/ph also reads auction prices from FojjiCore's own scan of the auction house. Auctionator still comes first, so FojjiCore's price counts when Auctionator hasn't seen the item in the last 21 days, and a FojjiCore scan older than that is left out too. TradeSkillMaster comes after both.
