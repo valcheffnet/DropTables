@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- g/ph also reads auction prices from FojjiCore's own scan of the auction house. Auctionator still comes first, so FojjiCore's price counts when Auctionator hasn't seen the item in the last 21 days, and a FojjiCore scan older than that is left out too. TradeSkillMaster comes after both.
+
+### Changed
+
+- The drop table window's item tooltip no longer adds a g/ph price line of its own, and the Loot Finder's mob tooltip doesn't repeat what a kill and an hour bring either, since the Price and g/ph columns already show that. The item tooltip now has only the prices Auctionator or FojjiCore put there.
+
 ## [0.5.1] - 2026-11-20
 
 ### Added

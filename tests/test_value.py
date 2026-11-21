@@ -87,6 +87,28 @@ def main():
     c.fire("DT_SETTINGS_CHANGED")
     expect("TradeSkillMaster's price when Auctionator is missing", ns.ValuePerKill(1), 10 + 0.5 * 380 + 20)
     expect("TradeSkillMaster named as the source", ns.PriceInfo(100), (380, "TradeSkillMaster"))
+    # FojjiCore's own scan comes before TradeSkillMaster when it's no older than 21 days. It loads after Drop Tables,
+    # and its scan tells the values to be worked out again.
+    gph_tsm = ns.GoldPerHour(1)
+    c.lua.execute("""
+        fojjiSeen, fojjiFrom = time() - 86400, nil
+        FojjiCoreNS = { Auctions = {
+            Price = function(id) if id == 100 then return 300, 5, fojjiSeen, fojjiFrom end end,
+            OnChange = function(fn) fojjiChanged = fn end,
+        } }
+    """)
+    c.fire("ADDON_LOADED", "FojjiCore_Professions")
+    expect("FojjiCore's scan before TradeSkillMaster", ns.PriceInfo(100), (285, "FojjiCore"))
+    expect("the cached value stays until FojjiCore scans", ns.GoldPerHour(1), gph_tsm)
+    c.g.fojjiChanged()
+    expect("a FojjiCore scan updates g/ph", ns.GoldPerHour(1), int((10 + 0.5 * 285 + 20) * 70))
+    c.lua.execute("fojjiSeen = time() - 30 * 86400")
+    expect("an old FojjiCore scan is left out", ns.PriceInfo(100), (380, "TradeSkillMaster"))
+    c.lua.execute("fojjiSeen, fojjiFrom = time() - 86400, 'auctionator'")
+    expect("Auctionator's price passed on by FojjiCore is left out", ns.PriceInfo(100), (380, "TradeSkillMaster"))
+    c.lua.execute("fojjiFrom = nil; FojjiCoreNS.Auctions.Price = function() error('changed') end")
+    expect("a FojjiCore that changed only means no price from it", ns.PriceInfo(100), (380, "TradeSkillMaster"))
+    c.lua.execute("FojjiCoreNS = nil")
     # A vendor price above the auction price wins.
     c.lua.execute("TSM_API = nil")
     c.g.itemInfo[100].sell = 60

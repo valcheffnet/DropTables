@@ -5,7 +5,7 @@
 ## Version: 0.5.1
 ## IconTexture: Interface\Icons\INV_Misc_Bag_10
 ## SavedVariables: DropTablesDB
-## OptionalDeps: Auctionator, TradeSkillMaster
+## OptionalDeps: Auctionator, TradeSkillMaster, FojjiCore, FojjiCore_Professions
 ## AddonCompartmentFunc: DropTables_OnCompartmentClick
 
 Core.lua

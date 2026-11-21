@@ -611,15 +611,6 @@ local function itemRow(tbl, index)
     return row
 end
 
--- A tooltip line like "Worth 1s 20c a kill, 84s an hour at 70 kills an hour", left out under a copper. eachText holds
--- the first part with a %s for the value of one.
-local function addWorth(eachText, each, perHour, npc)
-    if each >= 1 then
-        GameTooltip:AddLine(("%s, %s an hour at %d kills an hour"):format(eachText:format(ns.FormatGold(each)),
-            ns.FormatGold(perHour), math.floor(ns.KillsPerHour(npc) + 0.5)), 0.7, 0.7, 0.7, true)
-    end
-end
-
 local function mobRow(tbl, index)
     local row = tbl.rows[index]
     if row then
@@ -668,15 +659,12 @@ local function mobRow(tbl, index)
             if dropper.skill then
                 GameTooltip:AddLine(("Needs %d Skinning"):format(dropper.skill), 0.7, 0.7, 0.7)
             end
-            addWorth("Skinning is worth %s a corpse", ns.SkinValue(dropper.npc), ns.SkinGoldPerHour(dropper.npc),
-                dropper.npc)
             if dropper.scarce then
                 GameTooltip:AddLine("The Bountiful Harvest perk gives more of it.", 0.7, 0.7, 0.7, true)
             end
         else
             GameTooltip:AddLine(("Dropped %d times in %d looted corpses"):format(dropper.drops, dropper.opened),
                 0.7, 0.7, 0.7)
-            addWorth("Worth %s a kill", ns.ValuePerKill(dropper.npc), ns.GoldPerHour(dropper.npc), dropper.npc)
         end
         GameTooltip:AddLine("Click for the mob's full table", 0.5, 0.5, 0.5)
         GameTooltip:Show()

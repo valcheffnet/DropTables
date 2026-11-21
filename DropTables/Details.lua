@@ -238,34 +238,12 @@ emptyText:SetPoint("TOP", emptyTitle, "BOTTOM", 0, -6)
 
 local rows = {}
 
-local PRICE_SOURCES = {
-    Auctionator = "Auction price from Auctionator, less the 5% the auction house keeps.",
-    TradeSkillMaster = "Market value from TradeSkillMaster, less the 5% the auction house keeps.",
-    vendor = "What a vendor pays. Without Auctionator or TradeSkillMaster, and for items bound on pickup and world "
-        .. "drops, that's the price.",
-}
-local LEFT_OUT = {
-    rare = "Rare and epic drops don't count in g/ph.",
-    world = "World drops count in g/ph only with \"World drops in g/ph\" ticked in the Loot Finder.",
-}
-
 local function rowEnter(self)
     if not self.itemId then
         return
     end
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:SetItemByID(self.itemId)
-    local price, source = ns.PriceInfo(self.itemId, self.entry.world)
-    if price then
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddDoubleLine("Price for g/ph", ns.FormatGold(price) .. (price == 0 and "none" or ""),
-            1, 0.82, 0, 1, 1, 1)
-        GameTooltip:AddLine(PRICE_SOURCES[source], 0.7, 0.7, 0.7, true)
-        local _, leftOut = ns.CountsInValue(self.entry)
-        if leftOut then
-            GameTooltip:AddLine(LEFT_OUT[leftOut], 0.7, 0.7, 0.7, true)
-        end
-    end
     GameTooltip:AddLine(self.skin and "Click: which other mobs give it when skinned" or "Click: which other mobs drop it",
         0.5, 0.5, 0.5)
     GameTooltip:Show()
@@ -349,7 +327,6 @@ local function fillEntry(index, entry, small, skin)
         row.cells.price:SetText(ns.FormatGold(ns.UnitPrice(entry.itemId, entry.world) or 0))
         row.cells.price:SetAlpha(ns.CountsInValue(entry) and 1 or 0.45)
     end
-    row.entry = entry
     row.cells.rate:SetText(ns.FormatRate(entry.rate))
     row.cells.rate:SetAlpha(small and 0.6 or 1)
     row.bar:SetChance(entry.rate, COLUMNS[1].width)

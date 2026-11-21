@@ -20,8 +20,23 @@ local function call(fn, ...)
     end
 end
 
--- Auctionator's price when it saw the item in the last MAX_AUCTION_AGE days, else TradeSkillMaster's market value,
--- and which of the two it was.
+-- The lowest price in FojjiCore's own last scan of the auction house, when that scan is no older than MAX_AUCTION_AGE
+-- days. FojjiCore doesn't publish this as an API, so a change on its side only means no price from it. It passes on
+-- Auctionator's price when that is newer, which is left out here because Auctionator was already asked.
+local function fojjiPrice(itemId)
+    local auctions = FojjiCoreNS and FojjiCoreNS.Auctions
+    if not (auctions and auctions.Price) then
+        return
+    end
+    local ok, price, _, seen, from = pcall(auctions.Price, itemId)
+    if ok and from == nil and type(price) == "number" and price > 0 and not ns.IsSecret(price)
+        and type(seen) == "number" and time() - seen <= MAX_AUCTION_AGE * 86400 then
+        return price
+    end
+end
+
+-- Auctionator's price when it saw the item in the last MAX_AUCTION_AGE days, else FojjiCore's scan, else
+-- TradeSkillMaster's market value, and which of them it was.
 local function auctionPrice(itemId)
     local api = Auctionator and Auctionator.API and Auctionator.API.v1
     if api and api.GetAuctionPriceByItemID then
@@ -30,6 +45,10 @@ local function auctionPrice(itemId)
         if price and (age == nil or age <= MAX_AUCTION_AGE) then
             return price, "Auctionator"
         end
+    end
+    local fojji = fojjiPrice(itemId)
+    if fojji then
+        return fojji, "FojjiCore"
     end
     if TSM_API and TSM_API.GetCustomPriceValue and TSM_API.ToItemString then
         local ok, itemString = pcall(TSM_API.ToItemString, "i:" .. itemId)
@@ -194,21 +213,18 @@ ns.On("DT_SETTINGS_CHANGED", forgetAll)
 ns.On("GET_ITEM_INFO_RECEIVED", forgetAll)
 ns.On("PLAYER_LEVEL_UP", pricesChanged)
 
--- Auctionator says when a scan brought new prices.
-local function watchAuctionator()
-    local api = Auctionator and Auctionator.API and Auctionator.API.v1
-    if api and api.RegisterForDBUpdate then
-        pcall(api.RegisterForDBUpdate, CALLER, pricesChanged)
-        return true
+-- Auctionator and FojjiCore say when a scan brought new prices. Either may load after Drop Tables, so every addon that
+-- loads is a chance to start listening.
+local watching = {}
+local function watch()
+    local auctionator = Auctionator and Auctionator.API and Auctionator.API.v1
+    if not watching.auctionator and auctionator and auctionator.RegisterForDBUpdate then
+        watching.auctionator = pcall(auctionator.RegisterForDBUpdate, CALLER, pricesChanged)
+    end
+    local fojji = FojjiCoreNS and FojjiCoreNS.Auctions
+    if not watching.fojji and fojji and fojji.OnChange then
+        watching.fojji = pcall(fojji.OnChange, pricesChanged)
     end
 end
-
-ns.On("DT_READY", function()
-    if not watchAuctionator() then
-        ns.On("ADDON_LOADED", function(name)
-            if name == "Auctionator" then
-                watchAuctionator()
-            end
-        end)
-    end
-end)
+ns.On("DT_READY", watch)
+ns.On("ADDON_LOADED", watch)
