@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- The addon's version is shown in game: /dt status starts with it, and the options panel has it next to the name, so a bug report can say which version it was.
+
 ## [0.5.2] - 2026-11-21
 
 ### Added

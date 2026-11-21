@@ -61,6 +61,12 @@ function ns.Print(msg)
     print("|cff66ccffDrop Tables|r " .. msg)
 end
 
+-- The version in the toc, "?" when the client can't say.
+function ns.Version()
+    local get = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+    return get and get("DropTables", "Version") or "?"
+end
+
 -- /dt debug writes a chat line for every sharing message in and out and for every loot window, which helps when testing
 -- with another player. The lines go to a chat tab called "DT Debug" that /dt debug opens and closes again, or to the
 -- main window when there's no free tab.
@@ -334,6 +340,7 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Fire("DT_SETTINGS_CHANGED")
         ns.Print(("%s %s."):format(msg, ns.settings[key] and "on" or "off"))
     elseif msg == "status" then
+        ns.Print("version " .. ns.Version())
         local mobs, kills = 0, 0
         for _, mob in pairs(ns.db.mobs) do
             mobs = mobs + 1

@@ -338,6 +338,18 @@ def main():
     tester.see(91, "M91", 30)
     tester.g.SlashCmdList.DROPTABLES("")
     expect("the table of a hostile target", tester.g.detailsNpc, 91)
+    # /dt status starts with the version from the toc, so a bug report can say which one it was.
+    tester.lua.execute("""
+        printed = {}
+        print = function(text) printed[#printed + 1] = text end
+        C_AddOns = { GetAddOnMetadata = function(addon, field)
+            if addon == "DropTables" and field == "Version" then return "9.9.9" end
+        end }
+    """)
+    tester.g.SlashCmdList.DROPTABLES("status")
+    expect("status names the version", tester.g.printed[1], "|cff66ccffDrop Tables|r version 9.9.9")
+    tester.lua.execute("C_AddOns = nil")
+    expect("a client that can't say gives ?", tester.ns.Version(), "?")
     reloaded = Client("Reloaded", saved="DropTablesDB = { settings = { debug = true } }")
     reloaded.ns.Debug("after a reload")
     expect("debug still on after a reload", len(reloaded.g.ChatFrame1.lines), 1)

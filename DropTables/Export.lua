@@ -209,11 +209,6 @@ local function encode(text)
     return PREFIX .. C_EncodingUtil.EncodeBase64(packed)
 end
 
-local function version()
-    local get = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return get and get("DropTables", "Version") or "?"
-end
-
 -- Builds the export and returns { strings, copied, mobs, kills, sources, builtAt }. strings is empty when there's
 -- nothing to share.
 function ns.BuildExport()
@@ -228,7 +223,7 @@ function ns.BuildExport()
         local parts = split(result.sections, budget)
         local strings, fits = {}, true
         for i, lines in ipairs(parts) do
-            local header = table.concat({ "DTX", FORMAT, ns.db.installId, version(), result.builtAt, i .. "/" .. #parts }, "|")
+            local header = table.concat({ "DTX", FORMAT, ns.db.installId, ns.Version(), result.builtAt, i .. "/" .. #parts }, "|")
             strings[i] = encode(header .. "\n" .. table.concat(lines, "\n"))
             fits = fits and #strings[i] <= MAX_STRING
         end
