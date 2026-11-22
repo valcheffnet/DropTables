@@ -2,10 +2,16 @@
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-11-22
+
 ### Added
 
 - The addon's version is shown in game: /dt status starts with it, and the options panel has it next to the name, so a bug report can say which version it was.
 - The Loot Finder's search finds mobs too, by name or id. They show up in a Mobs category under the items, with their level, zone, g/ph and kills, and clicking one opens its drop table. When only mobs match, the Finder goes straight to them, so `/dt find kobold` works as well.
+
+### Changed
+
+- One more player's share went into the shared database, which now knows 1,845 mobs, with 34,609 kills and 7,108 skinned corpses.
 
 ## [0.5.2] - 2026-11-21
 
@@ -214,6 +220,11 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.5.3...HEAD
+[0.5.3]: https://github.com/valcheffnet/DropTables/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/valcheffnet/DropTables/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/valcheffnet/DropTables/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/valcheffnet/DropTables/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/valcheffnet/DropTables/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/valcheffnet/DropTables/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/valcheffnet/DropTables/compare/v0.2.7...v0.3.0
