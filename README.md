@@ -4,6 +4,12 @@ Drop Tables is a World of Warcraft: Forever addon that records what drops from t
 
 This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it from a web page. Everything sent there goes into a shared database that comes with the addon, so a new install already has chances for mobs you've never killed.
 
+## Download
+
+The latest version is here: https://github.com/valcheffnet/DropTables/releases/latest
+
+Under Assets, download `DropTables-x.y.z.zip`. The Source code archives are not the addon.
+
 ## Screenshots
 
 Target a mob and its likely drops show up as icons under the target frame, each with its chance. If you can skin it, a second row underneath shows what skinning gives.
@@ -21,12 +27,6 @@ The drop table window follows your target and shows where the kills behind each 
 The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance. The search box finds mobs as well: type part of a name and they show up under Mobs, where a click opens the mob's drop table.
 
 ![The Loot Finder listing all items sorted by gold per hour](screenshots/LootFinder.png)
-
-## Download
-
-The latest version is here: https://github.com/valcheffnet/DropTables/releases/latest
-
-Under Assets, download `DropTables-x.y.z.zip`. The Source code archives are not the addon.
 
 ## Install
 
