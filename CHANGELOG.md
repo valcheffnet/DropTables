@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-11-22
+
 ### Fixed
 
 - An open Loot Finder or drop table window could make the game stutter about once a second. A few items in the shared database can't be loaded by the game, and each failed try made the window redraw and ask for them again. Those were 23 items that EG Link recorded on Mottled Boars in an early build and that the server doesn't show, and they're out of the shared database now. The Loot Finder also worked every chance and price out again whenever the game loaded any item, the gear of players around you included, and now it does that only for the items it was waiting for.
@@ -224,7 +226,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.5.4...HEAD
+[0.5.4]: https://github.com/valcheffnet/DropTables/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/valcheffnet/DropTables/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/valcheffnet/DropTables/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/valcheffnet/DropTables/compare/v0.5.0...v0.5.1
