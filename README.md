@@ -64,6 +64,10 @@ The shared database only grows when players send their tables in. Type `/dt expo
 
 Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.
 
+## Known issues
+
+Drop Tables doesn't record anything in dungeons yet. Inside an instance the game hides which mob you're targeting or have killed, and without that the addon can't tell whose loot it's looking at. The loot window does still say which corpse the loot came from, and recording dungeon loot from that is next on the list. The dungeon mobs that already show chances got them from Everloot, which only counts corpses that were looted, so their chances may come out a little high.
+
 ## Bugs
 
 Open an issue here. To see Lua errors in game, type `/console scriptErrors 1` once.
