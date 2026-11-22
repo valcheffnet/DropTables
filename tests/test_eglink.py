@@ -55,22 +55,29 @@ def fake_clone(root):
             "object:99|spell:3365": kills(9),
         },
         "sources": {
-            "npc:10": window(8, {"100": item(4, quantity=6), "200": item(2, quest=123)},
+            "npc:10": window(8, {"100": item(4, quantity=6), "200": item(2, quest=123), "288842": item(1)},
                              coins=8, copper=400, copper_windows=4),
             "npc:10|quest": window(4, {"100": item(2), "201": item(4, quest=True)}),
             "npc:10|group": window(10, {"100": item(10)}),
-            "npc:10|spell:8613": window(6, {"2318": item(6)}),
+            "npc:10|spell:8613": window(6, {"2318": item(6), "288900": item(1)}),
             "npc:10|spell:8617|group": window(2, {"2318": item(1), "783": item(1, quantity=2)}),
             "npc:10|spell:8613|bountifulHarvest:1": window(5, {"249427": item(5)}),
             "npc:10|spell:921": window(3, {"5000": item(3)}),
             "npc:14|spell:8613": window(3, {"2934": item(3)}),
-            "npc:11": window(4, {"300": item(2)}, coins=3),
+            "npc:11": window(4, {"300": item(2), "289086": item(1)}, coins=3),
             "object:99|spell:3365": window(9, {"400": item(9)}),
         },
     })
     write(live / "1.60.1.70100", "creatures.json", {"creatures": {
         "10": {"name": "Old Name", "positions": [pos(1429, 0.101, 0.205), pos(1429, 0.105, 0.209)]},
         "14": {"name": "Skinned Cat", "positions": [pos(1431, 0.5, 0.5)]},
+    }})
+    # Later the server hid 288842 (not public yet) and 288900 (no such item), and showed 289086 after hiding it.
+    write(live / "1.60.1.70100", "item_hotfixes.enUS.json", {"items": {
+        "288842": {"status": "valid"}, "289086": {"status": "invalid"},
+    }})
+    write(live / "1.60.1.70200", "item_hotfixes.enUS.json", {"items": {
+        "288842": {"status": "invalid"}, "288900": {"status": "removed"}, "289086": {"status": "valid", "name": "Elixir"},
     }})
     write(live / "1.60.1.70200", "loot.json", {
         "kills": {"npc:10": kills(6, empty=2, levels={"8": 6})},
@@ -100,7 +107,7 @@ def conversion(clone):
     b = mobs["10"]["buckets"]["1"]
     expect("solo and quest corpses of both builds add up, group corpses don't", (b["kills"], b["opened"]), (20, 16))
     expect("empty corpses count", b["lootable"], 16)
-    expect("quest items, skinning and group loot stay out", sorted(b["items"]), ["100"])
+    expect("quest items, hidden items, skinning and group loot stay out", sorted(b["items"]), ["100"])
     expect("drops and stack sizes add up", b["items"]["100"], {"drops": 8, "qty": 10})
     # 10 windows with coins, copper known for 6 of them with 500 copper: 10 drops of about 83 copper.
     expect("money follows the windows with one corpse", (b["money"]["drops"], b["money"]["copper"]), (10, 833))
@@ -117,6 +124,7 @@ def conversion(clone):
     expect("more windows than corpses with loot scale the kills up", (b["kills"], b["lootable"], b["opened"]),
            (8, 4, 4))
     expect("coins without any known copper give no money", b["money"]["drops"], 0)
+    expect("an item the newest hotfixes call valid stays", sorted(b["items"]), ["289086", "300"])
     expect("a mob that only ever left empty corpses still counts", mobs["12"]["buckets"]["1"]["kills"], 3)
 
     expect("the import is full, not partial", imp["partial"], False)

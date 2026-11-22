@@ -16,7 +16,7 @@
    "id": "eglink",
    "license": "CC BY 4.0",
    "name": "EG Link output, recorded by players on WoW Forever",
-   "notice": "Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\ncorpses skinned without the Bountiful Harvest perk on the live servers, without quest items, summed over\nthe builds and turned into Drop Tables counts.",
+   "notice": "Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\ncorpses skinned without the Bountiful Harvest perk on the live servers, without quest items and items\nthe server doesn't show, summed over the builds and turned into Drop Tables counts.",
    "url": "https://github.com/JIVESCORP/eg-link-output-wowf/tree/1bf749ba19be7e699822d6587db0cb85b1b0bc3b/data/wowf"
   },
   {
@@ -56641,46 +56641,6 @@
        "min": 1,
        "qty": 1
       },
-      "288832": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288842": {
-       "drops": 2,
-       "qty": 2
-      },
-      "288851": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288853": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288867": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288877": {
-       "drops": 2,
-       "qty": 2
-      },
-      "288878": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288883": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288884": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288889": {
-       "drops": 1,
-       "qty": 1
-      },
       "288896": {
        "drops": 1,
        "qty": 5
@@ -56696,58 +56656,6 @@
       "288900": {
        "drops": 1,
        "qty": 1
-      },
-      "288904": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288906": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288907": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288909": {
-       "drops": 2,
-       "qty": 2
-      },
-      "288910": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288911": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288913": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288914": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288918": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288920": {
-       "drops": 2,
-       "qty": 2
-      },
-      "288922": {
-       "drops": 2,
-       "qty": 2
-      },
-      "288923": {
-       "drops": 1,
-       "qty": 1
-      },
-      "288925": {
-       "drops": 2,
-       "qty": 2
       },
       "288926": {
        "drops": 1,

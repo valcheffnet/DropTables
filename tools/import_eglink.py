@@ -15,7 +15,9 @@ What goes in:
 
 What stays out: corpses looted in a group (EG Link doesn't say the group size, and counts too many empty corpses
 there), quest items, pick pocket and other spells cast at corpses, nodes, chests, fishing and containers, and the beta
-servers.
+servers. So do items the server won't show, by their newest status in item_hotfixes.enUS.json: "invalid" (the item
+exists, but the server doesn't show it yet) or "removed" (there's no such item). The client can't load them, and one
+early build had a few dozen of them dropping from Mottled Boars. An item that turns "valid" later comes back in.
 
 EG Link counts loot windows rather than opened corpses, and corpses the game said nothing about (unknown) can be
 opened too, so a mob can have more windows than corpses with loot. Its own chances treat the windows as a sample:
@@ -37,11 +39,13 @@ ORIGIN = "eglink"
 PRODUCT = "wowf"
 GRID = 50  # DropTables/Places.lua
 SKINNING = {"8613", "8617", "8618", "10768"}  # the four ranks of Skinning, as DropTables/Collector.lua
+# Item statuses of item_hotfixes for items the server doesn't show: not public yet, or no such item.
+HIDDEN = ("invalid", "removed")
 REPO_URL = "https://github.com/JIVESCORP/eg-link-output-wowf"
 NOTICE = ("Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n"
           "(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\n"
-          "corpses skinned without the Bountiful Harvest perk on the live servers, without quest items, summed over\n"
-          "the builds and turned into Drop Tables counts.")
+          "corpses skinned without the Bountiful Harvest perk on the live servers, without quest items and items\n"
+          "the server doesn't show, summed over the builds and turned into Drop Tables counts.")
 
 
 def round_half_up(value):
@@ -196,12 +200,28 @@ def convert(tallies, info, skins=None):
     return mobs
 
 
+def add_statuses(statuses, hotfixes):
+    """Each item's status in a build's item hotfixes. A later build's status replaces an earlier one."""
+    for item, record in hotfixes.get("items", {}).items():
+        if record.get("status"):
+            statuses[item] = record["status"]
+
+
+def drop_hidden(tallies, skins, statuses):
+    """Leaves out the items the server doesn't show, which the client can't load."""
+    hidden = {item for item, status in statuses.items() if status in HIDDEN}
+    for t in list(tallies.values()) + list(skins.values()):
+        for item in hidden & set(t["items"]):
+            del t["items"][item]
+
+
 def read(clone):
-    tallies, info, builds, skins = {}, {}, [], {}
+    tallies, info, builds, skins, statuses = {}, {}, [], {}, {}
     product = clone / "data" / PRODUCT
     for folder in sorted(p for p in product.iterdir() if p.is_dir()):
         loot = folder / "loot.json"
         creatures = folder / "creatures.json"
+        hotfixes = folder / "item_hotfixes.enUS.json"
         if loot.exists():
             data = json.loads(loot.read_text(encoding="utf-8"))
             add_build(tallies, data)
@@ -209,6 +229,9 @@ def read(clone):
             builds.append(folder.name)
         if creatures.exists():
             add_creatures(info, json.loads(creatures.read_text(encoding="utf-8")))
+        if hotfixes.exists():
+            add_statuses(statuses, json.loads(hotfixes.read_text(encoding="utf-8")))
+    drop_hidden(tallies, skins, statuses)
     return tallies, info, builds, skins
 
 

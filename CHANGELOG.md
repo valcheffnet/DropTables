@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- An open Loot Finder or drop table window could make the game stutter about once a second. A few items in the shared database can't be loaded by the game, and each failed try made the window redraw and ask for them again. Those were 23 items that EG Link recorded on Mottled Boars in an early build and that the server doesn't show, and they're out of the shared database now. The Loot Finder also worked every chance and price out again whenever the game loaded any item, the gear of players around you included, and now it does that only for the items it was waiting for.
+
 ## [0.5.3] - 2026-11-22
 
 ### Added
