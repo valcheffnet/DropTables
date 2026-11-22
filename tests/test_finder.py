@@ -245,6 +245,16 @@ def main():
     expect("sightings without counts dropped", (old.ns.db.names[2], old.ns.db.info[2]), (None, None))
     expect("mobs with counts kept", (old.ns.db.names[1], old.ns.db.info[1].minLevel), ("Wolf", 5))
 
+    # Quest items stay out even when the shared database carries them (the imports don't know every one).
+    quester = Client("Quester")
+    qns = quester.ns
+    qns.shared[900] = quester.lua.eval("""{ from = {}, maps = {}, buckets = { [1] = { kills = 3, lootable = 3, opened = 3,
+        money = { copper = 0, drops = 0 },
+        items = { [102] = { drops = 2, qty = 2, min = 1, max = 1 }, [100] = { drops = 1, qty = 1, min = 1, max = 1 } } } } }""")
+    qns.db["items"][102] = quester.lua.table_from({"quality": 1})
+    expect("quest item left out of the table", [e.itemId for e in lua_list(qns.GetStats(900, "all").list)], [100])
+    expect("quest item left out of the search", 102 in [r.itemId for r in lua_list(qns.SearchItems(""))], False)
+
     report("finder")
 
 

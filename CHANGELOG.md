@@ -14,6 +14,7 @@
 ### Fixed
 
 - Debug lines go only to the DT Debug chat tab, also while another tab is selected. Before, they went to General whenever DT Debug wasn't the tab in front, and a /reload could open a second DT Debug tab. The tab keeps the last 500 lines over a /reload; a new login starts it empty.
+- Quest items no longer show up in drop tables or in the Loot Finder. Drop Tables never recorded them, but the shared database had some that the imported data didn't mark as quest items, Arnak's Hoof among them.
 
 ## [0.5.4] - 2026-11-22
 

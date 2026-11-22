@@ -10,6 +10,8 @@ for itemId = 248682, 248713 do
         WORLD_DROP_ITEMS[itemId] = true
     end
 end
+-- Quest items, which the addon never records. Other sources can still carry them, so they stay out of every table.
+local QUEST_CLASS = 12
 local OWN_DROP_MIN_RATE = 0.2
 -- Another install with more kills than this counts as this many, with all its counts scaled down by the same factor.
 local PEER_CAP = 300
@@ -206,8 +208,11 @@ local function newEntry(key, rate, sums, opened)
         -- Money is one more entry of the list (money = true, no itemId), so it is sorted by chance like any item.
         return { money = true, rate = rate, avg = merged.qty / merged.drops, min = merged.min, max = merged.max }
     end
-    local meta = ns.db.items[key]
     local classId = select(6, C_Item.GetItemInfoInstant(key))
+    if classId == QUEST_CLASS then
+        return nil
+    end
+    local meta = ns.db.items[key]
     return {
         itemId = key,
         rate = rate,

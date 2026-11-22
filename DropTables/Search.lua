@@ -9,7 +9,7 @@ local currentIndex, currentSkinIndex
 
 -- Items seen in loot windows whose name contains the text (in any case) or whose id is the text, or all of them when
 -- the text is empty. qualities, when given, is a set of the qualities to keep. Items that only ever came from skinning
--- are left to SkinItems.
+-- are left to SkinItems. Quest items (class 12) are left out, since only other sources carry them.
 function ns.SearchItems(text, qualities)
     text = strtrim(text or ""):lower()
     local id = tonumber(text)
@@ -18,10 +18,10 @@ function ns.SearchItems(text, qualities)
     for itemId, meta in pairs(ns.db.items) do
         local name = ns.ItemName(itemId)
         local quality = meta.quality or ns.ItemQuality(itemId) or 1
-        if (looted[itemId] or not skinnedOnly[itemId])
+        local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(itemId)
+        if (looted[itemId] or not skinnedOnly[itemId]) and classId ~= 12
             and (text == "" or itemId == id or name:lower():find(text, 1, true))
             and (not qualities or qualities[quality]) then
-            local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(itemId)
             table.insert(results, {
                 itemId = itemId, name = name, quality = quality, classId = classId or 15, subclassId = subclassId or 0,
             })
