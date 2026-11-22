@@ -63,6 +63,15 @@ def main():
     expect("a bound item's price is the vendor's", ns.PriceInfo(101), (20, "vendor"))
     expect("a world drop's price is the vendor's", ns.PriceInfo(105, True), (30, "vendor"))
     expect("gold per hour at 70 kills an hour", ns.GoldPerHour(1), int(per_kill * 70))
+    # The client brings item 106 later. Info for items Drop Tables never asked about keeps the cached value, and 106's
+    # own arrival counts it in.
+    c.lua.execute("itemInfo[106] = { sell = 400, bind = 0 }")
+    c.fire("GET_ITEM_INFO_RECEIVED", 4242, True)
+    expect("an unrelated item keeps the cached g/ph", ns.GoldPerHour(1), int(per_kill * 70))
+    c.fire("GET_ITEM_INFO_RECEIVED", 106, True)
+    expect("the awaited item's info updates g/ph", ns.GoldPerHour(1) > int(per_kill * 70), True)
+    c.lua.execute("itemInfo[106] = nil")
+    c.fire("DT_DATA_CHANGED", 1)
     # With world drops on, the armor counts at its vendor 30 in a quarter of the kills, not at its auction price.
     ns.settings.gphWorldDrops = True
     c.fire("DT_SETTINGS_CHANGED")

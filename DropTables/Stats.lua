@@ -208,7 +208,7 @@ local function newEntry(key, rate, sums, opened)
         avgQty = merged.qty / merged.drops,
         min = merged.min,
         max = merged.max,
-        quality = meta and meta.quality or C_Item.GetItemQualityByID(key),
+        quality = meta and meta.quality or ns.ItemQuality(key),
         world = WORLD_DROP_CLASSES[classId] == true and not (opened >= ns.SMALL_SAMPLE and rate >= OWN_DROP_MIN_RATE),
     }
 end
@@ -443,7 +443,7 @@ ns.On("DT_COUNTS_CHANGED", forget)
 ns.On("DT_SETTINGS_CHANGED", function()
     cache = {}
 end)
-ns.On("GET_ITEM_INFO_RECEIVED", function()
+ns.On("DT_ITEM_INFO_RECEIVED", function()
     cache = {}
 end)
 

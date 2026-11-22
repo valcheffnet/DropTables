@@ -212,11 +212,36 @@ function ns.TryLinkItem(itemId)
     return true
 end
 
+-- Items asked about before the client knew them. The client loads items all the time for other addons and for the
+-- gear of the players around, so only the arrival of these ones fires DT_ITEM_INFO_RECEIVED, the signal to work the
+-- values out again and redraw. An item the server can't load comes back as a failure and changes nothing; a redraw
+-- for it would only ask for it again and fail again, every second.
+local awaited = {}
+function ns.AwaitItem(itemId)
+    awaited[itemId] = true
+end
+
+ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
+    if awaited[itemId] and success ~= false then
+        awaited[itemId] = nil
+        ns.Fire("DT_ITEM_INFO_RECEIVED", itemId)
+    end
+end)
+
+function ns.ItemQuality(itemId)
+    local quality = C_Item.GetItemQualityByID(itemId)
+    if quality == nil then
+        ns.AwaitItem(itemId)
+    end
+    return quality
+end
+
 function ns.ItemName(itemId)
     local name = C_Item.GetItemInfo(itemId)
     if name then
         return name
     end
+    ns.AwaitItem(itemId)
     local meta = ns.db.items[itemId]
     return meta and meta.name or ("item:" .. itemId)
 end

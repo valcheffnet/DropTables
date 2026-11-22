@@ -532,9 +532,10 @@ ns.On("DT_DATA_CHANGED", refresh)
 ns.On("DT_INFO_CHANGED", refresh)
 
 -- Item names arrive from the server after the first request, so we redraw once they do. Items of other windows (bags,
--- vendors, chat links) don't concern this one.
-ns.On("GET_ITEM_INFO_RECEIVED", function(itemId)
-    if shownItems[itemId] then
+-- vendors, chat links) don't concern this one, and neither does an item the server failed to load, which a redraw would
+-- only ask for again.
+ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
+    if shownItems[itemId] and success ~= false then
         redrawSoon()
     end
 end)

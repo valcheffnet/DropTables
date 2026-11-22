@@ -119,14 +119,27 @@ def main():
     expect("world drop left out of icons", (len(list(visible.values())), world_count), (0, 1))
     expect("group mode empty", ns.GetStats(1, "group"), None)
 
-    # Stats are kept between calls until the mob's counts change or item info arrives.
+    # Stats are kept between calls until the mob's counts change or the info of an item they wait for arrives. The
+    # client loads items for the gear of players around and for other addons all the time, and those leave them be.
     same = lua.eval("function(a, b) return rawequal(a, b) end")
+    lua.execute("knownQuality = C_Item.GetItemQualityByID; C_Item.GetItemQualityByID = function() return nil end")
+    ns.db["items"][100].quality = None
+    client.fire("DT_DATA_CHANGED", 1)
     first = ns.GetStats(1, "all")
     expect("stats kept between calls", same(first, ns.GetStats(1, "all")), True)
-    ns.db["items"][100].quality = 3
-    client.fire("GET_ITEM_INFO_RECEIVED", 100)
+    client.fire("GET_ITEM_INFO_RECEIVED", 4242, True)
+    expect("info of an unrelated item keeps the stats", same(first, ns.GetStats(1, "all")), True)
+    lua.execute("C_Item.GetItemQualityByID = function() return 3 end")
+    client.fire("GET_ITEM_INFO_RECEIVED", 100, True)
     fang = next(e for e in ns.GetStats(1, "all").list.values() if e.itemId == 100)
     expect("item info arriving updates the stats", fang.quality, 3)
+    lua.execute("C_Item.GetItemQualityByID = knownQuality")
+    # An item name the client doesn't know yet waits for its info like the quality does.
+    arrived = []
+    ns.On("DT_ITEM_INFO_RECEIVED", lambda item: arrived.append(item))
+    ns.ItemName(4343)
+    client.fire("GET_ITEM_INFO_RECEIVED", 4343, True)
+    expect("an unknown item name waits for its info", arrived, [4343])
     second = ns.GetStats(3, "all")
     kill("Z", False, npc=3)
     g.advance(5)
@@ -394,6 +407,9 @@ def main():
     reader.fire("GET_ITEM_INFO_RECEIVED", 555)
     reader.advance(1)
     expect("no redraw for an item it does not list", reader.g.renders, 1)
+    reader.fire("GET_ITEM_INFO_RECEIVED", 100, False)
+    reader.advance(1)
+    expect("no redraw for a listed item the server failed to load", reader.g.renders, 1)
     reader.fire("GET_ITEM_INFO_RECEIVED", 100)
     reader.advance(1)
     expect("a redraw for an item it lists", reader.g.renders, 2)

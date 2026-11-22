@@ -218,6 +218,23 @@ def main():
     shown = set(viewer.g.texts.values())
     expect("an item's name stays with the items", ("Search results" in shown, "Mobs matching your search" in shown),
            (True, False))
+    # The open Finder redraws when the client brings the info of an item it shows, and not for every item the client
+    # loads for others, which happens all the time near other players and made the game stutter.
+    viewer.lua.execute("""
+        C_Item.GetItemInfo = function(id) if id == 2589 then return "Linen Cloth, loaded" end end
+        texts = {}
+    """)
+    viewer.fire("GET_ITEM_INFO_RECEIVED", 9999, True)
+    viewer.advance(1)
+    expect("an unrelated item doesn't redraw the Finder", len(viewer.g.texts), 0)
+    # An item the server can't load comes back as a failure, and a redraw would only ask for it again.
+    viewer.fire("GET_ITEM_INFO_RECEIVED", 2589, False)
+    viewer.advance(1)
+    expect("an item that failed to load doesn't redraw the Finder", len(viewer.g.texts), 0)
+    viewer.fire("GET_ITEM_INFO_RECEIVED", 2589, True)
+    viewer.advance(1)
+    expect("a shown item's info redraws it",
+           any("Linen Cloth, loaded" in str(text) for text in viewer.g.texts.values()), True)
 
     # Names and levels saved by earlier versions for creatures without any counts are dropped on login.
     old = Client("Old", saved="""DropTablesDB = {

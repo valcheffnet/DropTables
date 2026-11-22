@@ -17,7 +17,7 @@ function ns.SearchItems(text, qualities)
     local looted, skinnedOnly = currentIndex(), currentSkinIndex()
     for itemId, meta in pairs(ns.db.items) do
         local name = ns.ItemName(itemId)
-        local quality = meta.quality or C_Item.GetItemQualityByID(itemId) or 1
+        local quality = meta.quality or ns.ItemQuality(itemId) or 1
         if (looted[itemId] or not skinnedOnly[itemId])
             and (text == "" or itemId == id or name:lower():find(text, 1, true))
             and (not qualities or qualities[quality]) then
@@ -417,7 +417,7 @@ function ns.SkinItems(text, qualities)
     for itemId in pairs(currentSkinIndex()) do
         local name = ns.ItemName(itemId)
         local meta = ns.db.items[itemId]
-        local quality = meta and meta.quality or C_Item.GetItemQualityByID(itemId) or 1
+        local quality = meta and meta.quality or ns.ItemQuality(itemId) or 1
         if (text == "" or itemId == id or name:lower():find(text, 1, true))
             and (not qualities or qualities[quality]) then
             table.insert(results, { itemId = itemId, name = name, quality = quality })

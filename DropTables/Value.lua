@@ -65,6 +65,7 @@ end
 function ns.PriceInfo(itemId, vendorOnly)
     local name, _, _, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(itemId)
     if not name then
+        ns.AwaitItem(itemId)
         return nil
     end
     local vendor = sellPrice or 0
@@ -210,7 +211,7 @@ end
 ns.On("DT_DATA_CHANGED", forget)
 ns.On("DT_COUNTS_CHANGED", forget)
 ns.On("DT_SETTINGS_CHANGED", forgetAll)
-ns.On("GET_ITEM_INFO_RECEIVED", forgetAll)
+ns.On("DT_ITEM_INFO_RECEIVED", forgetAll)
 ns.On("PLAYER_LEVEL_UP", pricesChanged)
 
 -- Auctionator and FojjiCore say when a scan brought new prices. Either may load after Drop Tables, so every addon that
