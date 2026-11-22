@@ -5,10 +5,15 @@
 ### Added
 
 - A seventh colour theme, Classic, takes the colours of the game's own windows: gold titles on near black, with red lines. It's the first square in the Loot Finder's title bar and the default for new installs and after Restore defaults. If you already use Drop Tables, your theme stays as it is until you click the Classic square.
+- The DT Debug chat tab shows how many new lines came while another tab was in front, as a number in a red circle like the ones Chat+ puts on other tabs.
 
 ### Changed
 
 - Waylaid Crates count as world drops on every mob, like random gear and recipes, so they go into the world drops section of the drop table instead of the icons under the target.
+
+### Fixed
+
+- Debug lines go only to the DT Debug chat tab, also while another tab is selected. Before, they went to General whenever DT Debug wasn't the tab in front, and a /reload could open a second DT Debug tab. The tab keeps the last 500 lines over a /reload; a new login starts it empty.
 
 ## [0.5.4] - 2026-11-22
 

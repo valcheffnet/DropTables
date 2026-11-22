@@ -7,7 +7,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from wowsim import ALL_FILES, UI_STUBS, Client, expect, report  # noqa: E402
+from wowsim import ALL_FILES, FINDER_STUBS, UI_STUBS, Client, expect, report  # noqa: E402
 
 
 def guid(npc, spawn):
@@ -326,7 +326,11 @@ def main():
     tester = Client("Debugger")
     tester.lua.execute("""
         groupsRemoved = 0
-        FCF_OpenNewWindow = function(name) chatWindowNames[4] = name; return ChatFrame4 end
+        tabsOpened = 0
+        FCF_OpenNewWindow = function(name)
+            chatWindowNames[4], chatWindowShown[4], tabsOpened = name, nil, tabsOpened + 1
+            return ChatFrame4
+        end
         FCF_Close = function(frame) if frame == ChatFrame4 then chatWindowNames[4] = nil end end
         ChatFrame_RemoveAllMessageGroups = function(frame) if frame == ChatFrame4 then groupsRemoved = 1 end end
     """)
@@ -344,6 +348,55 @@ def main():
     tester.ns.settings.debug = True
     tester.fire("DT_SETTINGS_CHANGED")
     expect("the options checkbox opens it", tester.g.chatWindowNames[4], "DT Debug")
+    # The tab is hidden while another tab of the dock is selected, and the lines still go only to it.
+    tester.lua.execute("chatWindowShown[4], chatWindowDocked[4] = false, 2; ChatFrame1.lines = {}; ChatFrame4.lines = {}")
+    opened = tester.g.tabsOpened
+    tester.ns.Debug("while General is selected")
+    expect("a hidden docked tab gets the line, no new tab and none in General",
+           (len(tester.g.ChatFrame4.lines), tester.g.tabsOpened - opened, len(tester.g.ChatFrame1.lines)), (1, 0, 0))
+    # A tab closed by hand while debug is on opens again with the next line.
+    tester.lua.execute("chatWindowDocked[4] = nil")
+    tester.ns.Debug("after the tab was closed")
+    expect("a closed tab opens again", (tester.g.tabsOpened - opened, len(tester.g.ChatFrame4.lines),
+                                        len(tester.g.ChatFrame1.lines)), (1, 2, 0))
+
+    # Lines that come while the DT Debug tab is behind another one are counted on its tab, and bringing it to the
+    # front clears the count.
+    badger = Client("Badger", saved=FINDER_STUBS)
+    badger.lua.execute("""
+        hooks = {}
+        local function hookable(t, name)
+            t.shown = false
+            t.GetName = function() return name end
+            t.IsShown = function(self) return self.shown end
+            t.HookScript = function(_, script, fn) hooks[name .. script] = fn end
+        end
+        hookable(ChatFrame4, "ChatFrame4")
+        ChatFrame4Tab = {}
+        hookable(ChatFrame4Tab, "ChatFrame4Tab")
+        ChatFrame4Tab.shown = true
+        FCF_OpenNewWindow = function(name) chatWindowNames[4] = name; return ChatFrame4 end
+        FCF_Close = function(frame) chatWindowNames[4] = nil end
+    """)
+    badger.g.SlashCmdList.DROPTABLES("debug")
+    for i in range(3):
+        badger.ns.Debug("line %d", i)
+    badge = badger.ns.debugBadge
+    expect("hidden tab counts its new lines", (badge.shown, badge.text.text), (True, "4"))
+    badger.lua.execute("ChatFrame4.shown = true; hooks.ChatFrame4OnShow(ChatFrame4)")
+    expect("bringing the tab to the front clears the count", badge.shown, False)
+    badger.ns.Debug("read right away")
+    expect("a line seen as it comes counts nothing", badge.shown, False)
+    badger.lua.execute("ChatFrame4.shown = false")
+    for i in range(120):
+        badger.ns.Debug("line %d", i)
+    expect("more than 99 shows 99+", badge.text.text, "99+")
+    badger.lua.execute("ChatFrame4Tab.shown = false; hooks.ChatFrame4TabOnHide()")
+    expect("no badge while the tab itself is hidden", badge.shown, False)
+    badger.lua.execute("ChatFrame4Tab.shown = true; hooks.ChatFrame4TabOnShow()")
+    expect("the badge comes back with the tab", badge.shown, True)
+    badger.g.SlashCmdList.DROPTABLES("debug")
+    expect("debug off hides the badge", badge.shown, False)
 
     # /dt find keeps the case of the text, and /dt on a friendly NPC opens the table without it.
     tester.lua.eval("""function(ns)
@@ -370,9 +423,25 @@ def main():
     expect("status names the version", tester.g.printed[1], "|cff66ccffDrop Tables|r version 9.9.9")
     tester.lua.execute("C_AddOns = nil")
     expect("a client that can't say gives ?", tester.ns.Version(), "?")
-    reloaded = Client("Reloaded", saved="DropTablesDB = { settings = { debug = true } }")
+    reloaded = Client("Reloaded", saved="DropTablesDB = { settings = { debug = true }, debugLog = { 'one', 'two' } }")
     reloaded.ns.Debug("after a reload")
     expect("debug still on after a reload", len(reloaded.g.ChatFrame1.lines), 1)
+    # A /reload puts the kept lines back into the tab, and a new login forgets them.
+    reloaded.lua.execute("ChatFrame1.lines = {}")
+    reloaded.fire("PLAYER_ENTERING_WORLD", False, True)
+    expect("a reload puts the kept lines back", [reloaded.g.ChatFrame1.lines[i] for i in (1, 2)], ["one", "two"])
+    expect("the line before the reload is kept too", "after a reload" in (reloaded.g.ChatFrame1.lines[3] or ""), True)
+    reloaded.fire("PLAYER_ENTERING_WORLD", False, False)
+    expect("zoning puts nothing back", len(reloaded.g.ChatFrame1.lines), 3)
+    for i in range(510):
+        reloaded.ns.Debug("line %d", i)
+    expect("only the last 500 lines are kept", (len(reloaded.ns.db.debugLog), "line 509" in reloaded.ns.db.debugLog[500]),
+           (500, True))
+    reloaded.fire("PLAYER_ENTERING_WORLD", True, False)
+    expect("a new login starts with none", len(reloaded.ns.db.debugLog), 0)
+    reloaded.ns.Debug("again")
+    reloaded.g.SlashCmdList.DROPTABLES("debug")
+    expect("debug off forgets the kept lines", len(reloaded.ns.db.debugLog), 0)
 
     # Restore defaults puts the settings back and forgets window places, and keeps the recorded drops.
     ns.settings.minQuality = 3

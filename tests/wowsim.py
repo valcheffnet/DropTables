@@ -40,14 +40,17 @@ date = os.date
 -- Errors that ns.Fire hands to the error handler; the Client raises them in Python.
 luaErrors = {}
 function geterrorhandler() return function(err) table.insert(luaErrors, tostring(err)) end end
--- Chat windows: chatWindowNames[i] is the tab name of ChatFrame<i>; each frame keeps what it was given.
-chatWindowNames = { "General", "Combat Log" }
+-- Chat windows: chatWindowNames[i] is the tab name of ChatFrame<i>, chatWindowShown[i] false when it's hidden and
+-- chatWindowDocked[i] its place in the dock; each frame keeps what it was given.
+chatWindowNames, chatWindowShown, chatWindowDocked = { "General", "Combat Log" }, {}, {}
 NUM_CHAT_WINDOWS = 10
 for i = 1, NUM_CHAT_WINDOWS do
     _G["ChatFrame" .. i] = { lines = {}, AddMessage = function(self, text) table.insert(self.lines, text) end }
 end
 DEFAULT_CHAT_FRAME = ChatFrame1
-function GetChatWindowInfo(i) return chatWindowNames[i] end
+function GetChatWindowInfo(i)
+    return chatWindowNames[i], 14, 0, 0, 0, 0, chatWindowShown[i], false, chatWindowDocked[i]
+end
 SlashCmdList = {}
 Enum = {}
 function issecretvalue() return false end

@@ -68,21 +68,21 @@ function ns.Version()
 end
 
 -- /dt debug writes a chat line for every sharing message in and out and for every loot window, which helps when testing
--- with another player. The lines go to a chat tab called "DT Debug" that /dt debug opens and closes again, or to the
--- main window when there's no free tab.
+-- with another player. The lines go only to a chat tab called "DT Debug" that /dt debug opens and closes again, or to
+-- the main window when there's no free tab. The last lines are kept over a /reload and put back in the tab, and a new
+-- login starts with none.
 local DEBUG_TAB = "DT Debug"
+local DEBUG_KEEP = 500
 
+-- A docked tab that isn't the selected one is hidden, and the client then calls it not shown, so a tab counts while it
+-- is shown or docked. A tab closed by hand is neither.
 local function findDebugFrame()
     for i = 1, NUM_CHAT_WINDOWS or 0 do
-        local name, _, _, _, _, _, shown = GetChatWindowInfo(i)
-        if name and name:lower() == DEBUG_TAB:lower() and shown ~= false and _G["ChatFrame" .. i] then
+        local name, _, _, _, _, _, shown, _, docked = GetChatWindowInfo(i)
+        if name and name:lower() == DEBUG_TAB:lower() and (shown ~= false or docked) and _G["ChatFrame" .. i] then
             return _G["ChatFrame" .. i]
         end
     end
-end
-
-local function debugFrame()
-    return findDebugFrame() or DEFAULT_CHAT_FRAME
 end
 
 -- Opens the DT Debug tab with no other messages in it. If the client lacks Blizzard's chat functions, the lines just
@@ -100,7 +100,84 @@ local function openDebugTab()
     end
 end
 
+-- The DT Debug tab, opened again when it was closed by hand while debug is on.
+local function debugFrame()
+    if not findDebugFrame() then
+        openDebugTab()
+    end
+    return findDebugFrame() or DEFAULT_CHAT_FRAME
+end
+
+-- How many debug lines came while the DT Debug tab wasn't in front, as a number in a red circle on its tab, the way
+-- Chat+ marks other tabs. Bringing the tab to the front clears it.
+local unread, badge, badgeFrame = 0, nil, nil
+local hookedFrames = {}
+
+local function updateBadge()
+    if not badge then
+        return
+    end
+    local tab = badgeFrame and _G[badgeFrame:GetName() .. "Tab"]
+    if unread > 0 and tab and tab:IsShown() then
+        badge:ClearAllPoints()
+        badge:SetPoint("CENTER", tab, "TOPRIGHT", -6, -6)
+        badge.text:SetText(unread > 99 and "99+" or tostring(unread))
+        badge:SetWidth(math.max(16, badge.text:GetStringWidth() + 8))
+        badge:Show()
+    else
+        badge:Hide()
+    end
+end
+
+local function createBadge()
+    badge = CreateFrame("Frame", nil, UIParent)
+    badge:SetSize(16, 16)
+    badge:SetFrameStrata("MEDIUM")
+    local circle = badge:CreateTexture(nil, "BACKGROUND")
+    circle:SetAllPoints()
+    circle:SetColorTexture(0.85, 0.12, 0.12, 1)
+    local mask = badge:CreateMaskTexture()
+    mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    mask:SetAllPoints(circle)
+    circle:AddMaskTexture(mask)
+    badge.text = badge:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    badge.text:SetPoint("CENTER", 0, 0)
+    badge:Hide()
+    ns.debugBadge = badge
+end
+
+-- Counts a line written to the tab while it is hidden. A frame without a tab, the main window, counts nothing.
+local function countUnread(frame)
+    local tab = frame.GetName and frame ~= DEFAULT_CHAT_FRAME and _G[frame:GetName() .. "Tab"]
+    if not tab then
+        return
+    end
+    if not badge then
+        createBadge()
+    end
+    if not hookedFrames[frame] then
+        hookedFrames[frame] = true
+        frame:HookScript("OnShow", function(self)
+            if self == badgeFrame then
+                unread = 0
+                updateBadge()
+            end
+        end)
+        tab:HookScript("OnShow", updateBadge)
+        tab:HookScript("OnHide", updateBadge)
+    end
+    if badgeFrame ~= frame then
+        badgeFrame, unread = frame, 0
+    end
+    if not frame:IsShown() then
+        unread = unread + 1
+    end
+    updateBadge()
+end
+
 local function closeDebugTab()
+    unread = 0
+    updateBadge()
     local frame = findDebugFrame()
     if frame and frame ~= DEFAULT_CHAT_FRAME and FCF_Close then
         FCF_Close(frame)
@@ -118,14 +195,35 @@ ns.On("DT_SETTINGS_CHANGED", function()
         openDebugTab()
     else
         closeDebugTab()
+        wipe(ns.db.debugLog)
     end
 end)
 
 function ns.Debug(text, ...)
     if ns.settings and ns.settings.debug then
-        debugFrame():AddMessage(("|cff888888%s DT|r %s"):format(date("%H:%M:%S"), text:format(...)))
+        local line = ("|cff888888%s DT|r %s"):format(date("%H:%M:%S"), text:format(...))
+        local frame = debugFrame()
+        frame:AddMessage(line)
+        countUnread(frame)
+        local log = ns.db.debugLog
+        log[#log + 1] = line
+        if #log > DEBUG_KEEP then
+            table.remove(log, 1)
+        end
     end
 end
+
+-- A /reload empties the chat tabs, so the kept lines go back into the DT Debug tab.
+ns.On("PLAYER_ENTERING_WORLD", function(isInitialLogin, isReloadingUi)
+    if isInitialLogin then
+        wipe(ns.db.debugLog)
+    elseif isReloadingUi and ns.settings.debug then
+        local frame = debugFrame()
+        for _, line in ipairs(ns.db.debugLog) do
+            frame:AddMessage(line)
+        end
+    end
+end)
 
 local function isSecret(value)
     return issecretvalue ~= nil and issecretvalue(value)
@@ -335,6 +433,7 @@ ns.On("ADDON_LOADED", function(name)
     db.peers = db.peers or {}
     db.refreshed = db.refreshed or {}  -- npc -> time of its last daily question
     db.settings = db.settings or {}
+    db.debugLog = db.debugLog or {}  -- the last debug lines of this session, put back after a /reload
     for key, value in pairs(ns.DEFAULTS) do
         if db.settings[key] == nil then
             db.settings[key] = value
