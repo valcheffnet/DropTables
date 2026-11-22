@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- A seventh colour theme, Classic, takes the colours of the game's own windows: gold titles on near black, with red lines. It's the first square in the Loot Finder's title bar and the default for new installs and after Restore defaults. If you already use Drop Tables, your theme stays as it is until you click the Classic square.
+
+### Changed
+
+- Waylaid Crates count as world drops on every mob, like random gear and recipes, so they go into the world drops section of the drop table instead of the icons under the target.
+
 ## [0.5.4] - 2026-11-22
 
 ### Fixed

@@ -19,6 +19,9 @@ local function theme(key, name, ink, raised, accent, text, muted, bar, lineRgb)
     }
 end
 Style.THEMES = {
+    -- The game's own windows: gold titles on near black, white text and red trim.
+    theme("classic", "Classic", { 0.035, 0.025, 0.02 }, { 0.1, 0.045, 0.035 }, { 1, 0.82, 0 },
+        { 1, 1, 1 }, { 0.62, 0.6, 0.56 }, { 0.75, 0.1, 0.06, 0.35 }, { 0.72, 0.13, 0.08 }),
     theme("ledger", "Ledger", { 0.055, 0.047, 0.04 }, { 0.105, 0.09, 0.075 }, { 0.91, 0.77, 0.42 },
         { 0.94, 0.9, 0.82 }, { 0.62, 0.57, 0.48 }, { 0.78, 0.5, 0.16, 0.3 }, { 0.79, 0.64, 0.29 }),
     theme("frost", "Frost", { 0.035, 0.05, 0.065 }, { 0.07, 0.1, 0.13 }, { 0.6, 0.83, 0.98 },

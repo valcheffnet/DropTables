@@ -427,7 +427,7 @@ function render()
         end
         if #world > 0 then
             used = used + 1
-            fillSection(used, "WORLD DROPS", ("random gear and recipes, %d items"):format(#world))
+            fillSection(used, "WORLD DROPS", ("random gear, recipes and crates, %d items"):format(#world))
             for _, entry in ipairs(world) do
                 used = used + 1
                 fillEntry(used, entry, stats.small)

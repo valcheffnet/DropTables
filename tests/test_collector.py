@@ -117,6 +117,13 @@ def main():
     client.fire("DT_DATA_CHANGED", 3)
     visible, world_count, _ = ns.VisibleEntries(ns.GetStats(3, "all"))
     expect("world drop left out of icons", (len(list(visible.values())), world_count), (0, 1))
+    # A Waylaid Crate is a world drop even when a well-sampled mob gives it often.
+    gear_mob[3][1]["items"][248683] = lua.eval("{ drops = 8, qty = 8 }")
+    client.fire("DT_DATA_CHANGED", 3)
+    crate = next(e for e in ns.GetStats(3, "all").list.values() if e.itemId == 248683)
+    expect("a Waylaid Crate at 40% is still a world drop", crate.world, True)
+    gear_mob[3][1]["items"][248683] = None
+    client.fire("DT_DATA_CHANGED", 3)
     expect("group mode empty", ns.GetStats(1, "group"), None)
 
     # Stats are kept between calls until the mob's counts change or the info of an item they wait for arrives. The
@@ -417,7 +424,9 @@ def main():
     # A theme rewrites the shared colours in place and runs every painter again, and Restore defaults goes back.
     ns = reader.ns
     colors = ns.Style.colors
-    ledger_gold = tuple(colors.gold[i] for i in (1, 2, 3))
+    # Classic is the default: the game's own gold titles and red hairlines.
+    expect("classic is the default, gold with red lines", (ns.Style.CurrentTheme(), tuple(colors.gold[i] for i in (1, 2, 3)),
+           colors.line[1] > 2 * colors.line[2]), ("classic", (1, 0.82, 0), True))
     reader.lua.execute("paints = 0")
     reader.lua.eval("function(Style) Style.Paint(function() paints = paints + 1 end) end")(ns.Style)
     ns.settings.theme = "frost"
@@ -430,12 +439,12 @@ def main():
     expect("the same theme paints nothing", reader.g.paints, 2)
     ns.settings.theme = "no such theme"
     reader.fire("DT_SETTINGS_CHANGED")
-    expect("an unknown theme falls back to the first", ns.Style.CurrentTheme(), "ledger")
+    expect("an unknown theme falls back to the first", ns.Style.CurrentTheme(), "classic")
     ns.settings.theme = "frost"
     reader.fire("DT_SETTINGS_CHANGED")
     ns.RestoreDefaults()
-    expect("restore defaults brings the first theme back", (ns.Style.CurrentTheme(),
-           tuple(colors.gold[i] for i in (1, 2, 3))), ("ledger", ledger_gold))
+    expect("restore defaults brings the default theme back", (ns.Style.CurrentTheme(),
+           tuple(colors.gold[i] for i in (1, 2, 3))), ("classic", (1, 0.82, 0)))
 
     # Forever hides the server and spawn ids in GUIDs since 1.60.1, and a hotfix hides the realm id too. Only the npc
     # id, the sixth field, is ever read; the rest only has to stay the same for one corpse within the session.

@@ -70,7 +70,7 @@ ns.On("DT_READY", function()
         "Items below this quality stay out of the icons and the tooltip. The /dt table still lists everything.",
         0, 4, 1, qualityName)
     checkbox("collapseWorldDrops", "World drops only in the table",
-        "Keep random gear and recipe drops out of the icons and the tooltip; the /dt table lists them in their own section.")
+        "Keep random gear, recipes and Waylaid Crates out of the icons and the tooltip; the /dt table lists them in their own section.")
     checkbox("showMinimap", "Minimap button", "Show the Drop Tables button on the minimap edge.")
     slider("killsPerHour", "Kills per hour",
         "How many mobs of your level you kill in an hour, for the g/ph column of the Loot Finder. Mobs well below "

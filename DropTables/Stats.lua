@@ -3,6 +3,13 @@ local _, ns = ...
 -- Weapons, armor and recipes of any quality are treated as random world drops that any mob of the level can give,
 -- unless a well-sampled mob drops one often enough to make it part of its own table.
 local WORLD_DROP_CLASSES = { [2] = true, [4] = true, [9] = true }
+-- The Waylaid Crates of crafting materials drop from any mob of their level and are always world drops.
+local WORLD_DROP_ITEMS = {}
+for itemId = 248682, 248713 do
+    if itemId ~= 248700 and itemId ~= 248701 then
+        WORLD_DROP_ITEMS[itemId] = true
+    end
+end
 local OWN_DROP_MIN_RATE = 0.2
 -- Another install with more kills than this counts as this many, with all its counts scaled down by the same factor.
 local PEER_CAP = 300
@@ -209,7 +216,8 @@ local function newEntry(key, rate, sums, opened)
         min = merged.min,
         max = merged.max,
         quality = meta and meta.quality or ns.ItemQuality(key),
-        world = WORLD_DROP_CLASSES[classId] == true and not (opened >= ns.SMALL_SAMPLE and rate >= OWN_DROP_MIN_RATE),
+        world = WORLD_DROP_ITEMS[key]
+            or WORLD_DROP_CLASSES[classId] == true and not (opened >= ns.SMALL_SAMPLE and rate >= OWN_DROP_MIN_RATE),
     }
 end
 
