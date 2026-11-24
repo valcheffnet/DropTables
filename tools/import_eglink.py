@@ -19,6 +19,10 @@ servers. So do items the server won't show, by their newest status in item_hotfi
 exists, but the server doesn't show it yet) or "removed" (there's no such item). The client can't load them, and one
 early build had a few dozen of them dropping from Mottled Boars. An item that turns "valid" later comes back in.
 
+For a mob in data/loot-resets.json, whose loot a hotfix changed, only the builds that started recording on or after
+the day there count, by the "collectedOn" dates in each build's loot.json. A build that doesn't say counts nothing of
+it.
+
 EG Link counts loot windows rather than opened corpses, and corpses the game said nothing about (unknown) can be
 opened too, so a mob can have more windows than corpses with loot. Its own chances treat the windows as a sample:
 share of corpses with loot times drops per window. Drop Tables works the chances out the same way, so the windows go
@@ -33,6 +37,8 @@ import math
 import pathlib
 import subprocess
 import sys
+
+from build_data import load_resets
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ORIGIN = "eglink"
@@ -79,10 +85,10 @@ def new_tally():
             "items": {}, "levels": {}}
 
 
-def add_skins(skins, loot):
+def add_skins(skins, loot, skip=()):
     for key, source in loot.get("sources", {}).items():
         npc = skin_key(key)
-        if npc is None:
+        if npc is None or npc in skip:
             continue
         t = skins.setdefault(npc, {"skinned": 0, "items": {}})
         t["skinned"] += source.get("windows", 0)
@@ -103,10 +109,10 @@ def skin_counts(t):
     return {"skinned": t["skinned"], "items": items}
 
 
-def add_build(tallies, loot):
+def add_build(tallies, loot, skip=()):
     for key, kills in loot.get("kills", {}).items():
         npc = corpse_key(key)
-        if npc is None:
+        if npc is None or npc in skip:
             continue
         t = tallies.setdefault(npc, new_tally())
         for field in ("deaths", "empty", "unknown"):
@@ -115,7 +121,7 @@ def add_build(tallies, loot):
             t["levels"][level] = t["levels"].get(level, 0) + count
     for key, source in loot.get("sources", {}).items():
         npc = corpse_key(key)
-        if npc is None:
+        if npc is None or npc in skip:
             continue
         t = tallies.setdefault(npc, new_tally())
         for field in ("windows", "coins", "copper", "copperWindows"):
@@ -215,7 +221,14 @@ def drop_hidden(tallies, skins, statuses):
             del t["items"][item]
 
 
-def read(clone):
+def too_early(loot, resets):
+    """The mobs of resets this build's loot may hold from before their day: the build says it started recording
+    earlier, or doesn't say when."""
+    first = ((loot.get("meta") or {}).get("collectedOn") or {}).get("first")
+    return {npc for npc, since in (resets or {}).items() if not first or first < since}
+
+
+def read(clone, resets=None):
     tallies, info, builds, skins, statuses = {}, {}, [], {}, {}
     product = clone / "data" / PRODUCT
     for folder in sorted(p for p in product.iterdir() if p.is_dir()):
@@ -224,8 +237,9 @@ def read(clone):
         hotfixes = folder / "item_hotfixes.enUS.json"
         if loot.exists():
             data = json.loads(loot.read_text(encoding="utf-8"))
-            add_build(tallies, data)
-            add_skins(skins, data)
+            skip = too_early(data, resets)
+            add_build(tallies, data, skip)
+            add_skins(skins, data, skip)
             builds.append(folder.name)
         if creatures.exists():
             add_creatures(info, json.loads(creatures.read_text(encoding="utf-8")))
@@ -242,8 +256,8 @@ def commit_of(clone):
     return sha, int(when)
 
 
-def make_import(clone):
-    tallies, info, builds, skins = read(clone)
+def make_import(clone, resets=None):
+    tallies, info, builds, skins = read(clone, resets)
     sha, when = commit_of(clone)
     mobs = convert(tallies, info, skins)
     return {
@@ -262,7 +276,7 @@ def main(argv):
         return 2
     clone = pathlib.Path(argv[1])
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
-    imp = make_import(clone)
+    imp = make_import(clone, load_resets(root))
     target = root / "data" / "imports" / (ORIGIN + ".json")
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(imp, sort_keys=True, indent=1, ensure_ascii=False) + "\n", encoding="utf-8",

@@ -375,6 +375,71 @@ def shared_is_trusted():
     expect("the liar goes, the database stays", (stats.kills, stats.sharedKills), (100, 100))
 
 
+def hotfix_resets():
+    """A mob in data/loot-resets.json counts only what was recorded from its day on."""
+    a, since = origin(90), "2026-11-07"
+    start = build_data.since_time(since)
+    resets = {"9": since}
+
+    def at(sub, received):
+        sub["received"] = received
+        return sub
+
+    def skinned(record, count, drops):
+        record["skins"] = {"skinned": count, "items": {"2318": {"drops": drops, "qty": drops}}}
+        return record
+
+    before = at(submission(90, a, {a: {9: skinned(mob({1: bucket(10, 5, 5, {100: 1})}), 4, 4)}}), start - 100)
+    after = at(submission(91, a, {a: {9: skinned(mob({1: bucket(16, 11, 11, {100: 6})}, maps={"12": 16}), 10, 9)}}),
+               start + 100)
+    later = at(submission(92, a, {a: {9: mob({1: bucket(20, 15, 15, {100: 9})})}}), start + 200)
+
+    expect("without a reset the latest export counts whole",
+           build_data.build([before, after])["mobs"]["9"]["buckets"]["1"]["kills"], 16)
+    db = build_data.build([before, after], resets=resets)
+    b = db["mobs"]["9"]["buckets"]["1"]
+    expect("an export after the day counts only what it has beyond the last one before",
+           (b["kills"], b["lootable"], b["opened"], b["items"]["100"]["drops"]), (6, 6, 6, 5))
+    expect("and its kill spots too", db["mobs"]["9"]["maps"], {"12": 15})
+    expect("the database lists all of the install's kills, so the addon adds none of them back",
+           db["mobs"]["9"]["from"], {a: 16})
+    expect("skinning the same way", (db["mobs"]["9"]["skins"]["skinned"], db["mobs"]["9"]["skins"]["items"]["2318"],
+                                     db["mobs"]["9"]["skins"]["from"]), (6, {"drops": 5, "qty": 5}, {a: 10}))
+
+    db = build_data.build([after, later], resets=resets)
+    b = db["mobs"]["9"]["buckets"]["1"]
+    expect("with nothing from before, the first export after the day is the base",
+           (b["kills"], b["items"]["100"]["drops"], db["mobs"]["9"]["from"]), (4, 3, {a: 20}))
+    expect("a single export after the day may hold older kills, so it counts nothing",
+           "9" in build_data.build([after], resets=resets)["mobs"], False)
+    expect("other mobs of the same export are left alone",
+           build_data.build([after], resets={"8": since})["mobs"]["9"]["buckets"]["1"]["kills"], 16)
+
+    old = partial_import("beta", {9: mob({1: bucket(30, 30, 30, {100: 30})})})
+    old["source"]["collectedUntil"] = "2026-10-21"
+    fresh = partial_import("dated", {9: skinned(mob({1: bucket(8, 8, 8, {100: 2})}), 3, 2)})
+    db = build_data.build([before], [old, fresh], resets=resets)
+    expect("an import that stopped before the day goes, one that leaves old records out itself stays",
+           sorted(db["mobs"]["9"]["from"]), [a, "dated"])
+    expect("the kills left out of a player's install still count as known", db["mobs"]["9"]["from"][a], 10)
+    expect("and so do its skinned corpses", db["mobs"]["9"]["skins"]["from"], {a: 4, "dated": 3})
+    expect("an import that stopped before the day stays for other mobs",
+           "beta" in build_data.build([], [old], resets={"8": since})["mobs"]["9"]["from"], True)
+
+    expect("the last export before the day is kept as the base",
+           (build_data.superseded([before, after]) == [before], build_data.superseded([before, after], resets)),
+           (True, []))
+
+    # In game, another player's counts of the mob only add what came after the shared database's count of them.
+    pal = Client("Pal", data=build_data.lua_file(build_data.build([before, after], resets=resets)))
+    pal.lua.execute("""
+        DropTablesDB.peers[9] = { ["%s"] = { t = 1, maps = {}, buckets = { [1] = { kills = 16, lootable = 11,
+            opened = 11, items = { [100] = { drops = 6, qty = 6 } }, money = { drops = 0, copper = 0 } } } } }
+    """ % a)
+    pal.fire("DT_DATA_CHANGED", 9)
+    expect("the addon doesn't add the install's old kills back", pal.ns.GetStats(9, "all").kills, 6)
+
+
 def _saved_db(client):
     """Lua code that gives a new client the same saved variables."""
     dump = client.lua.execute("""
@@ -437,6 +502,7 @@ def daily_limit(root):
 def main():
     merge_rules()
     shared_is_trusted()
+    hotfix_resets()
     with tempfile.TemporaryDirectory() as folder:
         imports(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:

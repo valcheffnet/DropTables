@@ -16,7 +16,7 @@ on:
         required: false
   push:
     branches: [main]
-    paths: ["tools/build_data.py", "tools/check_export.py", "tools/ingest_issue.py"]
+    paths: ["tools/build_data.py", "tools/check_export.py", "tools/ingest_issue.py", "data/loot-resets.json"]
 
 concurrency:
   group: shared-data

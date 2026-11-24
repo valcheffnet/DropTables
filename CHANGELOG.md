@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The shared database kept the Ridgeshade Lurker corpses from before the hotfix of November 6 that fixed their loot, which threw off their chances. For a mob whose loot a hotfix changed, it now counts only what was recorded from the day after the hotfix, starting with Ridgeshade Lurker.
+
 ## [0.6.1] - 2026-11-24
 
 ### Fixed

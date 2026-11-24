@@ -80,6 +80,7 @@ def fake_clone(root):
         "288842": {"status": "invalid"}, "288900": {"status": "removed"}, "289086": {"status": "valid", "name": "Elixir"},
     }})
     write(live / "1.60.1.70200", "loot.json", {
+        "meta": {"collectedOn": {"first": "2026-11-12", "last": "2026-11-14"}},
         "kills": {"npc:10": kills(6, empty=2, levels={"8": 6})},
         "sources": {"npc:10": window(4, {"100": item(2)}, coins=2, copper=100, copper_windows=2)},
     })
@@ -132,6 +133,17 @@ def conversion(clone):
     return imp
 
 
+def resets(clone):
+    """A mob whose loot a hotfix changed keeps only the builds that started recording on or after its day."""
+    mobs = import_eglink.make_import(clone, {"10": "2026-11-12"})["result"]["sources"]["eglink"]["mobs"]
+    b = mobs["10"]["buckets"]["1"]
+    expect("only the build that started on the day counts", (b["kills"], b["lootable"], b["opened"]), (6, 4, 4))
+    expect("a build that doesn't say when it started counts nothing of it, skinning too", "skins" in mobs["10"], False)
+    expect("other mobs keep every build", mobs["11"]["buckets"]["1"]["kills"], 8)
+    mobs = import_eglink.make_import(clone, {"10": "2026-11-13"})["result"]["sources"]["eglink"]["mobs"]
+    expect("a build that started a day too early counts nothing of it", "10" in mobs, False)
+
+
 def in_the_addon(imp):
     lua = build_data.lua_file(build_data.build([], [imp]))
     expect("Data.lua carries the CC BY credit",
@@ -148,6 +160,7 @@ def main():
         clone = pathlib.Path(folder)
         fake_clone(clone)
         in_the_addon(conversion(clone))
+        resets(clone)
     report("EG Link import")
 
 

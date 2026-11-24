@@ -127,6 +127,23 @@ def conversion(folder):
     return imp
 
 
+def resets(folder):
+    """A mob whose loot a hotfix changed keeps only the windows from the day in data/loot-resets.json on."""
+    a = "pub-aaaaaaaa11"
+    records = [loot(a, 10, [(100, 1)], at="2026-11-10T12:00:00Z"), loot(a, 10, [(100, 1)], at="2026-11-12T08:00:00Z"),
+               loot(a, 10, [(2318, 1)], loot_type="skinning", at="2026-11-10T12:00:00Z"),
+               loot(a, 10, [(2318, 1)], loot_type="skinning", at="2026-11-12T08:00:00Z")]
+    reset = {"10": "2026-11-12"}
+    expect("kill windows from before the day stay out",
+           (import_everloot.tally(records, set())[(a, 10)]["opened"],
+            import_everloot.tally(records, set(), reset)[(a, 10)]["opened"]), (2, 1))
+    expect("so do skinning windows", import_everloot.tally_skins(records, set(), reset)[(a, 10)]["skinned"], 1)
+    expect("other mobs keep theirs", import_everloot.tally(records, set(), {"11": "2026-11-12"})[(a, 10)]["opened"], 2)
+    sources = import_everloot.make_import(folder, resets={"10": "2026-11-11"})["result"]["sources"]
+    npcs = {npc for source in sources.values() for npc in source["mobs"]}
+    expect("the import passes the resets on", ("10" in npcs, "11" in npcs), (False, True))
+
+
 def full_source(npc, kills, lootable, opened, items, money=(0, 0)):
     mob = {"buckets": {"1": {"kills": kills, "lootable": lootable, "opened": opened, "items": items,
                              "money": {"drops": money[0], "copper": money[1]}}}, "maps": {}, "name": "Forest Thing"}
@@ -175,6 +192,7 @@ def main():
         fake_corpus(folder)
         imp = conversion(folder)
         in_the_addon(merged(imp))
+        resets(folder)
     report("Everloot import")
 
 

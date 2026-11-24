@@ -11,8 +11,8 @@ What goes in:
   where Everloot records no sightings, can get their English name from a names file (--names, npc id -> name, or
   QuestieDB's npc rows with a "name" field).
 
-What stays out: quest items, gathering, fishing, disenchanting and containers, and anything recorded before the live
-servers opened. The corpus doesn't say who had the Bountiful Harvest perk, so its skinning counts the scarce Pristine
+What stays out: quest items, gathering, fishing, disenchanting and containers, anything recorded before the live
+servers opened, and what was recorded of a mob in data/loot-resets.json before the day a hotfix changed its loot. The corpus doesn't say who had the Bountiful Harvest perk, so its skinning counts the scarce Pristine
 materials as they came.
 
 The quest items are item class 12 in Everloot's item list, which it reads from the game client of the current build.
@@ -34,6 +34,8 @@ import pathlib
 import sys
 import time
 import urllib.request
+
+from build_data import load_resets
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ORIGIN = "everloot"
@@ -91,12 +93,17 @@ def add_stack(into, field, amount):
     into["max"] = amount if into["max"] is None else max(into["max"], amount)
 
 
-def tally(loot, quest_items):
+def recorded_early(rec, npc, resets):
+    """True for a record from before the live servers opened, or from before the day a hotfix changed the mob's loot."""
+    return rec["capturedAt"] < max(LAUNCH, (resets or {}).get(str(npc), LAUNCH))
+
+
+def tally(loot, quest_items, resets=None):
     """(install, npc) -> {opened, items, money} from the kill windows."""
     counts = {}
     for rec in loot:
         npc = rec.get("sourceNpcId")
-        if rec.get("lootType") != "kill" or not isinstance(npc, int) or rec["capturedAt"] < LAUNCH:
+        if rec.get("lootType") != "kill" or not isinstance(npc, int) or recorded_early(rec, npc, resets):
             continue
         t = counts.setdefault((rec["installId"], npc), {"opened": 0, "items": {}, "money": None})
         t["opened"] += 1
@@ -113,12 +120,12 @@ def tally(loot, quest_items):
     return counts
 
 
-def tally_skins(loot, quest_items):
+def tally_skins(loot, quest_items, resets=None):
     """(install, npc) -> {skinned, items} from the skinning windows. Every one is a skinned corpse, whoever killed it."""
     counts = {}
     for rec in loot:
         npc = rec.get("sourceNpcId")
-        if rec.get("lootType") != "skinning" or not isinstance(npc, int) or rec["capturedAt"] < LAUNCH:
+        if rec.get("lootType") != "skinning" or not isinstance(npc, int) or recorded_early(rec, npc, resets):
             continue
         t = counts.setdefault((rec["installId"], npc), {"skinned": 0, "items": {}})
         t["skinned"] += 1
@@ -241,11 +248,12 @@ def read_names(path):
     return names
 
 
-def make_import(folder, names=None):
+def make_import(folder, names=None, resets=None):
     loot_pages = pages(folder, "loot")
     loot = [rec for page in loot_pages for rec in page["records"]]
     quest = quest_items(folder)
-    sources = convert(tally(loot, quest), about(rows(folder, "sightings", "records")), names, tally_skins(loot, quest))
+    sources = convert(tally(loot, quest, resets), about(rows(folder, "sightings", "records")), names,
+                      tally_skins(loot, quest, resets))
     as_of = loot_pages[0]["dataAsOf"]
     return {
         "index": 3, "issue": 0, "partial": True, "own": ["money", "qty"], "received": unix(as_of),
@@ -283,7 +291,7 @@ def main(argv):
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
     folder = pathlib.Path(argv[1])
     names = read_names(argv[argv.index("--names") + 1]) if "--names" in argv else None
-    imp = make_import(folder, names)
+    imp = make_import(folder, names, load_resets(root))
     quest = root / "data" / "quest-items.json"
     quest.write_text(json.dumps(quest_list(folder), indent=1) + "\n", encoding="utf-8", newline="\n")
     target = root / "data" / "imports" / (ORIGIN + ".json")

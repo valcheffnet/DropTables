@@ -11,13 +11,19 @@ full sources of the mob, so it moves the item chances and nothing else.
 Items in data/quest-items.json (item class 12 of the game client, which the addon never records) are left out of
 every source, since an import can't always tell them apart.
 
+Mobs in data/loot-resets.json had their loot changed by a hotfix, so what was recorded of them before the day named
+there is left out (see after_reset). The EG Link and Everloot imports leave those records out themselves, by their
+dates.
+
 Usage:
     python tools/build_data.py [--root DIR]
 """
+import calendar
 import json
 import math
 import pathlib
 import sys
+import time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -66,12 +72,116 @@ def versions(submissions, quest_items=frozenset()):
                 if not buckets:
                     continue
                 mob = dict(mob, buckets=buckets)
-                found.setdefault((origin, npc), []).append({
-                    "kills": mob_kills(mob), "exporter": result["exporter"], "submitter": sub["submitter"],
-                    "issue": sub["issue"], "mob": mob, "partial": bool(sub.get("partial")),
-                    "own": frozenset(sub.get("own") or ()),
-                })
+                found.setdefault((origin, npc), []).append(dict(
+                    dated(sub), kills=mob_kills(mob), exporter=result["exporter"], submitter=sub["submitter"],
+                    issue=sub["issue"], mob=mob, partial=bool(sub.get("partial")), own=frozenset(sub.get("own") or ()),
+                ))
     return found
+
+
+def dated(sub):
+    """When a version was received, and the last day its source recorded anything, when the source says so."""
+    return {"received": sub["received"], "until": (sub.get("source") or {}).get("collectedUntil"),
+            "imported": sub["submitter"].startswith("import:")}
+
+
+def since_time(day):
+    return calendar.timegm(time.strptime(day, "%Y-%m-%d"))
+
+
+def minus_mob(mob, base):
+    """What an install recorded of a mob after base, an earlier version of the same install: the counts of every
+    bucket less the earlier ones, kept in order (drops <= opened <= lootable <= kills). None when nothing is left."""
+    buckets = {}
+    for b, data in mob["buckets"].items():
+        old = base["buckets"].get(b)
+        if old is None:
+            buckets[b] = data
+            continue
+        kills = data["kills"] - old["kills"]
+        if kills <= 0:
+            continue
+        lootable = max(0, min(kills, data["lootable"] - old["lootable"]))
+        opened = max(0, min(lootable, data["opened"] - old["opened"]))
+        money = dict(data["money"])
+        money["drops"] = max(0, min(opened, data["money"]["drops"] - old["money"]["drops"]))
+        money["copper"] = max(0, data["money"]["copper"] - old["money"]["copper"]) if money["drops"] else 0
+        items = {}
+        for item, entry in data["items"].items():
+            before = old["items"].get(item, {"drops": 0, "qty": 0})
+            drops = max(0, min(opened, entry["drops"] - before["drops"]))
+            if drops:
+                items[item] = dict(entry, drops=drops, qty=max(drops, entry["qty"] - before["qty"]))
+        buckets[b] = {"kills": kills, "lootable": lootable, "opened": opened, "money": money, "items": items}
+    if not buckets:
+        return None
+    maps = {m: k - (base.get("maps") or {}).get(m, 0) for m, k in (mob.get("maps") or {}).items()}
+    cells = {}
+    for m, spots in (mob.get("cells") or {}).items():
+        older = (base.get("cells") or {}).get(m, {})
+        left = {c: k - older.get(c, 0) for c, k in spots.items() if k - older.get(c, 0) > 0}
+        if left:
+            cells[m] = left
+    return dict(mob, buckets=buckets, maps={m: k for m, k in maps.items() if k > 0}, cells=cells)
+
+
+def minus_loot(v, base):
+    mob = minus_mob(v["mob"], base["mob"])
+    return mob and dict(v, mob=mob, kills=mob_kills(mob), total=v["kills"])
+
+
+def minus_skins(v, base):
+    skinned = v["skins"]["skinned"] - base["skins"]["skinned"]
+    if skinned <= 0:
+        return None
+    items = {}
+    for item, entry in v["skins"]["items"].items():
+        before = base["skins"]["items"].get(item, {"drops": 0, "qty": 0})
+        drops = max(0, min(skinned, entry["drops"] - before["drops"]))
+        if drops:
+            items[item] = dict(entry, drops=drops, qty=max(drops, entry["qty"] - before["qty"]))
+    return dict(v, kills=skinned, skins=dict(v["skins"], skinned=skinned, items=items), total=v["kills"])
+
+
+def after_reset(candidates, since, minus):
+    """The versions of one install's mob with only what was recorded on or after since, the day a hotfix changed the
+    mob's loot, and how many of the install's kills were left out.
+
+    An import that says it stopped recording before that day goes. The other imports stay as they are, since they
+    leave the older records out themselves. A player's export has no time for each kill, only the time it was
+    received, so the install's last version from before that day becomes the base and later versions count only what
+    they have beyond it. With no version from before, the first one after it is the base, as it may hold kills from
+    before the hotfix too."""
+    imports = [v for v in candidates if v["imported"] and (v["until"] is None or v["until"] >= since)]
+    players = [v for v in candidates if not v["imported"]]
+    start = since_time(since)
+    before = [v for v in players if v["received"] < start]
+    after = sorted((v for v in players if v["received"] >= start), key=lambda v: (v["received"], v["issue"]))
+    if before:
+        base, rest = latest_best(before), after
+    elif after:
+        base, rest = after[0], after[1:]
+    else:
+        return imports, 0
+    later = [d for d in (minus(v, base) for v in rest) if d]
+    return imports + later, base["kills"]
+
+
+def apply_resets(found, resets, minus):
+    """found with after_reset applied to the mobs in resets, and npc -> {origin: kills left out}."""
+    if not resets:
+        return found, {}
+    out, left_out = {}, {}
+    for (origin, npc), candidates in found.items():
+        if npc not in resets:
+            out[(origin, npc)] = candidates
+            continue
+        kept, kills = after_reset(candidates, resets[npc], minus)
+        if kills:
+            left_out.setdefault(npc, {})[origin] = kills
+        if kept:
+            out[(origin, npc)] = kept
+    return out, left_out
 
 
 def latest_best(candidates):
@@ -313,7 +423,7 @@ def shared_mob(chosen):
         buckets[bucket] = result
     if not buckets:
         return None
-    record = {"buckets": buckets, "from": {o: v["kills"] for o, v in kept.items()}, "maps": {}}
+    record = {"buckets": buckets, "from": {o: v.get("total", v["kills"]) for o, v in kept.items()}, "maps": {}}
     levels = [v["mob"]["levels"] for v in kept.values() if v["mob"].get("levels") and v["mob"]["levels"][0]]
     if levels:
         record["minLevel"] = min(low for low, _ in levels)
@@ -344,14 +454,17 @@ def shared_mob(chosen):
     return record
 
 
-def covered(older, newer):
+def covered(older, newer, resets=None):
     """True when the newer submission comes from the same exporter and has every install and mob of the older one
-    with at least as many kills and opened corpses, so the older one can't change the database any more."""
+    with at least as many kills and opened corpses, so the older one can't change the database any more. One that
+    holds a mob of resets from before its day stays, as the base later versions are counted from."""
     if older["result"]["exporter"] != newer["result"]["exporter"]:
         return False
     for origin, source in older["result"]["sources"].items():
         later = newer["result"]["sources"].get(origin)
         for npc, mob in source["mobs"].items():
+            if npc in (resets or {}) and older["received"] < since_time(resets[npc]):
+                return False
             other = later and later["mobs"].get(npc)
             if not other:
                 return False
@@ -365,10 +478,10 @@ def covered(older, newer):
     return True
 
 
-def superseded(submissions):
+def superseded(submissions, resets=None):
     """Submissions a later one covers. A player who sends everything each time ends up leaving only the last."""
     ordered = sorted(submissions, key=lambda s: (s["issue"], s["index"]))
-    return [old for i, old in enumerate(ordered) if any(covered(old, new) for new in ordered[i + 1:])]
+    return [old for i, old in enumerate(ordered) if any(covered(old, new, resets) for new in ordered[i + 1:])]
 
 
 def skin_versions(submissions, quest_items=frozenset()):
@@ -383,10 +496,10 @@ def skin_versions(submissions, quest_items=frozenset()):
                 if npc in NOT_MOBS or not skins or not skins.get("skinned"):
                     continue
                 items = {i: e for i, e in skins["items"].items() if int(i) not in quest_items}
-                found.setdefault((origin, npc), []).append({
-                    "kills": skins["skinned"], "exporter": result["exporter"], "submitter": sub["submitter"],
-                    "issue": sub["issue"], "mob": mob, "skins": dict(skins, items=items),
-                })
+                found.setdefault((origin, npc), []).append(dict(
+                    dated(sub), kills=skins["skinned"], exporter=result["exporter"], submitter=sub["submitter"],
+                    issue=sub["issue"], mob=mob, skins=dict(skins, items=items),
+                ))
     return found
 
 
@@ -411,7 +524,8 @@ def shared_skins(chosen):
             into["drops"] += entry["drops"] * factor
             into["qty"] += entry["qty"] * factor
             merge_range(into, entry.get("min"), entry.get("max"))
-    result = {"skinned": round_half_up(skinned), "items": {}, "from": {o: v["skins"]["skinned"] for o, v in kept.items()}}
+    result = {"skinned": round_half_up(skinned), "items": {},
+              "from": {o: v.get("total", v["skins"]["skinned"]) for o, v in kept.items()}}
     if result["skinned"] == 0:
         return None
     for item, entry in items.items():
@@ -442,9 +556,9 @@ def skin_only_record(chosen):
     return record
 
 
-def build(submissions, imports=(), quest_items=frozenset()):
+def build(submissions, imports=(), quest_items=frozenset(), resets=None):
     """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}, plus "imports" with the source
-    and license of each import that went in."""
+    and license of each import that went in. resets: npc -> the day a hotfix changed its loot."""
     everything = list(submissions) + list(imports)
     found = versions(everything, quest_items)
     skin_found = skin_versions(everything, quest_items)
@@ -452,6 +566,8 @@ def build(submissions, imports=(), quest_items=frozenset()):
     for key, candidates in skin_found.items():
         either.setdefault(key, []).extend(candidates)
     cut = unconfirmed_cut(either)
+    found, left_out = apply_resets(found, resets, minus_loot)
+    skin_found, skins_left_out = apply_resets(skin_found, resets, minus_skins)
     by_npc, skins_by_npc = {}, {}
     for into, versions_found in ((by_npc, found), (skins_by_npc, skin_found)):
         for (origin, npc), candidates in versions_found.items():
@@ -465,6 +581,14 @@ def build(submissions, imports=(), quest_items=frozenset()):
             record = record or skin_only_record(skins_by_npc[npc])
             record["skins"] = skins
         if record:
+            # The kills left out still count as known, so the addon doesn't add them back from the same install
+            # (newShare in DropTables/Stats.lua) and /dt export doesn't send them again.
+            for origin, kills in left_out.get(npc, {}).items():
+                if origin not in cut and record["buckets"]:
+                    record["from"][origin] = max(record["from"].get(origin, 0), kills)
+            for origin, kills in skins_left_out.get(npc, {}).items():
+                if origin not in cut and record.get("skins"):
+                    record["skins"]["from"][origin] = max(record["skins"]["from"].get(origin, 0), kills)
             mobs[npc] = record
     built = max((s["received"] for s in submissions), default=0)
     database = {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
@@ -547,6 +671,14 @@ def load_quest_items(root):
     return frozenset(json.loads(path.read_text(encoding="utf-8"))["items"]) if path.exists() else frozenset()
 
 
+def load_resets(root):
+    """npc -> the day from which its loot counts, from data/loot-resets.json."""
+    path = root / "data" / "loot-resets.json"
+    if not path.exists():
+        return {}
+    return {npc: entry["since"] for npc, entry in json.loads(path.read_text(encoding="utf-8"))["mobs"].items()}
+
+
 def write_outputs(root, database):
     """Writes both files and returns True when either one changed."""
     targets = {
@@ -566,11 +698,12 @@ def write_outputs(root, database):
 def main(argv):
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
     submissions = load_submissions(root)
-    for old in superseded(submissions):
+    resets = load_resets(root)
+    for old in superseded(submissions, resets):
         (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
         submissions.remove(old)
     imports = load_imports(root)
-    database = build(submissions, imports, load_quest_items(root))
+    database = build(submissions, imports, load_quest_items(root), resets)
     changed = write_outputs(root, database)
     print("%d submissions, %d imports, %d mobs%s" % (database["submissions"], len(imports), len(database["mobs"]),
                                                      "" if changed else ", nothing changed"))

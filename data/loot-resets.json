@@ -1,0 +1,10 @@
+{
+ "about": "Mobs whose loot a hotfix changed. What was recorded of them before \"since\" is left out of the shared database: tools/build_data.py, tools/import_eglink.py and tools/import_everloot.py read this file. \"since\" is the day after the hotfix, as the hotfix notes don't give the hour.",
+ "mobs": {
+  "266849": {
+   "name": "Ridgeshade Lurker",
+   "since": "2026-11-07",
+   "why": "WoW: Forever hotfixes of November 6, 2026: \"Durotar - Ridgeshade Lurkers now correctly have loot.\" https://news.blizzard.com/en-us/article/24315281"
+  }
+ }
+}
