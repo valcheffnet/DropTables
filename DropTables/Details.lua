@@ -159,6 +159,13 @@ for _, info in ipairs(MODES) do
     previous = tab
 end
 
+-- The mob's gold an hour, the same as in the Loot Finder, at the right end of the tab row.
+local gphText = Style.Text(frame, "body")
+gphText:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
+gphText:SetPoint("TOP", previous, "TOP", 0, 0)
+gphText:SetPoint("BOTTOM", previous, "BOTTOM", 0, 0)
+gphText:SetJustifyH("RIGHT")
+
 local toggles = {}
 
 -- A checkbox bound to a setting, placed left to right. It returns the checkbox so the next one can go after it.
@@ -400,6 +407,8 @@ function render()
             end
         end
     end
+    local gph = shownNpc and ns.GoldPerHour(shownNpc) or 0
+    gphText:SetText(gph > 0 and ("%s |cff999999g/ph|r"):format(ns.FormatGold(gph)) or "")
     local used = 0
     showSources(stats)
     shareCard:Refresh()

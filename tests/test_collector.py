@@ -468,12 +468,12 @@ def main():
     reader.ns.ShowDetails(8)
     reader.advance(1)
     reader.lua.eval("""function(ns)
-        local getStats = ns.GetStats
+        local getSkinStats = ns.GetSkinStats
         renders = 0
-        -- One render asks for the loot and, through GetSkinStats, for the skinning; the loot counts it once.
-        ns.GetStats = function(npc, mode)
-            if mode ~= "skin" then renders = renders + 1 end
-            return getStats(npc, mode)
+        -- One render asks for the skinning once. The loot is asked for by g/ph as well, so it can't count renders.
+        ns.GetSkinStats = function(npc)
+            renders = renders + 1
+            return getSkinStats(npc)
         end
     end""")(reader.ns)
     for _ in range(3):

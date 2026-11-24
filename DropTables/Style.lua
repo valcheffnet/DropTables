@@ -328,9 +328,9 @@ function Style.OpacitySlider(frame)
 end
 
 -- A card that asks the player to share. It has a square seal with the number of the player's mobs the shared database
--- lacks, and two lines of text, and the seal glows slowly while there's something to share. The whole card is the
+-- lacks, a heading and up to two lines of text, and the seal glows slowly while there's something to share. The whole card is the
 -- button. Callers place it, and Refresh() updates the number.
-Style.SHARE_CARD = 46
+Style.SHARE_CARD = 56
 local SEAL = 34
 local SEAL_ICON = "Interface\\Icons\\Achievement_Reputation_01"
 
@@ -382,6 +382,8 @@ function Style.ShareCard(parent)
     line:SetPoint("TOPLEFT", heading, "BOTTOMLEFT", 0, -4)
     line:SetPoint("RIGHT", -8, 0)
     line:SetJustifyH("LEFT")
+    line:SetWordWrap(true)
+    line:SetMaxLines(2)
 
     function card:Refresh()
         local count = ns.NewCount()

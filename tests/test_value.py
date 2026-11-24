@@ -182,6 +182,51 @@ def main():
     viewer.ns.OpenFinder(100)
     shown = set(viewer.g.texts.values())
     expect("the Loot Finder shows the mob's g/ph", viewer.ns.FormatGold(viewer.ns.GoldPerHour(1)) in shown, True)
+
+    # The mob tooltip shows the g/ph at the right end of the level line, which sits lower when the mob has a title.
+    tipper = Client("Tipper", files=ALL_FILES + ("Tooltip.lua",), saved=FINDER_STUBS + PRICES + """
+        GetCoinTextureString = function(copper) return copper .. "c" end
+        TOOLTIP_UNIT_LEVEL = "Level %s"
+        TooltipDataProcessor = { AddTooltipPostCall = function(_, fn) tooltipHook = fn end }
+        Enum.TooltipDataType = { Unit = 1 }
+        local function line(text)
+            return { text = text, GetText = function(self) return self.text end,
+                SetText = function(self, t) self.text = t end, SetTextColor = function() end, Show = function() end }
+        end
+        tipPairs = {}
+        tipLeft = { line("Deepmoss Venomspitter"), line("Spider Title"), line("Level 18"), line("Corpse") }
+        tipRight = { line(nil), line(nil), line(nil), line(nil) }
+        for i = 1, 4 do _G["GameTooltipTextLeft" .. i], _G["GameTooltipTextRight" .. i] = tipLeft[i], tipRight[i] end
+        GameTooltip = setmetatable({
+            GetName = function() return "GameTooltip" end,
+            NumLines = function() return #tipLeft end,
+            AddLine = function() end,
+            AddDoubleLine = function(_, left, right) table.insert(tipPairs, { left, right }) end,
+        }, getmetatable(GameTooltip))
+    """)
+    loot(tipper, 1, "A", [(100, 1)], 10)
+    tipper.g.tooltipHook(tipper.g.GameTooltip, tipper.lua.table_from({"guid": "Creature-0-1-0-1-1-T"}))
+    right = [tipper.g.tipRight[i].text for i in range(1, 5)]
+    expect("g/ph on the level line only", right,
+           [None, None, tipper.ns.FormatGoldShort(tipper.ns.GoldPerHour(1)) + " |cff999999g/ph|r", None])
+    pairs_ = [(str(p[1]), str(p[2])) for p in tipper.g.tipPairs.values()]
+    item_right = next(r for l, r in pairs_ if "Item 100" in l)
+    expect("the item line has its price before the chance", item_right,
+           tipper.ns.FormatGoldShort(tipper.ns.UnitPrice(100)) + "   " + tipper.ns.FormatRate(1))
+    money_right = next(r for l, r in pairs_ if "Money" in l)
+    expect("the money line has no price", money_right, tipper.ns.FormatRate(1))
+    for amount, text in ((13545, "~1%s 35%s" % (gold, silver)), (13555, "~1%s 36%s" % (gold, silver)),
+                         (13500, "1%s 35%s" % (gold, silver)), (19960, "~2" + gold), (230, "2%s 30%s" % (silver, copper_))):
+        expect("short format of %d copper" % amount, ns.FormatGoldShort(amount), text)
+
+    # The details window shows the mob's g/ph next to the All / Solo / Group tabs.
+    shower = Client("Shower", files=ALL_FILES + ("Style.lua", "Details.lua"),
+                    saved=FINDER_STUBS + PRICES + "GetCoinTextureString = function(c) return c .. \"c\" end")
+    loot(shower, 1, "A", [(100, 1)], 10)
+    shower.lua.execute("texts = {}")
+    shower.ns.ShowDetails(1)
+    expect("the details window shows the mob's g/ph",
+           shower.ns.FormatGold(shower.ns.GoldPerHour(1)) + " |cff999999g/ph|r" in set(shower.g.texts.values()), True)
     report("gold per hour")
 
 

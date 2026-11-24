@@ -17,6 +17,28 @@ local function addSkinLine(tooltip, skin)
     tooltip:AddLine(("|cffffd100Skinning|r  %s"):format(table.concat(parts, ", ")), shade, shade, shade, true)
 end
 
+-- "Level 18" in the client's language, the start of the line the mob's gold an hour goes next to.
+local LEVEL_TEXT = (TOOLTIP_UNIT_LEVEL or "Level %s"):match("^(.-)%%s") or "Level "
+
+-- Writes the mob's gold an hour at the right end of its level line. The line can sit lower when the mob has a title.
+local function addGoldPerHour(tooltip, npc)
+    local gph = ns.GoldPerHour(npc)
+    if gph <= 0 or not tooltip.GetName then
+        return
+    end
+    local name = tooltip:GetName()
+    for i = 2, tooltip:NumLines() do
+        local left, right = _G[name .. "TextLeft" .. i], _G[name .. "TextRight" .. i]
+        local text = left and left:GetText()
+        if type(text) == "string" and not ns.IsSecret(text) and text:find(LEVEL_TEXT, 1, true) == 1 and right then
+            right:SetText(("%s |cff999999g/ph|r"):format(ns.FormatGoldShort(gph)))
+            right:SetTextColor(1, 1, 1)
+            right:Show()
+            return
+        end
+    end
+end
+
 local function addDropLines(tooltip, data)
     if tooltip ~= GameTooltip or not ns.settings or not ns.settings.showTooltip then
         return
@@ -32,6 +54,7 @@ local function addDropLines(tooltip, data)
         end
         return
     end
+    addGoldPerHour(tooltip, npc)
     local entries, worldCount, lowCount = ns.VisibleEntries(stats)
     local rateShade = stats.small and 0.6 or 1
     tooltip:AddLine(" ")
@@ -50,7 +73,13 @@ local function addDropLines(tooltip, data)
             left = ("|T%s:14:14|t %s%s|r%s"):format(ns.ItemIcon(entry.itemId), ns.QualityColor(entry.quality),
                 ns.ItemName(entry.itemId), stack)
         end
-        tooltip:AddDoubleLine(left, ns.FormatRate(entry.rate), 1, 1, 1, rateShade, rateShade, rateShade)
+        -- The item's price before its chance, the one g/ph uses.
+        local price = entry.itemId and ns.UnitPrice(entry.itemId, entry.world)
+        local rightText = ns.FormatRate(entry.rate)
+        if price and price > 0 then
+            rightText = ns.FormatGoldShort(price) .. "   " .. rightText
+        end
+        tooltip:AddDoubleLine(left, rightText, 1, 1, 1, rateShade, rateShade, rateShade)
     end
     local more = {}
     if #entries > shown then

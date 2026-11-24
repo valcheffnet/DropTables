@@ -199,6 +199,15 @@ function ns.FormatGold(copper)
     return table.concat(parts, " ")
 end
 
+-- FormatGold without the copper of a gold amount, rounded to the nearest silver and marked with "~", for the tooltip.
+function ns.FormatGoldShort(copper)
+    copper = math.floor(copper or 0)
+    if copper >= 10000 and copper % 100 ~= 0 then
+        return "~" .. ns.FormatGold(math.floor(copper / 100 + 0.5) * 100)
+    end
+    return ns.FormatGold(copper)
+end
+
 local function pricesChanged()
     forget()
     ns.Fire("DT_PRICES_CHANGED")
