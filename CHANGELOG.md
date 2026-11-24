@@ -2,16 +2,19 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-24
+
 ### Added
 
 - A seventh colour theme, Classic, takes the colours of the game's own windows: gold titles on near black, with red lines. It's the first square in the Loot Finder's title bar and the default for new installs and after Restore defaults. If you already use Drop Tables, your theme stays as it is until you click the Classic square.
 - The DT Debug chat tab shows how many new lines came while another tab was in front, as a number in a red circle like the ones Chat+ puts on other tabs.
 - The mob tooltip shows the mob's gold per hour at the right end of its level line, worked out the same way as the g/ph column of the Loot Finder, and each item's price before its chance. Amounts of a gold or more drop the copper there and get a ~, so 1g 35s 55c reads ~1g 36s.
-- The details window shows the mob's gold per hour to the right of the All, Solo and Group tabs.
+- The drop table window shows the mob's gold per hour to the right of the All, Solo and Group tabs.
 
 ### Changed
 
 - Waylaid Crates count as world drops on every mob, like random gear and recipes, so they go into the world drops section of the drop table instead of the icons under the target.
+- One more player's share and the daily refresh of the EG Link and Everloot counts went into the shared database, which now knows 2,115 mobs, with 38,969 kills and 7,546 skinned corpses.
 
 ### Fixed
 
@@ -243,7 +246,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/valcheffnet/DropTables/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/valcheffnet/DropTables/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/valcheffnet/DropTables/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/valcheffnet/DropTables/compare/v0.5.1...v0.5.2
