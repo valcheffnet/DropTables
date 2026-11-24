@@ -147,7 +147,7 @@
 - Loot you take right after casting at the next mob counts. Only skinning a corpse that showed no loot is left out.
 - A mob that a guard or another player finished counts when you open its corpse.
 - A corpse that had no loot at first and opens with loot later gives its loot.
-- Restore defaults moves open windows back to the middle, and the Debug messages checkbox opens and closes the DT Debug tab the way /dt debug does.
+- Restore defaults moves open windows back to the middle.
 - Copying the export text counts when you let go of Ctrl before C, and Cmd+C works on a Mac.
 - /dt on a friendly NPC opens the table without it, and /dt find keeps your capital letters.
 - In the Loot Finder the map button shows only for mobs you killed yourself, and a new list starts at the top. The zone list also picks up zones from new kills.
@@ -164,10 +164,6 @@
 - The addon no longer answers its own questions. The hidden channel hands each question back to the player who asked it, and the addon used to answer it by whispering you counts you already had.
 
 ## [0.2.6] - 2026-11-18
-
-### Added
-
-- `/dt debug` also shows what each loot window gave and why the addon skipped one.
 
 ### Fixed
 
@@ -188,12 +184,6 @@
 ### Added
 
 - Restore defaults in the options puts every setting and window position back the way they were on first install. Your recorded drops stay.
-- Debug messages in the options, the same switch as `/dt debug`.
-
-### Changed
-
-- `/dt debug` stays on after a reload or an update. It opens its own DT Debug chat tab and closes it again when you turn it off.
-- `/dt debug` says when a group message is your own coming back, instead of calling it malformed.
 
 ## [0.2.3] - 2026-11-17
 
@@ -211,25 +201,17 @@
 - The text in the export window wraps instead of being cut off.
 - The Loot Finder updates when you switch Only mine and when item names load.
 
-### Changed
-
-- `/dt debug` lines start with the time.
-
 ### Removed
 
 - The Share drop counts option. Drop Tables always swaps counts with other players.
 
 ## [0.2.2] - 2026-11-17
 
-### Added
+### Changed
 
-- `/dt debug` lines go to a chat tab called DT Debug if you make one, and stay out of your main chat.
+- No changes you would notice in game.
 
 ## [0.2.1] - 2026-11-17
-
-### Added
-
-- `/dt debug` puts a chat line for every sharing message the addon sends or gets, and says why it ignored one. It turns itself off when you reload.
 
 ### Fixed
 
