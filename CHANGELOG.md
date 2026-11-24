@@ -7,7 +7,6 @@
 ### Added
 
 - A seventh colour theme, Classic, takes the colours of the game's own windows: gold titles on near black, with red lines. It's the first square in the Loot Finder's title bar and the default for new installs and after Restore defaults. If you already use Drop Tables, your theme stays as it is until you click the Classic square.
-- The DT Debug chat tab shows how many new lines came while another tab was in front, as a number in a red circle like the ones Chat+ puts on other tabs.
 - The mob tooltip shows the mob's gold per hour at the right end of its level line, worked out the same way as the g/ph column of the Loot Finder, and each item's price before its chance. Amounts of a gold or more drop the copper there and get a ~, so 1g 35s 55c reads ~1g 36s.
 - The drop table window shows the mob's gold per hour to the right of the All, Solo and Group tabs.
 
@@ -18,7 +17,6 @@
 
 ### Fixed
 
-- Debug lines go only to the DT Debug chat tab, also while another tab is selected. Before, they went to General whenever DT Debug wasn't the tab in front, and a /reload could open a second DT Debug tab. The tab keeps the last 500 lines over a /reload; a new login starts it empty.
 - Quest items no longer show up in drop tables or in the Loot Finder. Drop Tables never recorded them, but the shared database had some that the imported data didn't mark as quest items, Arnak's Hoof among them.
 - The share card under the Loot Finder's item list cut its second line short. It now wraps to two lines.
 
