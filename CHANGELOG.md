@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-24
+
+### Changed
+
+- The latest EG Link and Everloot counts went into the shared database, which now knows 2,128 mobs, with 39,295 kills and 7,575 skinned corpses.
+
 ### Fixed
 
 - The shared database kept the Ridgeshade Lurker corpses from before the hotfix of November 6 that fixed their loot, which threw off their chances. For a mob whose loot a hotfix changed, it now counts only what was recorded from the day after the hotfix, starting with Ridgeshade Lurker.
@@ -254,7 +260,8 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/valcheffnet/DropTables/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/valcheffnet/DropTables/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/valcheffnet/DropTables/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/valcheffnet/DropTables/compare/v0.5.3...v0.5.4
