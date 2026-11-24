@@ -54,6 +54,7 @@ jobs:
             echo "Nothing changed."
             exit 0
           fi
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "Refresh the counts imported from EG Link and Everloot"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Refresh the counts imported from EG Link and Everloot"
           git push || { git pull --rebase -q && git push; }

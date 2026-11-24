@@ -70,8 +70,9 @@ jobs:
             echo "Nothing changed."
             exit 0
           fi
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -F "$RUNNER_TEMP/replies/message.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -F "$RUNNER_TEMP/replies/message.txt"
           git push || { git pull --rebase -q && git push; }
 
       - name: Answer the issues
