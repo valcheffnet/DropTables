@@ -85,9 +85,6 @@ ns.On("DT_READY", function()
         0, 1, 0.05, percent)
     slider("finderAlpha", "Loot Finder background",
         "Opacity of the Loot Finder's background; also on the slider in its title bar.", 0, 1, 0.05, percent)
-    checkbox("debug", "Debug messages",
-        "A chat line for every sharing message in and out and every loot window, for testing with other players. "
-            .. "Same as /dt debug.")
     if CreateSettingsButtonInitializer and layout then
         layout:AddInitializer(CreateSettingsButtonInitializer("Default settings", "Restore defaults", function()
             StaticPopup_Show("DROPTABLES_RESTORE_DEFAULTS")

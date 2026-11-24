@@ -342,12 +342,12 @@ def main():
     expect("debug off closes the tab", (tester.ns.settings.debug, tester.g.chatWindowNames[4]), (False, None))
     tester.g.SlashCmdList.DROPTABLES("debug")
     expect("debug on opens it again", tester.g.chatWindowNames[4], "DT Debug")
-    # The options checkbox and Restore defaults open and close the tab too.
+    # Restore defaults closes the tab too, and any change of the setting opens it again.
     tester.ns.RestoreDefaults()
     expect("restore defaults closes the tab", tester.g.chatWindowNames[4], None)
     tester.ns.settings.debug = True
     tester.fire("DT_SETTINGS_CHANGED")
-    expect("the options checkbox opens it", tester.g.chatWindowNames[4], "DT Debug")
+    expect("a settings change opens it", tester.g.chatWindowNames[4], "DT Debug")
     # The tab is hidden while another tab of the dock is selected, and the lines still go only to it.
     tester.lua.execute("chatWindowShown[4], chatWindowDocked[4] = false, 2; ChatFrame1.lines = {}; ChatFrame4.lines = {}")
     opened = tester.g.tabsOpened

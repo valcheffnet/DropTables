@@ -184,7 +184,7 @@ local function closeDebugTab()
     end
 end
 
--- The tab follows the setting no matter what changed it, be it /dt debug, the options checkbox or Restore defaults.
+-- The tab follows the setting no matter what changed it, be it /dt debug or Restore defaults.
 local debugShown
 ns.On("DT_SETTINGS_CHANGED", function()
     if ns.settings.debug == debugShown then
