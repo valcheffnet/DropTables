@@ -3,6 +3,7 @@
  "built": 1795389753,
  "imports": [
   {
+   "collectedUntil": "2026-10-21",
    "copyright": "Copyright (c) 2026 Blackthornes",
    "id": "blackthornes-mit",
    "license": "MIT",
@@ -56472,22 +56473,22 @@
     "1": {
      "items": {
       "1476": {
-       "drops": 11,
+       "drops": 8,
        "max": 1,
        "min": 1,
-       "qty": 11
+       "qty": 8
       },
       "2590": {
-       "drops": 12,
+       "drops": 9,
        "max": 1,
        "min": 1,
-       "qty": 12
+       "qty": 9
       },
       "5465": {
-       "drops": 16,
+       "drops": 10,
        "max": 2,
        "min": 1,
-       "qty": 27
+       "qty": 15
       },
       "805": {
        "drops": 1,
@@ -56496,24 +56497,23 @@
        "qty": 1
       }
      },
-     "kills": 70,
-     "lootable": 41,
+     "kills": 64,
+     "lootable": 33,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 29
+     "opened": 18
     }
    },
    "from": {
     "2750ad299c178787": 9,
-    "blackthornes-mit": 4,
     "eglink": 25,
     "everloot-4518d2cc": 4,
     "everloot-933e529a": 7
    },
    "maps": {
-    "1411": 49
+    "1411": 36
    },
    "maxLevel": 6,
    "minLevel": 5,
@@ -56521,15 +56521,14 @@
    "spots": {
     "1411": {
      "1274": 2,
-     "1275": 5,
+     "1275": 3,
      "1276": 3,
-     "1277": 9,
-     "1278": 4,
+     "1277": 7,
+     "1278": 3,
      "1279": 1,
      "1280": 5,
-     "1281": 9,
-     "1282": 3,
-     "1324": 4,
+     "1281": 7,
+     "1282": 1,
      "1329": 2,
      "1330": 2
     }
