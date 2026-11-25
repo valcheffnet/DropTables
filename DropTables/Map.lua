@@ -43,7 +43,7 @@ local function drawPins()
     local info = ns.MobInfo(shownNpc)
     local place = info and info.maps[mapId]
 
-    local text = "|cffe8c46aDrop Tables:|r " .. ns.MobName(shownNpc)
+    local text = "|cffe8c46aForever Drop Tables:|r " .. ns.MobName(shownNpc)
     if place then
         text = text .. ("  |  %d kills here"):format(place.kills)
     end

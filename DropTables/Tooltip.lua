@@ -49,7 +49,7 @@ local function addDropLines(tooltip, data)
     if not stats then
         if skin then
             tooltip:AddLine(" ")
-            tooltip:AddDoubleLine("Drop Tables", ("%d skinned"):format(skin.skinned), 1, 0.82, 0, 0.6, 0.6, 0.6)
+            tooltip:AddDoubleLine("Forever Drop Tables", ("%d skinned"):format(skin.skinned), 1, 0.82, 0, 0.6, 0.6, 0.6)
             addSkinLine(tooltip, skin)
         end
         return
@@ -58,7 +58,7 @@ local function addDropLines(tooltip, data)
     local entries, worldCount, lowCount = ns.VisibleEntries(stats)
     local rateShade = stats.small and 0.6 or 1
     tooltip:AddLine(" ")
-    tooltip:AddDoubleLine("Drop Tables", ("%d kills"):format(stats.kills), 1, 0.82, 0, 0.6, 0.6, 0.6)
+    tooltip:AddDoubleLine("Forever Drop Tables", ("%d kills"):format(stats.kills), 1, 0.82, 0, 0.6, 0.6, 0.6)
     local shown = math.min(ns.settings.tooltipLines, #entries)
     for i = 1, shown do
         local entry = entries[i]

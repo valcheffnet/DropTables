@@ -31,7 +31,7 @@ moverTint:SetAllPoints()
 moverTint:SetColorTexture(0.1, 0.45, 0.9, 0.35)
 local moverLabel = mover:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 moverLabel:SetPoint("BOTTOM", mover, "TOP", 0, 2)
-moverLabel:SetText("Drop Tables")
+moverLabel:SetText("Forever Drop Tables")
 
 -- Anchor offsets are in the strip's own scaled units, so they get divided by the scale, which keeps the top-left
 -- corner in place when the icon size changes. stripPos holds that corner in UIParent units.
@@ -99,7 +99,7 @@ local function showEntryTooltip(button)
             GameTooltip:AddDoubleLine("Range", ns.CoinText(money.min) .. " - " .. ns.CoinText(money.max), 1, 0.82, 0, 1, 1, 1)
         end
     else
-        GameTooltip:SetText("Drop Tables")
+        GameTooltip:SetText("Forever Drop Tables")
         if stats and #stats.list > 0 then
             local _, worldCount, lowCount = ns.VisibleEntries(stats)
             local reason

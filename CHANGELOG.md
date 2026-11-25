@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The addon is called Forever Drop Tables now, in the addon list and on its windows, so it's clear which game it's for. The folder is still DropTables, so your recorded drops stay where they are, and /dt works as before.
+
 ### Fixed
 
 - A game client in another language sent its mob names along with its counts, so an export from a German client carried German names. Only an English client sends names now. A name another player's addon sent is still shown, but it no longer goes out with your counts.

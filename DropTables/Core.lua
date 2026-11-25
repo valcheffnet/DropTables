@@ -57,7 +57,7 @@ ns.frame:SetScript("OnEvent", function(_, event, ...)
 end)
 
 function ns.Print(msg)
-    print("|cff66ccffDrop Tables|r " .. msg)
+    print("|cff66ccffForever Drop Tables|r " .. msg)
 end
 
 -- The version in the toc, "?" when the client can't say.

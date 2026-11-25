@@ -11,7 +11,7 @@ local db  -- DropTablesDebugDB: on, and log, the kept lines
 local shareState  -- Drop Tables' sharing state, for the first line after turning on
 
 local function print(msg)
-    _G.print("|cff66ccffDrop Tables Debug|r " .. msg)
+    _G.print("|cff66ccffForever Drop Tables Debug|r " .. msg)
 end
 
 -- A docked tab that isn't the selected one is hidden, and the client then calls it not shown, so a tab counts while it

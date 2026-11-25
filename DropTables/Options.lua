@@ -65,7 +65,7 @@ StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS = {
 }
 
 ns.On("DT_READY", function()
-    category, layout = Settings.RegisterVerticalLayoutCategory("Drop Tables " .. ns.Version())
+    category, layout = Settings.RegisterVerticalLayoutCategory("Forever Drop Tables " .. ns.Version())
     checkbox("showStrip", "Icons under the target", "Show the most likely drops of your target under its frame.")
     slider("stripIcons", "Number of icons", "How many icons the strip shows at most, money included.", 3, 10, 1, whole)
     slider("stripScale", "Icon size", "Scale of the icon strip.", 0.6, 2, 0.1, percent)

@@ -53,7 +53,7 @@ end
 
 local function openMenu(owner)
     MenuUtil.CreateContextMenu(owner, function(_, root)
-        root:CreateTitle("Drop Tables")
+        root:CreateTitle("Forever Drop Tables")
         root:CreateButton("Loot Finder", function()
             ns.OpenFinder()
         end)
@@ -78,7 +78,7 @@ end)
 
 button:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_LEFT")
-    GameTooltip:SetText("Drop Tables")
+    GameTooltip:SetText("Forever Drop Tables")
     GameTooltip:AddLine("Left click: Loot Finder", 1, 1, 1)
     GameTooltip:AddLine("Right click: menu", 1, 1, 1)
     GameTooltip:AddLine("Drag: move around the minimap", 0.7, 0.7, 0.7)

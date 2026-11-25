@@ -400,7 +400,7 @@ function render()
     for key, tab in pairs(tabs) do
         tab:SetChosen(key == mode)
     end
-    frame.title:SetText(shownNpc and ns.MobName(shownNpc) or "Drop Tables")
+    frame.title:SetText(shownNpc and ns.MobName(shownNpc) or "Forever Drop Tables")
     local stats = shownNpc and ns.GetStats(shownNpc, mode)
     local skin = shownNpc and ns.GetSkinStats(shownNpc)
     shownItems = {}

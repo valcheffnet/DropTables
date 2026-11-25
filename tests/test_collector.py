@@ -379,7 +379,7 @@ def main():
         end }
     """)
     tester.g.SlashCmdList.DROPTABLES("status")
-    expect("status names the version", tester.g.printed[1], "|cff66ccffDrop Tables|r version 9.9.9")
+    expect("status names the version", tester.g.printed[1], "|cff66ccffForever Drop Tables|r version 9.9.9")
     tester.lua.execute("C_AddOns = nil")
     expect("a client that can't say gives ?", tester.ns.Version(), "?")
 

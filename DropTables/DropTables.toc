@@ -1,5 +1,5 @@
 ## Interface: 16001
-## Title: Drop Tables
+## Title: Forever Drop Tables
 ## Notes: Drop rates for every mob, from what players actually loot.
 ## Author: SasnycoN
 ## Version: 0.6.3
