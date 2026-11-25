@@ -232,9 +232,11 @@ def main():
     guarded = "Creature-0-1-0-1-11-G1"
     skinner.g.lootable[guarded] = True
     skinner.g.units["mouseover"] = guarded
+    skinner.stand(12, 0.5, 0.5)
     skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [guarded, 1]}])
     skinner.g.units["mouseover"] = None
     expect("kill finished by someone else counted from the corpse", counts_of(skinner, 11), (1, 1, 1, 1))
+    expect("and placed where it lies", skinner.ns.db.info[11].maps[12].kills, 1)
     # Pickpocketing the living target is not a kill.
     living = "Creature-0-1-0-1-12-A1"
     skinner.g.units["target"], skinner.g.alive["target"] = living, True

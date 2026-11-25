@@ -513,6 +513,11 @@ def main():
         issue_list(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:
         pruning(pathlib.Path(folder))
+    # A control character in a name can't break Data.lua: it goes in as an escape and reads back the same.
+    literal = build_data.lua_string('Line\none "two"\\')
+    expect("control characters escaped", "\n" in literal, False)
+    reader = Client("Reader")
+    expect("the escaped name reads back", reader.lua.eval(literal), 'Line\none "two"\\')
     report("shared data")
 
 

@@ -503,6 +503,11 @@ def main():
     expect("garbage not stored", carol.ns.db.peers[35][fake] if carol.ns.db.peers[35] else None, None)
     expect("own install id not stored",
            carol.ns.db.peers[35][carol.ns.db.installId] if carol.ns.db.peers[35] else None, None)
+    # Install ids are lower-case hex, so the same id in capitals isn't another install.
+    shouted = carol.ns.db.installId.upper()
+    whisper(carol, "Olga", shouted, ["Mz.1.a.a.a.0.0.."])
+    expect("own install id in capitals not stored", carol.ns.db.peers[35][shouted] if carol.ns.db.peers[35] else None,
+           None)
     whisper(carol, "Olga", fake, ["Mz.1.a.a.a.0.0.."])
     expect("the same answer, well formed, is taken", carol.ns.db.peers[35][fake] is not None, True)
     # Numbers have at most six base 36 digits, because tonumber would cut longer ones at 2^32.

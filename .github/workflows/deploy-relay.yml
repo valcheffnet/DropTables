@@ -24,7 +24,7 @@ jobs:
       - name: Test
         run: node --test "relay/test/*.test.mjs"
       - name: Deploy
-        # Skipped until the share page is set up (relay/SETUP.md).
+        # Runs where the share page is set up (relay/SETUP.md); a fork without it skips this step.
         if: ${{ vars.RELAY_APP_ID != '' }}
         uses: cloudflare/wrangler-action@v4
         with:

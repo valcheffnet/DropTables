@@ -87,8 +87,6 @@ for i, kind in ipairs({ "own", "peer", "shared" }) do
     Style.Paint(function()
         segment:SetColorTexture(unpack(SOURCE_COLORS[kind]))
     end)
-    segment:SetPoint("TOP")
-    segment:SetPoint("BOTTOM")
     segments[i] = { kind = kind, texture = segment }
 end
 local sourceLegend = Style.Text(frame, "muted")
@@ -122,7 +120,9 @@ local function showSources(stats)
     for _, segment in ipairs(segments) do
         local part = sum > 0 and width * counts[segment.kind] / sum or 0
         segment.texture:SetShown(part >= 1)
-        segment.texture:SetPoint("LEFT", left, 0)
+        segment.texture:ClearAllPoints()
+        segment.texture:SetPoint("TOPLEFT", sourceBar, "TOPLEFT", left, 0)
+        segment.texture:SetPoint("BOTTOMLEFT", sourceBar, "BOTTOMLEFT", left, 0)
         segment.texture:SetWidth(math.max(part, 1))
         left = left + part
     end

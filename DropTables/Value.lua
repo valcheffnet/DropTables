@@ -219,6 +219,7 @@ local function forgetAll()
 end
 ns.On("DT_DATA_CHANGED", forget)
 ns.On("DT_COUNTS_CHANGED", forget)
+ns.On("DT_INFO_CHANGED", forget)
 ns.On("DT_SETTINGS_CHANGED", forgetAll)
 ns.On("DT_ITEM_INFO_RECEIVED", forgetAll)
 ns.On("PLAYER_LEVEL_UP", pricesChanged)

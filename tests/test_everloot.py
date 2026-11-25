@@ -186,6 +186,41 @@ def in_the_addon(database):
     expect("and its name falls back to the npc id", client.ns.MobName(11), "NPC 11")
 
 
+def next_page_elsewhere(folder):
+    """The API key goes only to Everloot's own API, so a next page anywhere else stops the download."""
+    calls = []
+
+    class Reply:
+        def __init__(self, body):
+            self.body = body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def read(self):
+            return self.body
+
+    def fake_open(request, timeout):
+        calls.append((request.full_url, request.get_header("Authorization")))
+        following = "https://elsewhere.example/api/corpus?page=2" if len(calls) == 1 else None
+        return Reply(json.dumps({"next": following, "rows": []}).encode())
+
+    real_open, real_sleep = import_everloot.urllib.request.urlopen, import_everloot.time.sleep
+    import_everloot.urllib.request.urlopen, import_everloot.time.sleep = fake_open, lambda _: None
+    try:
+        import_everloot.fetch(folder, "secret")
+        stopped = False
+    except SystemExit:
+        stopped = True
+    finally:
+        import_everloot.urllib.request.urlopen, import_everloot.time.sleep = real_open, real_sleep
+    expect("a next page outside Everloot's API stops the download", stopped, True)
+    expect("and the key never goes there", [url for url, _ in calls if "elsewhere" in url], [])
+
+
 def main():
     with tempfile.TemporaryDirectory() as folder:
         folder = pathlib.Path(folder)
@@ -193,6 +228,7 @@ def main():
         imp = conversion(folder)
         in_the_addon(merged(imp))
         resets(folder)
+        next_page_elsewhere(folder / "download")
     report("Everloot import")
 
 

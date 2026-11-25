@@ -22,6 +22,7 @@ import calendar
 import json
 import math
 import pathlib
+import re
 import sys
 import time
 
@@ -600,7 +601,10 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None):
 
 
 def lua_string(text):
-    return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    """A Lua string literal. Control characters go in as three-digit escapes, so a new line in an imported name
+    can't break the file."""
+    text = text.replace("\\", "\\\\").replace('"', '\\"')
+    return '"' + re.sub(r"[\x00-\x1f\x7f]", lambda m: "\\%03d" % ord(m.group()), text) + '"'
 
 
 def lua_value(value, string_keys=False):

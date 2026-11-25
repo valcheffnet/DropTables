@@ -9,6 +9,24 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from wowsim import ALL_FILES, FINDER_STUBS, Client, expect, report  # noqa: E402
 
+# What the options panel needs from Blizzard's Settings: a setting writes its value and calls its callback, as the
+# game's does, and everything else is a stub.
+OPTIONS_STUBS = """
+StaticPopupDialogs = {}
+MinimalSliderWithSteppersMixin = { Label = { Right = 1 } }
+local callbacks = {}
+Settings = setmetatable({
+    VarType = { Boolean = "boolean", Number = "number" },
+    RegisterAddOnSetting = function(_, variable, key, values)
+        return { SetValue = function(_, value)
+            values[key] = value
+            if callbacks[variable] then callbacks[variable]() end
+        end }
+    end,
+    SetOnValueChangedCallback = function(variable, callback) callbacks[variable] = callback end,
+}, { __index = function() return function() return widget() end end })
+"""
+
 def count(table):
     return len(list(table.keys()))
 
@@ -203,6 +221,8 @@ def main():
     """)
     c.fire("DT_DATA_CHANGED", 50)
     expect("a skinned mob in the mob search", [(m.npc, m.kills) for m in lua_list(ns.SearchMobs("50"))], [(50, 4)])
+    c.see(50, "s", 10)
+    expect("a mob only skinned keeps the name it was seen with", ns.db.names[50], "Test Mob")
 
     # The Loot Finder goes straight to the mobs when only mobs match the search, and stays with the items otherwise.
     viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=FINDER_STUBS)
@@ -236,6 +256,11 @@ def main():
     expect("a shown item's info redraws it",
            any("Linen Cloth, loaded" in str(text) for text in viewer.g.texts.values()), True)
 
+    # Opening an item from skinning moves the Finder to the Skinning category, and a settings change keeps it there.
+    viewer.ns.OpenFinder(2589, "skin")
+    viewer.fire("DT_SETTINGS_CHANGED")
+    expect("the item's category survives a settings change", viewer.ns.settings.finderCategory, "skin")
+
     # Names and levels saved by earlier versions for creatures without any counts are dropped on login.
     old = Client("Old", saved="""DropTablesDB = {
         mobs = { [1] = { [1] = { kills = 1, lootable = 0, opened = 0, items = {}, money = { drops = 0, copper = 0 } } } },
@@ -244,6 +269,13 @@ def main():
     }""")
     expect("sightings without counts dropped", (old.ns.db.names[2], old.ns.db.info[2]), (None, None))
     expect("mobs with counts kept", (old.ns.db.names[1], old.ns.db.info[1].minLevel), ("Wolf", 5))
+    skinned = Client("Skinned", saved="""DropTablesDB = {
+        skins = { [3] = { skinned = 2, items = {} }, [4] = { skinned = 1, items = {} } },
+        names = { [3] = "Boar", [4] = "Crag Boar" },
+        info = { [3] = { minLevel = 4, maxLevel = 4, maps = {} } },
+    }""")
+    expect("mobs only skinned kept", (skinned.ns.db.names[3], skinned.ns.db.info[3].minLevel), ("Boar", 4))
+    expect("and their names without a level", skinned.ns.db.names[4], "Crag Boar")
 
     # Quest items stay out even when the shared database carries them (the imports don't know every one).
     quester = Client("Quester")
@@ -255,6 +287,14 @@ def main():
     expect("quest item left out of the table", [e.itemId for e in lua_list(qns.GetStats(900, "all").list)], [100])
     expect("quest item left out of the search", 102 in [r.itemId for r in lua_list(qns.SearchItems(""))], False)
 
+    # Restore defaults tells the addon once, after every setting is back, so windows don't jump in between.
+    options = Client("Options", files=ALL_FILES + ("Style.lua", "Options.lua"), saved=FINDER_STUBS + OPTIONS_STUBS)
+    options.lua.execute("changes = 0")
+    options.ns.On("DT_SETTINGS_CHANGED", options.lua.eval("function() changes = changes + 1 end"))
+    options.ns.settings.stripIcons = 9
+    options.g.StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS.OnAccept()
+    expect("Restore defaults tells the addon once", options.g.changes, 1)
+    expect("and the settings are back", options.ns.settings.stripIcons, options.ns.DEFAULTS.stripIcons)
     report("finder")
 
 

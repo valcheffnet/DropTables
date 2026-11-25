@@ -64,6 +64,8 @@ def fetch(folder, key):
             (folder / ("%s-%02d.json" % (name, page))).write_bytes(body)
             data = json.loads(body)
             url = data.get("next")
+            if url and not url.startswith(API + "/"):
+                raise SystemExit("Everloot's next page is outside its API, not following it: %s" % url)
             page += 1
             time.sleep(1)
         print("%s: %d pages" % (name, page))

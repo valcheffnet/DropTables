@@ -447,7 +447,7 @@ local SKIN_KINDS = { K = true, U = true }
 -- Origin, npc and records of a well-formed message about one mob of another install, or nil. A D| message holds loot
 -- and an S| message skinning, nothing else.
 local function decodeAnswer(text)
-    local kind, origin, body = text:match("^([DS])|(%x+)|(.+)$")
+    local kind, origin, body = text:match("^([DS])|([0-9a-f]+)|(.+)$")
     if not origin or #origin ~= 16 or origin == ns.db.installId then
         return nil
     end
@@ -716,7 +716,7 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
     ns.Debug("got %s from %s: %s", chatType, sender, shown(text))
     local kind = text:sub(1, 2)
     if chatType == "CHANNEL" and kind == "Q|" then
-        local asker, npc, held = text:match("^Q|(%x+)|([0-9a-z]+)|([0-9a-z,]*)$")
+        local asker, npc, held = text:match("^Q|([0-9a-f]+)|([0-9a-z]+)|([0-9a-z,]*)$")
         npc = npc and Wire.ReadNumber(npc)
         if asker == ns.db.installId then
             ns.Debug("own question about mob %s came back over the channel, ignored", npc or "?")
@@ -726,7 +726,7 @@ ns.On("CHAT_MSG_ADDON", function(prefix, text, chatType, sender)
     elseif chatType == "CHANNEL" and kind == "C|" then
         -- Only the asker can call off the answers to them. The plan is looked up by the sender rather than by the
         -- install id in the message, because anyone could copy that id.
-        local npc = text:match("^C|%x+|([0-9a-z]+)$")
+        local npc = text:match("^C|[0-9a-f]+|([0-9a-z]+)$")
         npc = npc and Wire.ReadNumber(npc)
         if npc and planned[sender] and planned[sender].npc == npc then
             planned[sender] = nil

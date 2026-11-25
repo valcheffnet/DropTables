@@ -2,9 +2,12 @@ local _, ns = ...
 
 local category, layout
 local registered = {}
+local restoring = false  -- Restore defaults is putting the settings back and tells the addon once at the end
 
 local function onChange()
-    ns.Fire("DT_SETTINGS_CHANGED")
+    if not restoring then
+        ns.Fire("DT_SETTINGS_CHANGED")
+    end
 end
 
 local function register(key, name, varType)
@@ -49,9 +52,11 @@ StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS = {
     OnAccept = function()
         -- The controls in the open panel only see new values through their settings, and a setting that already
         -- holds the value doesn't tell them, so the settings go first and the rest of the table after.
+        restoring = true
         for key, setting in pairs(registered) do
             setting:SetValue(ns.DEFAULTS[key])
         end
+        restoring = false
         ns.RestoreDefaults()
     end,
     timeout = 0,

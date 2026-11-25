@@ -137,6 +137,13 @@ def main():
     c.g.unitLevels["player"] = 18
     c.fire("PLAYER_LEVEL_UP")
     expect("a mob far below counts half as many kills again", ns.GoldPerHour(1), int((10 + 0.5 * 60 + 20) * 150))
+    # A lower level seen on the mob changes its kills an hour, and its g/ph follows.
+    c.g.unitLevels["player"] = 8
+    c.fire("PLAYER_LEVEL_UP")
+    expect("g/ph at the player's level", ns.GoldPerHour(1), int((10 + 0.5 * 60 + 20) * 100))
+    c.see(1, "B", 3)
+    expect("the new level changes the kills an hour", ns.KillsPerHour(1), 125)
+    expect("and g/ph follows it", ns.GoldPerHour(1), int((10 + 0.5 * 60 + 20) * ns.KillsPerHour(1)))
 
     # The Loot Finder can sort the mobs that drop an item by it. Mob 2 drops item 100 as often as mob 1 does, but its
     # money makes it worth more.

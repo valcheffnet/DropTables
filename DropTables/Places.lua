@@ -43,7 +43,7 @@ local function playerSpot()
 end
 
 local function hasCounts(npc)
-    return ns.db.mobs[npc] or ns.db.info[npc] or ns.db.peers[npc]
+    return ns.db.mobs[npc] or ns.db.skins[npc] or ns.db.info[npc] or ns.db.peers[npc]
 end
 
 -- Writes what was seen of the mob into the saved data and returns true when its level range changed.
@@ -158,12 +158,12 @@ end)
 ns.On("DT_READY", function()
     local db = ns.db
     for npc, info in pairs(db.info) do
-        if not db.mobs[npc] and not db.peers[npc] and not next(info.maps or {}) then
+        if not db.mobs[npc] and not db.skins[npc] and not db.peers[npc] and not next(info.maps or {}) then
             db.info[npc] = nil
         end
     end
     for npc in pairs(db.names) do
-        if not db.mobs[npc] and not db.peers[npc] and not db.info[npc] then
+        if not db.mobs[npc] and not db.skins[npc] and not db.peers[npc] and not db.info[npc] then
             db.names[npc] = nil
         end
     end

@@ -209,6 +209,7 @@ local function lateKill(guid)
     for _, unit in ipairs(CORPSE_UNITS) do
         if deadUnitGuid(unit) == guid then
             pending[guid] = { npc = npc, bucket = groupBucket(), at = GetTime(), state = "checking" }
+            ns.PlaceCorpse(npc)
             ns.Debug("  %s was finished by someone else, counted from its corpse", ns.MobName(npc))
             return
         end

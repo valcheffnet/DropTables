@@ -899,6 +899,7 @@ function selectItem(itemId, kind)
     elseif category == SKIN then
         category = "all"
     end
+    ns.settings.finderCategory = category
     view, selectedItem, itemKind = "item", itemId, kind
     droppers = findMobs(itemId)
     setupZones(ns.DropperMaps(droppers))
