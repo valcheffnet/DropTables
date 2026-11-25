@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-11-25
+
+### Added
+
+- Drop Tables now records loot in dungeons and raids. The game hides which mob you killed there, but a loot window still says whose corpse it belongs to, so every corpse you loot counts as a kill that left loot. Corpses that leave nothing can't be seen at all, so the chances of dungeon mobs come out a little high, and their drop table says "Dungeon: per looted corpse". Since the target doesn't work in dungeons, the drop table window with Follow target on switches to each corpse you loot instead.
+
+### Changed
+
+- Two more shares, one of them from a new player, and the daily refresh of the EG Link and Everloot counts went into the shared database, which now knows 2,176 mobs, with 41,034 kills and 7,867 skinned corpses.
+
+### Fixed
+
+- With the Loot Finder open, the game hitched every second. The game's item cache lets go of items while the Finder reads through two thousand of them, and the Finder kept asking for the ones it had let go. Drop Tables now keeps what it has read about an item until you log out.
+- The bar under Kills in the drop table window, which splits the kills between you, other players and the shared database, was drawn in a single colour.
+- After a settings change, the Loot Finder's back button went to All items instead of the category you came from, Skinning for example.
+- Restore defaults moved the windows around while it put the settings back.
+- Mobs you had only skinned lost their names at login.
+- A mob someone else finished off, a guard for example, counted as your kill but didn't show up on the map.
+- Gold per hour stayed the same when Drop Tables learned a mob's level.
+
 ## [0.6.2] - 2026-11-24
 
 ### Changed

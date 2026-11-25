@@ -65,7 +65,7 @@ Drop Tables relies on drop counts from the players who run it. The addons swap t
 
 ## Known issues
 
-Drop Tables doesn't record anything in dungeons yet. Inside an instance the game hides which mob you're targeting or have killed, and without that the addon can't tell whose loot it's looking at. The loot window does still say which corpse the loot came from, and recording dungeon loot from that is next on the list. The dungeon mobs that already show chances got them from Everloot, which only counts corpses that were looted, so their chances may come out a little high.
+Dungeons work only halfway. Inside an instance the game hides which mob you're targeting or have killed, so Drop Tables can't count kills there. The loot window still says which corpse the loot came from, so every corpse you loot in a dungeon or raid counts as a kill that left loot. Corpses that leave nothing never show up, which makes dungeon chances come out a little high, the same as the Everloot counts the shared database already had for those mobs. The icons under the target and the drop lines in the mob tooltip don't work in there either, because they need to know your target. The drop table window does: with Follow target on, it switches to each corpse you loot.
 
 ## Bugs
 
