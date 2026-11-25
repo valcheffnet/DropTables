@@ -312,7 +312,7 @@ end
 
 -- What Drop Tables reads of an item, kept for the session once the client has given it. The client's own item cache
 -- lets go of items while the Loot Finder goes through two thousand of them, and asking again for one it let go loads
--- it again: that arrival redrew the Finder, the redraw asked again, and the game hitched every second.
+-- it again, which would redraw the Finder and ask once more.
 local itemInfo = {}
 
 local function readItem(itemId)
