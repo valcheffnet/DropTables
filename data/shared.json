@@ -1,6 +1,6 @@
 {
  "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables",
- "built": 1795519130,
+ "built": 1795592354,
  "imports": [
   {
    "collectedUntil": "2026-10-21",
@@ -1927,23 +1927,24 @@
        "qty": 1
       }
      },
-     "kills": 3,
-     "lootable": 3,
+     "kills": 5,
+     "lootable": 5,
      "money": {
-      "copper": 325,
-      "drops": 3,
-      "max": 89,
-      "min": 89
+      "copper": 489,
+      "drops": 5,
+      "max": 129,
+      "min": 35
      },
-     "opened": 3
+     "opened": 5
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "eglink": 2,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 2
+    "1441": 4
    },
    "maxLevel": 26,
    "minLevel": 26,
@@ -1951,8 +1952,9 @@
    "spots": {
     "1441": {
      "616": 1,
+     "666": 1,
      "914": 1,
-     "965": 2
+     "965": 3
     }
    }
   },
@@ -2175,27 +2177,28 @@
     "1": {
      "items": {
       "9451": {
-       "drops": 2,
+       "drops": 4,
        "max": 3,
-       "min": 3,
-       "qty": 6
+       "min": 2,
+       "qty": 11
       }
      },
-     "kills": 6,
-     "lootable": 6,
+     "kills": 16,
+     "lootable": 8,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 6
+     "opened": 8
     }
    },
    "from": {
+    "2750ad299c178787": 4,
     "everloot-0512e71f": 4,
     "everloot-f8c829b9": 2
    },
    "maps": {
-    "1441": 6
+    "1441": 10
    },
    "maxLevel": 29,
    "minLevel": 28,
@@ -2203,9 +2206,10 @@
    "spots": {
     "1441": {
      "815": 1,
-     "866": 1,
-     "867": 1,
-     "917": 1,
+     "817": 1,
+     "866": 2,
+     "867": 2,
+     "917": 2,
      "918": 1,
      "919": 1
     }
@@ -2216,27 +2220,28 @@
     "1": {
      "items": {
       "9451": {
-       "drops": 6,
+       "drops": 7,
        "max": 3,
        "min": 1,
-       "qty": 13
+       "qty": 16
       }
      },
-     "kills": 6,
-     "lootable": 6,
+     "kills": 35,
+     "lootable": 14,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 6
+     "opened": 7
     }
    },
    "from": {
+    "2750ad299c178787": 5,
     "everloot-bab301d5": 2,
     "everloot-f8c829b9": 4
    },
    "maps": {
-    "1441": 6
+    "1441": 11
    },
    "maxLevel": 28,
    "minLevel": 27,
@@ -2245,6 +2250,8 @@
     "1441": {
      "815": 1,
      "816": 1,
+     "817": 1,
+     "866": 4,
      "917": 1,
      "918": 3,
      "968": 1
@@ -2266,7 +2273,7 @@
        "qty": 1
       }
      },
-     "kills": 5,
+     "kills": 7,
      "lootable": 5,
      "money": {
       "copper": 317,
@@ -2321,14 +2328,14 @@
     }
    },
    "from": {
-    "2750ad299c178787": 4,
+    "2750ad299c178787": 5,
     "eglink": 2,
     "everloot-933e529a": 1,
     "everloot-bab301d5": 1,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 14
+    "1441": 15
    },
    "maxLevel": 26,
    "minLevel": 25,
@@ -2337,7 +2344,7 @@
     "1441": {
      "813": 7,
      "816": 1,
-     "818": 1,
+     "818": 2,
      "819": 1,
      "865": 2,
      "915": 3,
@@ -2364,21 +2371,21 @@
        "qty": 2
       },
       "4306": {
-       "drops": 4,
+       "drops": 5,
        "max": 2,
        "min": 1,
-       "qty": 6
+       "qty": 7
       }
      },
-     "kills": 15,
-     "lootable": 15,
+     "kills": 17,
+     "lootable": 13,
      "money": {
-      "copper": 585,
-      "drops": 7,
+      "copper": 687,
+      "drops": 8,
       "max": 127,
       "min": 38
      },
-     "opened": 7
+     "opened": 8
     },
     "3": {
      "items": {
@@ -2401,14 +2408,14 @@
     }
    },
    "from": {
-    "2750ad299c178787": 1,
+    "2750ad299c178787": 3,
     "eglink": 1,
     "everloot-933e529a": 3,
     "everloot-bab301d5": 1,
     "everloot-f8c829b9": 3
    },
    "maps": {
-    "1441": 13
+    "1441": 14
    },
    "maxLevel": 27,
    "minLevel": 26,
@@ -2419,6 +2426,7 @@
      "813": 1,
      "815": 1,
      "816": 1,
+     "817": 1,
      "865": 1,
      "867": 1,
      "868": 1,
@@ -2571,15 +2579,15 @@
        "qty": 3
       }
      },
-     "kills": 7,
-     "lootable": 7,
+     "kills": 9,
+     "lootable": 9,
      "money": {
-      "copper": 423,
-      "drops": 7,
-      "max": 94,
+      "copper": 667,
+      "drops": 9,
+      "max": 138,
       "min": 36
      },
-     "opened": 7
+     "opened": 9
     },
     "2": {
      "items": {
@@ -2621,13 +2629,13 @@
     }
    },
    "from": {
-    "2750ad299c178787": 2,
+    "2750ad299c178787": 4,
     "everloot-933e529a": 1,
     "everloot-bab301d5": 3,
     "everloot-f8c829b9": 3
    },
    "maps": {
-    "1441": 10
+    "1441": 11
    },
    "maxLevel": 28,
    "minLevel": 28,
@@ -2635,7 +2643,7 @@
    "spots": {
     "1441": {
      "818": 2,
-     "869": 2,
+     "869": 3,
      "870": 1,
      "913": 1,
      "963": 3,
@@ -12182,6 +12190,75 @@
     }
    }
   },
+  "12579": {
+   "buckets": {
+    "1": {
+     "items": {
+      "15520": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 331,
+      "drops": 1,
+      "max": 331,
+      "min": 331
+     },
+     "opened": 1
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 77,
+      "drops": 1,
+      "max": 77,
+      "min": 77
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "2750ad299c178787": 3
+   },
+   "maps": {
+    "1442": 3
+   },
+   "maxLevel": 26,
+   "minLevel": 26,
+   "name": "Bloodfury Ripper",
+   "spots": {
+    "1442": {
+     "780": 2,
+     "781": 1
+    }
+   }
+  },
   "1258": {
    "buckets": {
     "1": {
@@ -14089,7 +14166,7 @@
    "buckets": {
     "1": {
      "items": {},
-     "kills": 1,
+     "kills": 2,
      "lootable": 0,
      "money": {
       "copper": 0,
@@ -14099,15 +14176,20 @@
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 1
    },
    "maps": {
+    "1442": 1,
     "2548": 1
    },
    "maxLevel": 1,
    "minLevel": 1,
    "name": "Squirrel",
    "spots": {
+    "1442": {
+     "1327": 1
+    },
     "2548": {
      "1965": 1
     }
@@ -39890,9 +39972,20 @@
       "drops": 0
      },
      "opened": 4
+    },
+    "3": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "everloot-4518d2cc": 1,
     "everloot-c8df3474": 1,
     "everloot-f8c829b9": 2
@@ -39911,10 +40004,10 @@
        "qty": 1
       },
       "1210": {
-       "drops": 1,
+       "drops": 2,
        "max": 1,
        "min": 1,
-       "qty": 1
+       "qty": 2
       },
       "2216": {
        "drops": 2,
@@ -40011,18 +40104,42 @@
        "max": 1,
        "min": 1,
        "qty": 1
+      },
+      "9749": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
       }
      },
-     "kills": 24,
-     "lootable": 24,
+     "kills": 25,
+     "lootable": 25,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 24
+     "opened": 25
+    },
+    "3": {
+     "items": {
+      "3167": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "everloot-0512e71f": 3,
     "everloot-4518d2cc": 4,
     "everloot-c8df3474": 2,
@@ -40273,6 +40390,37 @@
    },
    "maps": {},
    "name": "Skeleton"
+  },
+  "250619": {
+   "buckets": {
+    "1": {
+     "items": {
+      "2215": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3931": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {}
   },
   "250620": {
    "buckets": {
@@ -40678,11 +40826,17 @@
        "drops": 1,
        "qty": 1
       },
-      "1512": {
+      "1511": {
        "drops": 1,
        "max": 1,
        "min": 1,
        "qty": 1
+      },
+      "1512": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
       },
       "1515": {
        "drops": 1,
@@ -40706,6 +40860,12 @@
        "min": 1,
        "qty": 2
       },
+      "2777": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "2975": {
        "drops": 1,
        "max": 1,
@@ -40713,10 +40873,10 @@
        "qty": 1
       },
       "3167": {
-       "drops": 9,
+       "drops": 13,
        "max": 1,
        "min": 1,
-       "qty": 9
+       "qty": 13
       },
       "3931": {
        "drops": 4,
@@ -40756,6 +40916,12 @@
        "min": 1,
        "qty": 1
       },
+      "774": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "818": {
        "drops": 1,
        "max": 1,
@@ -40769,16 +40935,46 @@
        "qty": 2
       }
      },
-     "kills": 23,
-     "lootable": 23,
+     "kills": 29,
+     "lootable": 29,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 23
+     "opened": 29
+    },
+    "3": {
+     "items": {
+      "1513": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2214": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3167": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 9,
     "blackthornes-mit": 9,
     "everloot-0512e71f": 1,
     "everloot-4518d2cc": 1,
@@ -41523,10 +41719,10 @@
        "qty": 1
       },
       "3167": {
-       "drops": 2,
+       "drops": 4,
        "max": 1,
        "min": 1,
-       "qty": 2
+       "qty": 4
       },
       "3931": {
        "drops": 4,
@@ -41541,16 +41737,17 @@
        "qty": 1
       }
      },
-     "kills": 8,
-     "lootable": 8,
+     "kills": 10,
+     "lootable": 10,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 8
+     "opened": 10
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "blackthornes-mit": 3,
     "everloot-c8df3474": 2,
     "everloot-f8c829b9": 3
@@ -48260,6 +48457,12 @@
    "buckets": {
     "1": {
      "items": {
+      "1499": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "1516": {
        "drops": 1,
        "max": 1,
@@ -48272,6 +48475,12 @@
       },
       "1789": {
        "drops": 1,
+       "qty": 1
+      },
+      "1815": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
        "qty": 1
       },
       "2073": {
@@ -48291,10 +48500,10 @@
        "qty": 1
       },
       "3167": {
-       "drops": 5,
+       "drops": 7,
        "max": 1,
        "min": 1,
-       "qty": 5
+       "qty": 7
       },
       "3375": {
        "drops": 1,
@@ -48303,28 +48512,58 @@
        "qty": 1
       },
       "3931": {
-       "drops": 6,
+       "drops": 7,
        "max": 1,
        "min": 1,
-       "qty": 6
+       "qty": 7
       },
       "4567": {
        "drops": 1,
        "max": 1,
        "min": 1,
        "qty": 1
+      },
+      "9786": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
       }
      },
-     "kills": 13,
-     "lootable": 13,
+     "kills": 17,
+     "lootable": 17,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 13
+     "opened": 17
+    },
+    "3": {
+     "items": {
+      "1511": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3167": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 5,
     "blackthornes-mit": 6,
     "everloot-4518d2cc": 1,
     "everloot-c8df3474": 4,
@@ -81757,7 +81996,7 @@
    "buckets": {
     "1": {
      "items": {},
-     "kills": 12,
+     "kills": 13,
      "lootable": 0,
      "money": {
       "copper": 0,
@@ -81767,16 +82006,17 @@
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 12
    },
    "maps": {
     "1417": 1,
     "1418": 8,
     "1434": 3,
-    "1441": 1
+    "1441": 2
    },
    "maxLevel": 41,
-   "minLevel": 34,
+   "minLevel": 26,
    "name": "Healing Ward",
    "spots": {
     "1417": {
@@ -81802,6 +82042,7 @@
      "554": 2
     },
     "1441": {
+     "814": 1,
      "963": 1
     }
    }
@@ -86415,22 +86656,32 @@
    "buckets": {
     "1": {
      "items": {},
-     "kills": 3,
-     "lootable": 3,
+     "kills": 4,
+     "lootable": 4,
      "money": {
-      "copper": 266,
-      "drops": 3,
+      "copper": 327,
+      "drops": 4,
       "max": 151,
       "min": 35
      },
-     "opened": 3
+     "opened": 4
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "everloot-f8c829b9": 3
    },
-   "maps": {},
-   "name": "Severed Druid"
+   "maps": {
+    "1440": 1
+   },
+   "maxLevel": 28,
+   "minLevel": 28,
+   "name": "Severed Druid",
+   "spots": {
+    "1440": {
+     "1887": 1
+    }
+   }
   },
   "38": {
    "buckets": {
@@ -86600,26 +86851,42 @@
        "max": 1,
        "min": 1,
        "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
       }
      },
-     "kills": 3,
-     "lootable": 3,
+     "kills": 5,
+     "lootable": 5,
      "money": {
-      "copper": 96,
-      "drops": 2,
+      "copper": 217,
+      "drops": 4,
       "max": 62,
       "min": 34
      },
-     "opened": 3
+     "opened": 5
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "everloot-0512e71f": 1,
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
-   "maps": {},
-   "name": "Severed Sleeper"
+   "maps": {
+    "1440": 2
+   },
+   "maxLevel": 29,
+   "minLevel": 28,
+   "name": "Severed Sleeper",
+   "spots": {
+    "1440": {
+     "1937": 2
+    }
+   }
   },
   "3802": {
    "buckets": {
@@ -86647,6 +86914,36 @@
     "everloot-c8ee0b15": 1
    },
    "maps": {}
+  },
+  "3803": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 42,
+      "drops": 1,
+      "max": 42,
+      "min": 42
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1440": 1
+   },
+   "maxLevel": 30,
+   "minLevel": 30,
+   "name": "Severed Keeper",
+   "spots": {
+    "1440": {
+     "1937": 1
+    }
+   }
   },
   "3806": {
    "buckets": {
@@ -91303,31 +91600,32 @@
        "qty": 9
       },
       "2592": {
-       "drops": 5,
+       "drops": 6,
        "max": 1,
        "min": 1,
-       "qty": 8
+       "qty": 9
       }
      },
-     "kills": 21,
-     "lootable": 21,
+     "kills": 24,
+     "lootable": 24,
      "money": {
-      "copper": 488,
-      "drops": 15,
+      "copper": 590,
+      "drops": 18,
       "max": 58,
-      "min": 25
+      "min": 11
      },
-     "opened": 19
+     "opened": 22
     }
    },
    "from": {
+    "2750ad299c178787": 3,
     "eglink": 11,
     "everloot-0512e71f": 2,
     "everloot-4518d2cc": 2,
     "everloot-c8ee0b15": 5
    },
    "maps": {
-    "1442": 20
+    "1442": 23
    },
    "maxLevel": 20,
    "minLevel": 19,
@@ -91345,6 +91643,8 @@
      "1676": 1,
      "1777": 2,
      "1824": 2,
+     "1827": 1,
+     "1828": 2,
      "1877": 1,
      "1927": 1
     }
@@ -91498,25 +91798,26 @@
        "qty": 7
       }
      },
-     "kills": 20,
-     "lootable": 20,
+     "kills": 35,
+     "lootable": 35,
      "money": {
-      "copper": 678,
-      "drops": 18,
+      "copper": 792,
+      "drops": 21,
       "max": 64,
       "min": 9
      },
-     "opened": 18
+     "opened": 21
     }
    },
    "from": {
+    "2750ad299c178787": 3,
     "eglink": 2,
     "everloot-4518d2cc": 1,
     "everloot-c8ee0b15": 15,
     "everloot-f8c829b9": 2
    },
    "maps": {
-    "1442": 20
+    "1442": 23
    },
    "maxLevel": 20,
    "minLevel": 19,
@@ -91530,9 +91831,11 @@
      "1625": 2,
      "1626": 1,
      "1627": 2,
+     "1629": 1,
      "1672": 1,
      "1724": 1,
-     "1777": 1,
+     "1777": 2,
+     "1778": 1,
      "1827": 1,
      "1879": 1
     }
@@ -91921,18 +92224,20 @@
     "1": {
      "items": {
       "1081": {
-       "drops": 2,
+       "drops": 6,
        "max": 1,
        "min": 1,
-       "qty": 2
+       "qty": 6
       },
       "1475": {
        "drops": 1,
        "qty": 1
       },
       "3174": {
-       "drops": 1,
-       "qty": 1
+       "drops": 7,
+       "max": 1,
+       "min": 1,
+       "qty": 7
       },
       "3182": {
        "drops": 1,
@@ -91941,28 +92246,29 @@
        "qty": 1
       },
       "3931": {
-       "drops": 3,
+       "drops": 8,
        "max": 1,
        "min": 1,
-       "qty": 3
+       "qty": 8
       }
      },
-     "kills": 8,
-     "lootable": 8,
+     "kills": 21,
+     "lootable": 17,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 4
+     "opened": 16
     }
    },
    "from": {
+    "2750ad299c178787": 15,
     "eglink": 2,
     "everloot-4518d2cc": 2,
     "everloot-c8ee0b15": 1
    },
    "maps": {
-    "1442": 5
+    "1442": 20
    },
    "maxLevel": 20,
    "minLevel": 19,
@@ -91972,11 +92278,18 @@
      "1335": 2,
      "1336": 2,
      "1385": 1,
-     "1872": 1,
+     "1822": 2,
+     "1871": 2,
+     "1872": 5,
+     "1874": 1,
+     "1875": 2,
      "1877": 1,
-     "1922": 1,
+     "1921": 1,
+     "1922": 2,
+     "1923": 1,
      "1926": 1,
-     "1927": 1
+     "1927": 1,
+     "1972": 1
     }
    }
   },
@@ -91985,56 +92298,101 @@
     "1": {
      "items": {
       "1081": {
-       "drops": 5,
+       "drops": 9,
        "max": 1,
        "min": 1,
-       "qty": 5
+       "qty": 9
       },
       "1206": {
        "drops": 1,
        "qty": 1
       },
       "1475": {
-       "drops": 5,
+       "drops": 6,
        "max": 1,
        "min": 1,
-       "qty": 5
+       "qty": 6
       },
       "3174": {
-       "drops": 3,
+       "drops": 8,
        "max": 1,
        "min": 1,
-       "qty": 3
+       "qty": 8
+      },
+      "3182": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3196": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
       },
       "3931": {
-       "drops": 4,
+       "drops": 9,
        "max": 1,
        "min": 1,
-       "qty": 4
+       "qty": 9
       }
      },
-     "kills": 32,
-     "lootable": 25,
+     "kills": 46,
+     "lootable": 35,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 14
+     "opened": 26
+    },
+    "2": {
+     "items": {
+      "1081": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3174": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "3931": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 9,
+     "lootable": 9,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 7,
+    "6b05637e02d9a0a8": 20,
     "eglink": 9,
     "everloot-c8ee0b15": 4,
     "everloot-f8c829b9": 6
    },
    "maps": {
-    "1442": 19
+    "1442": 49
    },
    "maxLevel": 18,
    "minLevel": 17,
    "name": "Deepmoss Venomspitter",
    "spots": {
     "1442": {
+     "1269": 1,
+     "1270": 1,
      "1273": 1,
      "1274": 1,
      "1331": 1,
@@ -92046,7 +92404,9 @@
      "1531": 2,
      "1532": 1,
      "1579": 1,
-     "1580": 1
+     "1580": 2,
+     "1581": 3,
+     "1629": 1
     }
    }
   },
@@ -92095,28 +92455,103 @@
    }
   },
   "4009": {
-   "buckets": {},
-   "from": {},
-   "maps": {},
+   "buckets": {
+    "1": {
+     "items": {
+      "14120": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "14564": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5125": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5128": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      },
+      "5470": {
+       "drops": 6,
+       "max": 1,
+       "min": 1,
+       "qty": 6
+      }
+     },
+     "kills": 15,
+     "lootable": 9,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 9
+    }
+   },
+   "from": {
+    "2750ad299c178787": 10,
+    "6b05637e02d9a0a8": 5
+   },
+   "maps": {
+    "1442": 16
+   },
+   "maxLevel": 19,
+   "minLevel": 18,
    "name": "Raging Cliff Stormer",
    "skins": {
     "from": {
+     "6b05637e02d9a0a8": 5,
      "eglink": 2
     },
     "items": {
      "2318": {
+      "drops": 4,
+      "max": 1,
+      "min": 1,
+      "qty": 6
+     },
+     "2319": {
       "drops": 2,
-      "qty": 4
+      "max": 1,
+      "min": 1,
+      "qty": 2
+     },
+     "783": {
+      "drops": 1,
+      "max": 1,
+      "min": 1,
+      "qty": 1
      }
     },
-    "skinned": 2
+    "skinned": 7
+   },
+   "spots": {
+    "1442": {
+     "1168": 1,
+     "1169": 1,
+     "1217": 2,
+     "1268": 1,
+     "1581": 2,
+     "1582": 1,
+     "1778": 2
+    }
    }
   },
   "4011": {
    "buckets": {
     "1": {
      "items": {},
-     "kills": 1,
+     "kills": 4,
      "lootable": 1,
      "money": {
       "copper": 0,
@@ -92126,10 +92561,11 @@
     }
    },
    "from": {
+    "2750ad299c178787": 3,
     "everloot-c8ee0b15": 1
    },
    "maps": {
-    "1442": 1
+    "1442": 4
    },
    "maxLevel": 20,
    "minLevel": 19,
@@ -92156,15 +92592,31 @@
    },
    "spots": {
     "1442": {
-     "1529": 1
+     "1529": 1,
+     "1580": 1,
+     "1872": 1,
+     "1926": 1
     }
    }
   },
   "4012": {
-   "buckets": {},
-   "from": {},
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
    "maps": {
-    "1442": 4
+    "1442": 1
    },
    "maxLevel": 22,
    "minLevel": 21,
@@ -92196,6 +92648,11 @@
      }
     },
     "skinned": 6
+   },
+   "spots": {
+    "1442": {
+     "1371": 1
+    }
    }
   },
   "4013": {
@@ -92590,10 +93047,10 @@
        "qty": 4
       },
       "17056": {
-       "drops": 12,
+       "drops": 14,
        "max": 1,
        "min": 1,
-       "qty": 12
+       "qty": 14
       },
       "1821": {
        "drops": 1,
@@ -92650,16 +93107,16 @@
        "qty": 1
       },
       "3857": {
-       "drops": 6,
+       "drops": 7,
        "max": 1,
        "min": 1,
-       "qty": 6
+       "qty": 7
       },
       "4306": {
-       "drops": 1,
+       "drops": 2,
        "max": 1,
        "min": 1,
-       "qty": 1
+       "qty": 2
       },
       "5115": {
        "drops": 1,
@@ -92668,10 +93125,10 @@
        "qty": 1
       },
       "5116": {
-       "drops": 4,
+       "drops": 7,
        "max": 1,
        "min": 1,
-       "qty": 4
+       "qty": 7
       },
       "5635": {
        "drops": 1,
@@ -92686,24 +93143,75 @@
        "qty": 1
       }
      },
-     "kills": 43,
-     "lootable": 37,
+     "kills": 47,
+     "lootable": 43,
      "money": {
-      "copper": 1861,
-      "drops": 37,
+      "copper": 2162,
+      "drops": 42,
       "max": 103,
       "min": 14
      },
-     "opened": 37
+     "opened": 42
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 156,
+      "drops": 2,
+      "max": 92,
+      "min": 64
+     },
+     "opened": 3
+    },
+    "3": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 1,
+       "max": 3,
+       "min": 3,
+       "qty": 3
+      },
+      "7090": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 83,
+      "drops": 2,
+      "max": 68,
+      "min": 15
+     },
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 12,
     "eglink": 14,
     "everloot-342b2112": 10,
     "everloot-c8ee0b15": 15
    },
    "maps": {
-    "1442": 39
+    "1442": 54
    },
    "maxLevel": 24,
    "minLevel": 23,
@@ -92714,21 +93222,24 @@
      "731": 5,
      "732": 1,
      "779": 3,
-     "780": 2,
-     "781": 6,
-     "782": 1,
+     "780": 3,
+     "781": 7,
+     "782": 5,
+     "783": 1,
+     "829": 2,
      "830": 1,
-     "831": 1,
-     "832": 3,
-     "833": 2,
+     "831": 2,
+     "832": 4,
+     "833": 4,
      "879": 1,
      "880": 6,
-     "881": 4,
+     "881": 5,
      "882": 1,
      "922": 4,
      "923": 2,
      "924": 4,
-     "925": 1
+     "925": 1,
+     "926": 1
     }
    }
   },
@@ -92777,8 +93288,8 @@
        "qty": 3
       }
      },
-     "kills": 15,
-     "lootable": 15,
+     "kills": 16,
+     "lootable": 16,
      "money": {
       "copper": 1144,
       "drops": 15,
@@ -92786,16 +93297,79 @@
       "min": 20
      },
      "opened": 15
+    },
+    "2": {
+     "items": {
+      "2589": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 141,
+      "drops": 2,
+      "max": 96,
+      "min": 45
+     },
+     "opened": 3
+    },
+    "3": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3857": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 5,
+     "lootable": 5,
+     "money": {
+      "copper": 229,
+      "drops": 3,
+      "max": 105,
+      "min": 60
+     },
+     "opened": 4
     }
    },
    "from": {
+    "2750ad299c178787": 8,
     "eglink": 6,
     "everloot-342b2112": 6,
     "everloot-c8df3474": 1,
     "everloot-c8ee0b15": 2
    },
    "maps": {
-    "1442": 15
+    "1442": 27
    },
    "maxLevel": 26,
    "minLevel": 25,
@@ -92805,13 +93379,15 @@
      "684": 2,
      "685": 2,
      "733": 6,
-     "734": 6,
-     "883": 1,
-     "884": 7,
-     "885": 1,
+     "734": 9,
+     "783": 2,
+     "784": 1,
+     "883": 2,
+     "884": 8,
+     "885": 3,
      "932": 1,
-     "933": 1,
-     "934": 2
+     "933": 2,
+     "934": 3
     }
    }
   },
@@ -92877,34 +93453,97 @@
       "min": 20
      },
      "opened": 18
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1797": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2589": {
+       "drops": 1,
+       "max": 3,
+       "min": 3,
+       "qty": 3
+      },
+      "954": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 6,
+     "lootable": 6,
+     "money": {
+      "copper": 180,
+      "drops": 4,
+      "max": 89,
+      "min": 27
+     },
+     "opened": 6
+    },
+    "3": {
+     "items": {
+      "1205": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 7,
     "eglink": 9,
     "everloot-342b2112": 6,
     "everloot-c8ee0b15": 4
    },
    "maps": {
-    "1442": 19
+    "1442": 30
    },
    "maxLevel": 26,
    "minLevel": 25,
    "name": "Bloodfury Slayer",
    "spots": {
     "1442": {
-     "684": 5,
+     "684": 6,
      "685": 1,
      "733": 1,
-     "734": 9,
+     "734": 13,
      "735": 1,
-     "783": 1,
+     "783": 2,
+     "784": 2,
      "785": 3,
      "833": 1,
      "834": 1,
      "883": 1,
-     "884": 3,
-     "885": 3,
-     "933": 2
+     "884": 4,
+     "885": 4,
+     "933": 2,
+     "934": 1
     }
    }
   },
@@ -92922,6 +93561,12 @@
        "drops": 1,
        "qty": 1
       },
+      "15313": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "1705": {
        "drops": 1,
        "max": 1,
@@ -92929,10 +93574,10 @@
        "qty": 1
       },
       "17056": {
-       "drops": 7,
+       "drops": 8,
        "max": 1,
        "min": 1,
-       "qty": 7
+       "qty": 8
       },
       "1821": {
        "drops": 1,
@@ -92946,11 +93591,17 @@
        "min": 1,
        "qty": 1
       },
+      "2589": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      },
       "2592": {
-       "drops": 3,
+       "drops": 4,
        "max": 2,
        "min": 1,
-       "qty": 5
+       "qty": 7
       },
       "3385": {
        "drops": 1,
@@ -92987,24 +93638,87 @@
        "qty": 2
       }
      },
-     "kills": 22,
-     "lootable": 22,
+     "kills": 27,
+     "lootable": 27,
      "money": {
-      "copper": 1059,
-      "drops": 22,
+      "copper": 1327,
+      "drops": 27,
       "max": 100,
-      "min": 24
+      "min": 22
      },
-     "opened": 22
+     "opened": 27
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1822": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3770": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5116": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 47,
+      "drops": 2,
+      "max": 33,
+      "min": 14
+     },
+     "opened": 4
+    },
+    "3": {
+     "items": {
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 67,
+      "drops": 1,
+      "max": 67,
+      "min": 67
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 10,
     "eglink": 7,
     "everloot-342b2112": 6,
     "everloot-c8ee0b15": 9
    },
    "maps": {
-    "1442": 22
+    "1442": 36
    },
    "maxLevel": 24,
    "minLevel": 23,
@@ -93013,18 +93727,18 @@
     "1442": {
      "731": 4,
      "732": 1,
-     "779": 1,
-     "780": 5,
+     "779": 2,
+     "780": 6,
      "781": 4,
      "782": 4,
      "783": 1,
-     "829": 1,
-     "830": 1,
-     "831": 2,
-     "832": 1,
-     "833": 1,
-     "880": 5,
-     "881": 4,
+     "829": 4,
+     "830": 3,
+     "831": 4,
+     "832": 3,
+     "833": 2,
+     "880": 6,
+     "881": 5,
      "882": 2
     }
    }
@@ -93034,10 +93748,10 @@
     "1": {
      "items": {
       "17056": {
-       "drops": 7,
+       "drops": 9,
        "max": 1,
        "min": 1,
-       "qty": 7
+       "qty": 9
       },
       "1818": {
        "drops": 1,
@@ -93062,10 +93776,10 @@
        "qty": 4
       },
       "2592": {
-       "drops": 4,
+       "drops": 5,
        "max": 2,
        "min": 1,
-       "qty": 6
+       "qty": 7
       },
       "3012": {
        "drops": 1,
@@ -93095,46 +93809,96 @@
        "min": 1,
        "qty": 6
       },
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "929": {
        "drops": 2,
        "qty": 2
       }
      },
-     "kills": 26,
-     "lootable": 26,
+     "kills": 31,
+     "lootable": 31,
      "money": {
-      "copper": 1594,
-      "drops": 26,
-      "max": 104,
+      "copper": 1851,
+      "drops": 30,
+      "max": 108,
       "min": 17
      },
-     "opened": 26
+     "opened": 30
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2592": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5635": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 181,
+      "drops": 3,
+      "max": 74,
+      "min": 36
+     },
+     "opened": 4
+    },
+    "3": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
     }
    },
    "from": {
+    "2750ad299c178787": 9,
     "eglink": 8,
     "everloot-342b2112": 6,
     "everloot-4518d2cc": 1,
     "everloot-c8ee0b15": 11
    },
    "maps": {
-    "1442": 26
+    "1442": 38
    },
    "maxLevel": 25,
    "minLevel": 24,
    "name": "Bloodfury Windcaller",
    "spots": {
     "1442": {
-     "779": 4,
-     "780": 2,
-     "781": 4,
-     "830": 4,
-     "831": 2,
+     "779": 5,
+     "780": 3,
+     "781": 6,
+     "782": 2,
+     "829": 2,
+     "830": 6,
+     "831": 3,
      "832": 1,
      "833": 1,
      "878": 1,
      "879": 1,
-     "880": 4,
+     "880": 5,
      "881": 8,
      "882": 2,
      "883": 1
@@ -93199,15 +93963,84 @@
       "min": 56
      },
      "opened": 15
+    },
+    "2": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2592": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      },
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 5,
+     "lootable": 5,
+     "money": {
+      "copper": 177,
+      "drops": 3,
+      "max": 92,
+      "min": 36
+     },
+     "opened": 5
+    },
+    "3": {
+     "items": {
+      "17056": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2592": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5116": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 248,
+      "drops": 2,
+      "max": 131,
+      "min": 117
+     },
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 9,
     "eglink": 10,
     "everloot-342b2112": 2,
     "everloot-c8ee0b15": 3
    },
    "maps": {
-    "1442": 15
+    "1442": 30
    },
    "maxLevel": 27,
    "minLevel": 26,
@@ -93215,13 +94048,15 @@
    "spots": {
     "1442": {
      "683": 1,
-     "684": 6,
-     "734": 6,
+     "684": 8,
+     "733": 1,
+     "734": 10,
      "783": 1,
-     "784": 2,
+     "784": 4,
      "785": 1,
-     "883": 2,
-     "884": 4,
+     "883": 3,
+     "884": 6,
+     "885": 3,
      "933": 1
     }
    }
@@ -93249,24 +94084,25 @@
        "qty": 1
       }
      },
-     "kills": 4,
-     "lootable": 4,
+     "kills": 5,
+     "lootable": 5,
      "money": {
-      "copper": 202,
-      "drops": 4,
+      "copper": 267,
+      "drops": 5,
       "max": 77,
       "min": 24
      },
-     "opened": 4
+     "opened": 5
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 1,
     "everloot-342b2112": 1,
     "everloot-c8ee0b15": 2
    },
    "maps": {
-    "1442": 4
+    "1442": 5
    },
    "maxLevel": 26,
    "minLevel": 25,
@@ -93275,6 +94111,7 @@
     "1442": {
      "733": 1,
      "734": 1,
+     "783": 1,
      "785": 1,
      "880": 1,
      "884": 1
@@ -93357,19 +94194,31 @@
       "drops": 0
      },
      "opened": 0
+    },
+    "3": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 1
    },
    "maps": {
-    "1442": 1
+    "1442": 4
    },
-   "maxLevel": 26,
-   "minLevel": 26,
+   "maxLevel": 27,
+   "minLevel": 25,
    "name": "Fledgling Chimaera",
    "spots": {
     "1442": {
+     "835": 3,
      "886": 1
     }
    }
@@ -93532,7 +94381,7 @@
        "qty": 1
       }
      },
-     "kills": 24,
+     "kills": 28,
      "lootable": 24,
      "money": {
       "copper": 0,
@@ -93542,11 +94391,12 @@
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 6,
     "everloot-c8ee0b15": 15
    },
    "maps": {
-    "1442": 21
+    "1442": 23
    },
    "maxLevel": 24,
    "minLevel": 23,
@@ -93558,9 +94408,9 @@
      "831": 3,
      "875": 1,
      "876": 2,
-     "879": 1,
+     "879": 2,
      "880": 2,
-     "881": 1,
+     "881": 2,
      "923": 4,
      "924": 1,
      "925": 2,
@@ -93633,30 +94483,50 @@
       }
      },
      "kills": 17,
-     "lootable": 15,
+     "lootable": 16,
      "money": {
       "copper": 0,
       "drops": 0
      },
      "opened": 15
+    },
+    "3": {
+     "items": {
+      "3857": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "eglink": 10,
     "everloot-c8ee0b15": 6
    },
    "maps": {
-    "1442": 16
+    "1442": 24
    },
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Burning Destroyer",
    "spots": {
     "1442": {
-     "785": 2,
+     "736": 1,
+     "784": 1,
+     "785": 3,
      "786": 2,
      "834": 2,
-     "835": 4,
+     "835": 9,
      "836": 1,
      "837": 2,
      "886": 4,
@@ -93769,16 +94639,44 @@
       "drops": 0
      },
      "opened": 8
+    },
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    },
+    "3": {
+     "items": {
+      "11384": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": 2,
     "eglink": 6,
     "everloot-0512e71f": 1,
     "everloot-933e529a": 3,
     "everloot-c8ee0b15": 1
    },
    "maps": {
-    "1442": 11
+    "1442": 13
    },
    "maxLevel": 28,
    "minLevel": 27,
@@ -93797,7 +94695,8 @@
    },
    "spots": {
     "1442": {
-     "786": 1,
+     "785": 1,
+     "786": 2,
      "836": 3,
      "837": 1,
      "885": 1,
@@ -94606,10 +95505,10 @@
     "1": {
      "items": {
       "2589": {
-       "drops": 1,
-       "max": 1,
+       "drops": 2,
+       "max": 2,
        "min": 1,
-       "qty": 1
+       "qty": 3
       },
       "3770": {
        "drops": 1,
@@ -94618,23 +95517,24 @@
        "qty": 1
       }
      },
-     "kills": 2,
-     "lootable": 2,
+     "kills": 3,
+     "lootable": 3,
      "money": {
-      "copper": 205,
-      "drops": 2,
+      "copper": 271,
+      "drops": 3,
       "max": 104,
-      "min": 101
+      "min": 66
      },
-     "opened": 2
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1442": 2
+    "1442": 3
    },
    "maxLevel": 23,
    "minLevel": 23,
@@ -94642,6 +95542,7 @@
    "spots": {
     "1442": {
      "1527": 1,
+     "1678": 1,
      "1778": 1
     }
    }
@@ -94673,6 +95574,62 @@
      "1830": 1,
      "1929": 1,
      "1930": 1
+    }
+   }
+  },
+  "4077": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 30,
+   "minLevel": 30,
+   "name": "Gaxim Rustfizzle",
+   "spots": {
+    "1442": {
+     "1483": 1
+    }
+   }
+  },
+  "4080": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "2750ad299c178787": 1
+   },
+   "maps": {
+    "1442": 1
+   },
+   "maxLevel": 23,
+   "minLevel": 23,
+   "name": "Kaela Shadowspear",
+   "spots": {
+    "1442": {
+     "1483": 1
     }
    }
   },
@@ -94721,10 +95678,10 @@
        "qty": 1
       },
       "2592": {
-       "drops": 8,
+       "drops": 9,
        "max": 2,
        "min": 1,
-       "qty": 11
+       "qty": 13
       },
       "3378": {
        "drops": 1,
@@ -94751,15 +95708,15 @@
        "qty": 16
       }
      },
-     "kills": 48,
-     "lootable": 43,
+     "kills": 49,
+     "lootable": 45,
      "money": {
-      "copper": 3349,
-      "drops": 43,
+      "copper": 3459,
+      "drops": 45,
       "max": 121,
       "min": 17
      },
-     "opened": 43
+     "opened": 45
     },
     "2": {
      "items": {
@@ -94801,7 +95758,7 @@
     }
    },
    "from": {
-    "2750ad299c178787": 3,
+    "2750ad299c178787": 5,
     "eglink": 19,
     "everloot-0512e71f": 1,
     "everloot-bab301d5": 5,
@@ -94809,7 +95766,7 @@
     "everloot-f8c829b9": 11
    },
    "maps": {
-    "1441": 57
+    "1441": 60
    },
    "maxLevel": 26,
    "minLevel": 25,
@@ -94820,10 +95777,10 @@
      "1018": 8,
      "1019": 5,
      "1068": 4,
-     "1069": 8,
+     "1069": 9,
      "1070": 1,
-     "1117": 1,
-     "1118": 6,
+     "1117": 2,
+     "1118": 7,
      "1119": 2,
      "1120": 13,
      "1121": 2,
@@ -94893,15 +95850,15 @@
        "qty": 1
       }
      },
-     "kills": 53,
-     "lootable": 44,
+     "kills": 54,
+     "lootable": 45,
      "money": {
-      "copper": 2714,
-      "drops": 44,
+      "copper": 2779,
+      "drops": 45,
       "max": 109,
       "min": 17
      },
-     "opened": 44
+     "opened": 45
     },
     "2": {
      "items": {
@@ -94943,14 +95900,14 @@
     }
    },
    "from": {
-    "2750ad299c178787": 5,
+    "2750ad299c178787": 6,
     "eglink": 33,
     "everloot-bab301d5": 3,
     "everloot-c8ee0b15": 2,
     "everloot-f8c829b9": 12
    },
    "maps": {
-    "1441": 64
+    "1441": 65
    },
    "maxLevel": 25,
    "minLevel": 24,
@@ -94964,7 +95921,7 @@
      "1069": 5,
      "1070": 1,
      "1117": 2,
-     "1118": 3,
+     "1118": 4,
      "1119": 4,
      "1120": 9,
      "1121": 6,
@@ -94980,8 +95937,10 @@
     "1": {
      "items": {
       "1205": {
-       "drops": 1,
-       "qty": 1
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
       },
       "1755": {
        "drops": 1,
@@ -95006,24 +95965,25 @@
        "qty": 9
       }
      },
-     "kills": 26,
-     "lootable": 26,
+     "kills": 27,
+     "lootable": 27,
      "money": {
-      "copper": 1968,
-      "drops": 26,
+      "copper": 2005,
+      "drops": 27,
       "max": 145,
       "min": 21
      },
-     "opened": 26
+     "opened": 27
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 20,
     "everloot-bab301d5": 5,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 26
+    "1441": 27
    },
    "maxLevel": 28,
    "minLevel": 27,
@@ -95036,7 +95996,7 @@
      "1066": 4,
      "1067": 6,
      "1116": 3,
-     "1117": 2,
+     "1117": 3,
      "410": 1,
      "460": 1,
      "461": 1,
@@ -95079,10 +96039,10 @@
        "qty": 2
       },
       "4306": {
-       "drops": 11,
+       "drops": 12,
        "max": 2,
        "min": 1,
-       "qty": 18
+       "qty": 20
       },
       "8186": {
        "drops": 1,
@@ -95098,12 +96058,12 @@
      "kills": 36,
      "lootable": 36,
      "money": {
-      "copper": 2355,
-      "drops": 35,
+      "copper": 2457,
+      "drops": 36,
       "max": 111,
       "min": 20
      },
-     "opened": 35
+     "opened": 36
     },
     "2": {
      "items": {
@@ -95144,14 +96104,14 @@
     }
    },
    "from": {
-    "2750ad299c178787": 8,
+    "2750ad299c178787": 9,
     "eglink": 21,
     "everloot-bab301d5": 4,
     "everloot-c8ee0b15": 2,
     "everloot-f8c829b9": 8
    },
    "maps": {
-    "1441": 49
+    "1441": 52
    },
    "maxLevel": 25,
    "minLevel": 24,
@@ -95162,9 +96122,10 @@
      "1018": 6,
      "1019": 2,
      "1020": 1,
+     "1067": 1,
      "1068": 1,
      "1069": 8,
-     "1118": 1,
+     "1118": 3,
      "1119": 5,
      "1120": 6,
      "1121": 1,
@@ -95234,28 +96195,60 @@
       "min": 23
      },
      "opened": 36
+    },
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 46,
+      "drops": 1,
+      "max": 46,
+      "min": 46
+     },
+     "opened": 1
+    },
+    "3": {
+     "items": {
+      "4306": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 67,
+      "drops": 1,
+      "max": 67,
+      "min": 67
+     },
+     "opened": 1
     }
    },
    "from": {
-    "2750ad299c178787": 1,
+    "2750ad299c178787": 3,
     "eglink": 24,
     "everloot-0512e71f": 1,
     "everloot-bab301d5": 8,
     "everloot-f8c829b9": 2
    },
    "maps": {
-    "1441": 36
+    "1441": 41
    },
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Galak Stormer",
    "spots": {
     "1441": {
-     "1016": 2,
+     "1015": 1,
+     "1016": 3,
      "1017": 1,
      "1065": 4,
      "1066": 7,
-     "1067": 10,
+     "1067": 13,
      "1116": 3,
      "1117": 2,
      "409": 1,
@@ -95304,36 +96297,49 @@
        "qty": 15
       }
      },
-     "kills": 33,
-     "lootable": 33,
+     "kills": 34,
+     "lootable": 34,
      "money": {
-      "copper": 2292,
-      "drops": 33,
+      "copper": 2400,
+      "drops": 34,
       "max": 118,
       "min": 42
      },
-     "opened": 33
+     "opened": 34
+    },
+    "3": {
+     "items": {},
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 155,
+      "drops": 2,
+      "max": 105,
+      "min": 50
+     },
+     "opened": 2
     }
    },
    "from": {
+    "2750ad299c178787": 3,
     "eglink": 24,
     "everloot-bab301d5": 8,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 33
+    "1441": 37
    },
    "maxLevel": 27,
    "minLevel": 26,
    "name": "Galak Marauder",
    "spots": {
     "1441": {
-     "1016": 1,
-     "1065": 5,
+     "1016": 2,
+     "1065": 6,
      "1066": 7,
-     "1067": 4,
+     "1067": 5,
      "1116": 1,
-     "1117": 3,
+     "1117": 4,
      "1118": 2,
      "359": 1,
      "411": 2,
@@ -96101,29 +97107,31 @@
        "qty": 1
       }
      },
-     "kills": 2,
-     "lootable": 2,
+     "kills": 3,
+     "lootable": 3,
      "money": {
-      "copper": 113,
-      "drops": 2,
-      "max": 35,
+      "copper": 219,
+      "drops": 3,
+      "max": 106,
       "min": 35
      },
-     "opened": 2
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 1,
     "everloot-c8ee0b15": 1
    },
    "maps": {
-    "1441": 1
+    "1441": 2
    },
    "maxLevel": 26,
    "minLevel": 26,
    "name": "Gravelsnout Vermin",
    "spots": {
     "1441": {
+     "816": 1,
      "863": 1
     }
    }
@@ -96442,7 +97450,7 @@
        "qty": 1
       }
      },
-     "kills": 19,
+     "kills": 21,
      "lootable": 19,
      "money": {
       "copper": 0,
@@ -96469,14 +97477,14 @@
     }
    },
    "from": {
-    "2750ad299c178787": 2,
+    "2750ad299c178787": 3,
     "eglink": 9,
     "everloot-0512e71f": 2,
     "everloot-c8ee0b15": 2,
     "everloot-f8c829b9": 2
    },
    "maps": {
-    "1441": 18
+    "1441": 19
    },
    "maxLevel": 28,
    "minLevel": 27,
@@ -96517,6 +97525,7 @@
      "1627": 1,
      "1675": 2,
      "257": 1,
+     "261": 1,
      "310": 1,
      "366": 2,
      "417": 1,
@@ -98591,7 +99600,7 @@
        "qty": 1
       }
      },
-     "kills": 11,
+     "kills": 12,
      "lootable": 11,
      "money": {
       "copper": 0,
@@ -98601,13 +99610,14 @@
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "eglink": 2,
     "everloot-0512e71f": 3,
     "everloot-bab301d5": 3,
     "everloot-c8ee0b15": 3
    },
    "maps": {
-    "1441": 11,
+    "1441": 12,
     "1444": 3
    },
    "maxLevel": 29,
@@ -98653,7 +99663,7 @@
      "307": 1,
      "308": 1,
      "309": 2,
-     "312": 1,
+     "312": 2,
      "315": 2,
      "367": 2,
      "411": 2,
@@ -98848,7 +99858,7 @@
        "qty": 3
       }
      },
-     "kills": 21,
+     "kills": 32,
      "lootable": 7,
      "money": {
       "copper": 0,
@@ -98858,19 +99868,22 @@
     }
    },
    "from": {
+    "2750ad299c178787": 1,
+    "6b05637e02d9a0a8": 2,
     "eglink": 6,
     "everloot-0512e71f": 1,
     "everloot-4518d2cc": 1,
     "everloot-f8c829b9": 3
    },
    "maps": {
-    "1442": 11
+    "1442": 17
    },
    "maxLevel": 14,
    "minLevel": 14,
    "name": "Deepmoss Hatchling",
    "spots": {
     "1442": {
+     "1222": 1,
      "1270": 1,
      "1336": 2,
      "1337": 1,
@@ -104806,40 +105819,42 @@
     "1": {
      "items": {
       "4784": {
-       "drops": 1,
+       "drops": 2,
        "max": 1,
        "min": 1,
-       "qty": 1
+       "qty": 2
       },
       "5741": {
-       "drops": 1,
+       "drops": 2,
        "max": 1,
        "min": 1,
-       "qty": 1
+       "qty": 2
       }
      },
-     "kills": 2,
-     "lootable": 2,
+     "kills": 3,
+     "lootable": 3,
      "money": {
       "copper": 0,
       "drops": 0
      },
-     "opened": 2
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": 1,
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 2
+    "1441": 3
    },
    "maxLevel": 30,
    "minLevel": 30,
    "name": "Rok'Alim the Pounder",
    "spots": {
     "1441": {
-     "519": 2
+     "519": 2,
+     "620": 1
     }
    }
   },
@@ -136777,5 +137792,5 @@
    }
   }
  },
- "submissions": 7
+ "submissions": 8
 }
