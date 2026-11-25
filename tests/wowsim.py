@@ -9,6 +9,7 @@ import zlib
 from lupa import lua51
 
 ADDON_DIR = pathlib.Path(__file__).resolve().parent.parent / "DropTables"
+DEBUG_FILE = ADDON_DIR.parent / "debug" / "DropTablesDebug" / "DropTablesDebug.lua"
 
 STUBS = r"""
 timers = {}
@@ -246,10 +247,12 @@ def py_compress(text, method):
 class Client:
     """One game client with the addon loaded."""
 
-    def __init__(self, name, files=ALL_FILES, saved=None, data=None):
+    def __init__(self, name, files=ALL_FILES, saved=None, data=None, debug=False):
         """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would.
-        data: the text of a Data.lua (shared database) loaded right after Core.lua, as the toc does."""
-        self.name, self.files = name, files
+        data: the text of a Data.lua (shared database) loaded right after Core.lua, as the toc does.
+        debug: load the Drop Tables Debug addon after it; its namespace is debug_ns and it gets every event fired."""
+        self.name, self.files, self.debug = name, files, debug
+        self.debug_ns = None
         self.lua = lua51.LuaRuntime(unpack_returned_tuples=True)
         self.g = self.lua.globals()
         self.g.pyCompress = py_compress
@@ -263,6 +266,10 @@ class Client:
             if file_name == "Core.lua" and data:
                 loader(data, "Data.lua")("DropTables", self.ns)
         self.fire("ADDON_LOADED", "DropTables")
+        if debug:
+            self.debug_ns = self.lua.table()
+            loader(DEBUG_FILE.read_text(encoding="utf-8"), DEBUG_FILE.name)("DropTablesDebug", self.debug_ns)
+            self.fire("ADDON_LOADED", "DropTablesDebug")
 
     def raise_errors(self):
         errors = self.g.luaErrors
@@ -275,10 +282,14 @@ class Client:
         self.fire("PLAYER_LOGOUT")
         dump = self.lua.execute(DUMP)
         state = "%s\nDropTablesDB = %s\nnow = %s" % (saved, dump(self.g.DropTablesDB), self.g.now + later)
-        return Client(self.name, files=self.files, saved=state)
+        if self.g.DropTablesDebugDB is not None:
+            state += "\nDropTablesDebugDB = %s" % dump(self.g.DropTablesDebugDB)
+        return Client(self.name, files=self.files, saved=state, debug=self.debug)
 
     def fire(self, event, *args):
         self.ns.Fire(event, *args)
+        if self.debug_ns is not None:
+            self.debug_ns.OnEvent(event, *args)
         self.raise_errors()
 
     def advance(self, seconds):

@@ -618,7 +618,7 @@ def main():
 
 
     # Party members send each other their own changed counts once a minute, without being asked.
-    pat, quinn = Client("Pat"), Client("Quinn")
+    pat, quinn = Client("Pat", debug=True), Client("Quinn", debug=True)
     net.add(pat, quinn)
     form_party(pat, quinn)
     net.run(70)
@@ -781,13 +781,13 @@ def main():
     expect("relay migrated", (peer.buckets[1].kills, peer.buckets[1]["items"][100].drops, peer.maps[12]), (4, 2, 4))
     expect("relay and bridge setting removed", (upgraded.ns.db.relay, upgraded.ns.settings.bridgeMode), (None, None))
 
-    # /dt debug puts a chat line for every message in and out, with the reason when one is not taken.
+    # The debug addon puts a chat line for every message in and out, with the reason when one is not taken.
     def debug_lines(client, frame=1):
         lines = client.g["ChatFrame%d" % frame].lines
         return [lines[i] for i in range(1, len(lines) + 1)]
 
     for client in (pat, quinn):
-        client.g.SlashCmdList.DROPTABLES("debug")
+        client.g.SlashCmdList.DROPTABLESDEBUG("")
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(210), ";".join(counts(25, 5, 5))),
                "PARTY", "Pat Ashwood")
     lines = "\n".join(debug_lines(quinn))
@@ -805,7 +805,7 @@ def main():
                "PARTY", "Stranger")
     expect("debug goes to the DT Debug tab", (len(debug_lines(quinn, 3)) > 0, debug_lines(quinn)), (True, []))
 
-    quinn.g.SlashCmdList.DROPTABLES("debug")
+    quinn.g.SlashCmdList.DROPTABLESDEBUG("")
     quinn.lua.execute("ChatFrame1.lines = {}; ChatFrame3.lines = {}")
     quinn.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|%s" % (origin_id(211), ";".join(counts(25, 5, 5))),
                "PARTY", "Stranger")

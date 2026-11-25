@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Drop Tables Debug
+## Notes: Test-only helper: /dtdebug writes what Drop Tables does into a DT Debug chat tab.
+## Author: SasnycoN
+## Version: 1.0.0
+## Dependencies: DropTables
+## SavedVariables: DropTablesDebugDB
+
+DropTablesDebug.lua
