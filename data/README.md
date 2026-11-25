@@ -75,8 +75,10 @@ The numbers are not plain sums of everything sent in:
 - Each install's counts for a mob go in once, from the most complete version sent.
 - Counts are rounded to whole numbers.
 - Quest items and character names are never in it.
-- A mob's `name` is the one most sources gave in Latin letters. Names in other scripts, like the Korean ones a player
-  with a Korean client sends, are left out, and a mob no source names any more keeps the name it had before.
+- A mob's `name` is the one most sources gave. Names in other scripts, like the Korean ones a player with a Korean
+  client sends, are left out one by one. When most of a player's names differ from what everyone else calls the same
+  mobs, the player's client is in another language (German, say), and all of their names are left out. A mob no
+  source names any more keeps the name it had before.
 - An install's kill spots weigh like its counts, at most 300 kills' worth, and only the player's own spots come
   in. Counts that other players passed on in the game carry none.
 - Skinning follows the same rules with skinned corpses in place of kills: at most 300 per install, and an install

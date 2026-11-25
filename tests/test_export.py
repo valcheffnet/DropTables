@@ -41,6 +41,29 @@ def json_view(bucket):
     }
 
 
+def names_by_language():
+    """Only an English client sends mob names, and only the ones it saw itself."""
+    anna = Client("Anna")
+    loot_mob(anna, 3, "A1", [(100, 1)])
+    anna.see(3, "A1", 4)
+    peer = "0123456789abcdef"
+    anna.advance(10)
+    anna.see(5, "P1", 2)
+    anna.fire("CHAT_MSG_ADDON", "DropTables", "D|%s|M5.1.a.a.a.0.0..;I5.1.2s.3.3.1.1;N5.Fleischfresser" % peer,
+              "WHISPER", "Dieter")
+    parsed = checked(lua_list(anna.ns.BuildExport().strings)[0])
+    expect("an english client sends its own names", parsed["sources"][anna.ns.db.installId]["mobs"]["3"].get("name"),
+           "Test Mob")
+    expect("but not one another player's addon sent", parsed["sources"][peer]["mobs"]["5"].get("name"), None)
+
+    dieter = Client("Dieter", saved='locale = "deDE"')
+    loot_mob(dieter, 3, "D1", [(100, 1)])
+    dieter.see(3, "D1", 4)
+    parsed = checked(lua_list(dieter.ns.BuildExport().strings)[0])
+    expect("a client in another language sends no names",
+           parsed["sources"][dieter.ns.db.installId]["mobs"]["3"].get("name"), None)
+
+
 def main():
     alice = Client("Alice")
     ns = alice.ns
@@ -194,6 +217,7 @@ def main():
                                  capture_output=True, text=True)
             expect("exit code %d" % code, run.returncode, code)
 
+    names_by_language()
     report("export")
 
 

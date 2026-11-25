@@ -523,8 +523,35 @@ def names(root):
     expect("main keeps the name data/shared.json had", shared["mobs"]["5"].get("name"), "Old Wolf")
 
 
+def other_languages():
+    """Every name of an exporter whose names mostly differ from the others' stays out: a client in German, French,
+    Spanish, Italian or Portuguese writes in Latin letters too."""
+    def exporting(n, names, extra=None):
+        mobs = {npc: mob({1: bucket(10, 10, 10)}, name=name) for npc, name in names.items()}
+        sources = {origin(900 + n): mobs}
+        if extra:
+            sources[origin(950 + n)] = {npc: mob({1: bucket(10, 10, 10)}, name=name) for npc, name in extra.items()}
+        return submission(90 + n, origin(900 + n), sources)
+
+    english = [exporting(1, {5: "Wolf", 6: "Bear", 7: "Boar"}), exporting(5, {6: "Bear", 7: "Boar"})]
+    # The German for wolf is Wolf, so one of its names agrees. It also passes on another player's spider.
+    german = exporting(2, {5: "Wolf", 6: "Bär", 7: "Eber"}, extra={8: "Spinne"})
+    expect("an exporter whose names mostly differ is found", build_data.other_language(english + [german]),
+           {origin(902): (2, 3)})
+    mobs = build_data.build(english + [german])["mobs"]
+    expect("its names stay out", (mobs["6"].get("name"), mobs["7"].get("name")), ("Bear", "Boar"))
+    expect("the ones it passed on too", "name" in mobs["8"], False)
+    expect("with nobody else to settle it, two that disagree both keep their names",
+           build_data.other_language(english[:1] + [german]), {})
+    renamed = exporting(3, {5: "Wolf", 6: "Old Bear", 7: "Boar"})
+    expect("a mob renamed since doesn't make a client foreign", build_data.other_language(english + [renamed]), {})
+    alone = exporting(4, {6: "Bär"})
+    expect("one name compared isn't enough to tell", build_data.other_language(english + [alone]), {})
+
+
 def main():
     merge_rules()
+    other_languages()
     with tempfile.TemporaryDirectory() as folder:
         names(pathlib.Path(folder))
     shared_is_trusted()

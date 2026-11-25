@@ -70,6 +70,8 @@ friendly = {}      -- unit token -> true for a living creature the player cannot
 alive = {}         -- unit token -> true for a living hostile creature (a pickpocket target)
 function UnitIsDead(unit) return units[unit] ~= nil and not friendly[unit] and not alive[unit] end
 function UnitCanAttack(_, unit) return units[unit] ~= nil and not friendly[unit] end
+locale = "enUS"  -- what GetLocale() says, the language of the game client
+function GetLocale() return locale end
 function UnitName(unit)
     local index = tonumber(unit:match("^party(%d+)$") or "")
     if index then return groupMembers[index] end

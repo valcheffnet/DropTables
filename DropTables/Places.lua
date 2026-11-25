@@ -162,9 +162,11 @@ ns.On("DT_READY", function()
             db.info[npc] = nil
         end
     end
-    for npc in pairs(db.names) do
-        if not db.mobs[npc] and not db.skins[npc] and not db.peers[npc] and not db.info[npc] then
-            db.names[npc] = nil
+    for _, names in ipairs({ db.names, db.peerNames }) do
+        for npc in pairs(names) do
+            if not db.mobs[npc] and not db.skins[npc] and not db.peers[npc] and not db.info[npc] then
+                names[npc] = nil
+            end
         end
     end
 end)

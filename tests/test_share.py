@@ -246,6 +246,32 @@ def sharing_off():
     expect("off at login leaves the channel", (fay.g.leaves, fay.g.inChannel, fay.g.joins), (1, False, 0))
 
 
+def names_by_language():
+    """A client in another language answers without the mob's name, and a name another player's addon sent is kept
+    apart from the player's own."""
+    dieter, anna = Client("Dieter", saved='locale = "deDE"'), Client("Anna")
+    fixed_random(dieter, 0)
+    net = Net(dieter, anna)
+    net.run(10)
+    loot_mob(dieter, 1, "D1", [(100, 1)])
+    dieter.see(1, "D1", 5)
+    start = len(net.log)
+    anna.see(1, "A1", 5)
+    net.run(10)
+    answers = net.sent("Dieter", "D|", start)
+    expect("the german client answers", len(answers) > 0, True)
+    expect("without the mob's name", [m[1] for m in answers if ";N1." in m[1] or "|N1." in m[1]], [])
+    expect("so there's no name to keep", anna.ns.db.peerNames[1], None)
+
+    # An older version sends the name in the language of its client. Answers count only after a question.
+    anna.see(2, "A2", 5)
+    net.run(10)
+    whisper(anna, "Dieter", origin_id(300), counts(2, 4, 4) + ["N2.Fleischfresser"])
+    expect("an older version's name is kept as another player's", anna.ns.db.peerNames[2], "Fleischfresser")
+    expect("not as the player's own", anna.ns.db.names[2], None)
+    expect("after a reload it still names the mob", anna.reload().ns.MobName(2), "Fleischfresser")
+
+
 def main():
     alice, bob, carol = Client("Alice"), Client("Bob"), Client("Carol")
     fixed_random(alice, 0)
@@ -787,6 +813,7 @@ def main():
 
     offline_asker()
     sharing_off()
+    names_by_language()
     report("sharing")
 
 

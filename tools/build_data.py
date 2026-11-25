@@ -15,9 +15,12 @@ Mobs in data/loot-resets.json had their loot changed by a hotfix, so what was re
 there is left out (see after_reset). The EG Link and Everloot imports leave those records out themselves, by their
 dates.
 
-A mob's name is the one most sources gave, among names in Latin letters: a player with a Korean client sends Korean
-names, and those can't stand in for the English ones. A mob that gets no name this way keeps the one data/shared.json
-had before, so a source that stops naming it doesn't take the name away. The names left out are printed.
+A mob's name is the one most sources gave in English. The addon sends the names its game client shows, so versions
+before 0.6.4 on a client in another language sent them in that language. Names not in Latin letters (Korean, Chinese,
+Russian) are left out one by one, and so is every name of an exporter whose names mostly differ from what the others
+call the same mobs (German, French, Spanish, Italian, Portuguese). A mob that gets no name this way keeps the one
+data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left out is
+printed.
 
 Usage:
     python tools/build_data.py [--root DIR]
@@ -397,6 +400,42 @@ def foreign_names(sources):
     return sorted(found, key=lambda pair: (int(pair[0]), pair[1]))
 
 
+def other_language(sources):
+    """Exporters whose names mostly differ from the name most exporters give the same mob: a game client in another
+    language. A mob whose names tie isn't compared. Returns exporter -> (names that differ, names compared), for at
+    least two compared."""
+    given = {}
+    for s in sources:
+        exporter = s["result"]["exporter"]
+        for origin in s["result"]["sources"].values():
+            for npc, mob in origin["mobs"].items():
+                if mob.get("name") and latin(mob["name"]):
+                    given.setdefault(str(npc), {}).setdefault(exporter, set()).add(mob["name"])
+    tally = {}
+    for by_exporter in given.values():
+        votes = {}
+        for names in by_exporter.values():
+            for name in names:
+                votes[name] = votes.get(name, 0) + 1
+        ranked = sorted(votes.values(), reverse=True)
+        if len(by_exporter) < 2 or (len(ranked) > 1 and ranked[0] == ranked[1]):
+            continue
+        top = max(votes, key=votes.get)
+        for exporter, names in by_exporter.items():
+            differ, compared = tally.get(exporter, (0, 0))
+            tally[exporter] = (differ + (top not in names), compared + 1)
+    return {e: (differ, compared) for e, (differ, compared) in tally.items() if compared >= 2 and differ * 2 > compared}
+
+
+def unnamed(sub):
+    """A submission with the mob names left out."""
+    result = sub["result"]
+    sources = {origin: dict(source, mobs={npc: {k: v for k, v in mob.items() if k != "name"}
+                                          for npc, mob in source["mobs"].items()})
+               for origin, source in result["sources"].items()}
+    return dict(sub, result=dict(result, sources=sources))
+
+
 def shared_mob(chosen):
     """chosen: origin -> version. Returns the shared record of the mob, or None when no install is left."""
     sums = {origin: scaled_sum(v["mob"]) for origin, v in chosen.items()}
@@ -586,6 +625,8 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
     and license of each import that went in. resets: npc -> the day a hotfix changed its loot. previous_names: npc ->
     the name it had before, for a mob no source names now."""
     everything = list(submissions) + list(imports)
+    other = other_language(everything)
+    everything = [unnamed(s) if s["result"]["exporter"] in other else s for s in everything]
     found = versions(everything, quest_items)
     skin_found = skin_versions(everything, quest_items)
     either = {key: list(candidates) for key, candidates in found.items()}
@@ -752,6 +793,9 @@ def main(argv):
     left_out = foreign_names(submissions + imports)
     if left_out:
         print("Names left out, not in Latin letters: " + ", ".join("%s %s" % pair for pair in left_out))
+    for exporter, (differ, compared) in sorted(other_language(submissions + imports).items()):
+        print("Names left out, from a client in another language: every name exporter %s sent (%d of %d differ)"
+              % (exporter, differ, compared))
     return 0
 
 

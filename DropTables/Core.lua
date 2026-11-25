@@ -460,7 +460,8 @@ ns.On("ADDON_LOADED", function(name)
     db.skins = db.skins or {}  -- npc -> { skinned, items }, what skinning its corpses gave
     db.looted = db.looted or {}  -- npc -> true for mobs counted from their corpses in a dungeon, kills unknown
     db.items = db.items or {}
-    db.names = db.names or {}
+    db.names = db.names or {}  -- npc -> the name the player's client showed
+    db.peerNames = db.peerNames or {}  -- npc -> the name another player's addon sent
     db.info = db.info or {}
     db.peers = db.peers or {}
     db.refreshed = db.refreshed or {}  -- npc -> time of its last daily question

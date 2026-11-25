@@ -308,7 +308,7 @@ local function sendDueAnswers(now)
             local due = plan.due[source.origin]
             if due and now >= due then
                 plan.due[source.origin] = nil
-                for _, text in ipairs(sourceTexts(plan.npc, source, ns.db.names[plan.npc])) do
+                for _, text in ipairs(sourceTexts(plan.npc, source, ns.NameToSend(plan.npc))) do
                     enqueue(text, "WHISPER", plan.target)
                 end
                 session.answers = session.answers + 1
@@ -387,8 +387,8 @@ local function store(origin, npc, records)
             peer.minLevel, peer.maxLevel = r.minLevel, r.maxLevel
         elseif r.kind == "Z" then
             peer.maps[r.map] = r.kills
-        elseif r.kind == "N" and not ns.db.names[npc] then
-            ns.db.names[npc] = r.name
+        elseif r.kind == "N" then
+            ns.db.peerNames[npc] = r.name
         elseif r.kind == "K" or r.kind == "U" then
             peer.skins = peer.skins or { skinned = 0, items = {} }
             if r.kind == "K" then
@@ -553,7 +553,7 @@ local function flushGroup()
     for npc in pairs(groupDirty) do
         -- A mob the player only skinned has no loot of theirs, just the skinning.
         local source = ns.OwnSource(npc) or { origin = ns.db.installId, buckets = {}, maps = {}, skins = ns.db.skins[npc] }
-        local texts = sourceTexts(npc, source, ns.db.names[npc])
+        local texts = sourceTexts(npc, source, ns.NameToSend(npc))
         -- A mob too big for one send still goes out when it comes first.
         if used > 0 and used + #texts > GROUP_FLUSH_CAP then
             break

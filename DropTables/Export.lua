@@ -42,12 +42,12 @@ end
 local function lineRecords(npc, origin, buckets, source, skins)
     local records = {}
     if buckets and missing(npc, origin, buckets) then
-        records = Wire.SourceRecords(npc, source, ns.db.names[npc])
+        records = Wire.SourceRecords(npc, source, ns.NameToSend(npc))
     end
     local loot = #records > 0
     if skinsMissing(npc, origin, skins) then
         if not loot then
-            local name = Wire.NameRecord(npc, ns.db.names[npc])
+            local name = Wire.NameRecord(npc, ns.NameToSend(npc))
             if name then
                 table.insert(records, name)
             end

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- A game client in another language sent its mob names along with its counts, so an export from a German client carried German names. Only an English client sends names now. A name another player's addon sent is still shown, but it no longer goes out with your counts.
+
 ## [0.6.3] - 2026-11-25
 
 ### Added

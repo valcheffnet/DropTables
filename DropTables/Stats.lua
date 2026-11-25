@@ -501,7 +501,14 @@ end
 function ns.MobName(npc)
     local sight = ns.SeenMob(npc)
     local shared = ns.shared[npc]
-    return ns.db.names[npc] or (sight and sight.name) or (shared and shared.name) or ("NPC " .. npc)
+    return ns.db.names[npc] or (sight and sight.name) or ns.db.peerNames[npc] or (shared and shared.name)
+        or ("NPC " .. npc)
+end
+
+-- The name the player's client gave the mob, to send with its counts. The shared database names mobs in English, so a
+-- client in another language sends none, and names heard from other players aren't passed on.
+function ns.NameToSend(npc)
+    return GetLocale():sub(1, 2) == "en" and ns.db.names[npc] or nil
 end
 
 -- Every mob with counts, the player's own and, unless only those are wanted, other players' and the shared database's.
