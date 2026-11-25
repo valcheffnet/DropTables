@@ -10,7 +10,7 @@
 
 ### Changed
 
-- Two more shares, one of them from a new player, and the daily refresh of the EG Link and Everloot counts went into the shared database, which now knows 2,176 mobs, with 41,034 kills and 7,867 skinned corpses.
+- Two more shares and the daily refresh of the EG Link and Everloot counts went into the shared database, which now knows 2,176 mobs, with 41,034 kills and 7,867 skinned corpses.
 
 ### Fixed
 
