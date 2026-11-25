@@ -15,6 +15,10 @@ Mobs in data/loot-resets.json had their loot changed by a hotfix, so what was re
 there is left out (see after_reset). The EG Link and Everloot imports leave those records out themselves, by their
 dates.
 
+A mob's name is the one most sources gave, among names in Latin letters: a player with a Korean client sends Korean
+names, and those can't stand in for the English ones. A mob that gets no name this way keeps the one data/shared.json
+had before, so a source that stops naming it doesn't take the name away. The names left out are printed.
+
 Usage:
     python tools/build_data.py [--root DIR]
 """
@@ -367,6 +371,32 @@ def completed(data, full, own=frozenset()):
     return out
 
 
+def latin(name):
+    """Whether a name is written in Latin letters (up to Latin Extended-B)."""
+    return all(ord(ch) <= 0x24F for ch in name)
+
+
+def mob_name(chosen):
+    """The name most of the chosen versions give, ties by name, leaving out names not in Latin letters."""
+    names = {}
+    for v in chosen.values():
+        name = v["mob"].get("name")
+        if name and latin(name):
+            names[name] = names.get(name, 0) + 1
+    return sorted(names.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if names else None
+
+
+def foreign_names(sources):
+    """(npc, name) of every name in the submissions and imports that isn't in Latin letters."""
+    found = set()
+    for s in sources:
+        for origin in s["result"]["sources"].values():
+            for npc, mob in origin["mobs"].items():
+                if mob.get("name") and not latin(mob["name"]):
+                    found.add((str(npc), mob["name"]))
+    return sorted(found, key=lambda pair: (int(pair[0]), pair[1]))
+
+
 def shared_mob(chosen):
     """chosen: origin -> version. Returns the shared record of the mob, or None when no install is left."""
     sums = {origin: scaled_sum(v["mob"]) for origin, v in chosen.items()}
@@ -445,13 +475,9 @@ def shared_mob(chosen):
         busiest = sorted(((c, k) for c, k in rounded.items() if k > 0), key=lambda kv: (-kv[1], int(kv[0])))
         if busiest:
             record.setdefault("spots", {})[map_id] = dict(busiest[:MAX_SPOTS])
-    names = {}
-    for v in kept.values():
-        name = v["mob"].get("name")
-        if name:
-            names[name] = names.get(name, 0) + 1
-    if names:
-        record["name"] = sorted(names.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+    name = mob_name(kept)
+    if name:
+        record["name"] = name
     return record
 
 
@@ -546,20 +572,19 @@ def skin_only_record(chosen):
     if levels:
         record["minLevel"] = min(low for low, _ in levels)
         record["maxLevel"] = max(high for _, high in levels)
-    names = {}
     for v in chosen.values():
         for map_id, kills in (v["mob"].get("maps") or {}).items():
             record["maps"][map_id] = record["maps"].get(map_id, 0) + kills
-        if v["mob"].get("name"):
-            names[v["mob"]["name"]] = names.get(v["mob"]["name"], 0) + 1
-    if names:
-        record["name"] = sorted(names.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+    name = mob_name(chosen)
+    if name:
+        record["name"] = name
     return record
 
 
-def build(submissions, imports=(), quest_items=frozenset(), resets=None):
+def build(submissions, imports=(), quest_items=frozenset(), resets=None, previous_names=None):
     """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}, plus "imports" with the source
-    and license of each import that went in. resets: npc -> the day a hotfix changed its loot."""
+    and license of each import that went in. resets: npc -> the day a hotfix changed its loot. previous_names: npc ->
+    the name it had before, for a mob no source names now."""
     everything = list(submissions) + list(imports)
     found = versions(everything, quest_items)
     skin_found = skin_versions(everything, quest_items)
@@ -590,6 +615,9 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None):
             for origin, kills in skins_left_out.get(npc, {}).items():
                 if origin not in cut and record.get("skins"):
                     record["skins"]["from"][origin] = max(record["skins"]["from"].get(origin, 0), kills)
+            previous = (previous_names or {}).get(npc)
+            if "name" not in record and previous and latin(previous):
+                record["name"] = previous
             mobs[npc] = record
     built = max((s["received"] for s in submissions), default=0)
     database = {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
@@ -683,6 +711,15 @@ def load_resets(root):
     return {npc: entry["since"] for npc, entry in json.loads(path.read_text(encoding="utf-8"))["mobs"].items()}
 
 
+def load_names(root):
+    """npc -> name from the data/shared.json there is now."""
+    path = root / "data" / "shared.json"
+    if not path.exists():
+        return {}
+    mobs = json.loads(path.read_text(encoding="utf-8"))["mobs"]
+    return {npc: mob["name"] for npc, mob in mobs.items() if mob.get("name")}
+
+
 def write_outputs(root, database):
     """Writes both files and returns True when either one changed."""
     targets = {
@@ -700,6 +737,7 @@ def write_outputs(root, database):
 
 
 def main(argv):
+    sys.stdout.reconfigure(encoding="utf-8")
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
     submissions = load_submissions(root)
     resets = load_resets(root)
@@ -707,10 +745,13 @@ def main(argv):
         (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
         submissions.remove(old)
     imports = load_imports(root)
-    database = build(submissions, imports, load_quest_items(root), resets)
+    database = build(submissions, imports, load_quest_items(root), resets, load_names(root))
     changed = write_outputs(root, database)
     print("%d submissions, %d imports, %d mobs%s" % (database["submissions"], len(imports), len(database["mobs"]),
                                                      "" if changed else ", nothing changed"))
+    left_out = foreign_names(submissions + imports)
+    if left_out:
+        print("Names left out, not in Latin letters: " + ", ".join("%s %s" % pair for pair in left_out))
     return 0
 
 

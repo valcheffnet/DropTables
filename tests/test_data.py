@@ -499,8 +499,34 @@ def daily_limit(root):
     expect("taken in on the next day", ingest_issue.ingest(late, root, now=noon + 13 * 3600)[0], "accepted")
 
 
+def names(root):
+    """Names in other scripts stay out, from any source, and a mob nobody names keeps its name from before."""
+    def named(n, name):
+        return submission(80 + n, origin(800 + n), {origin(800 + n): {5: mob({1: bucket(10, 10, 10)}, name=name)}})
+
+    english, korean = named(1, "Wolf"), [named(2, "늑대"), named(3, "늑대")]
+    expect("an English name beats two Korean ones", build_data.build([english] + korean)["mobs"]["5"]["name"], "Wolf")
+    expect("a mob only named in Korean has no name", "name" in build_data.build(korean)["mobs"]["5"], False)
+    nameless = [named(4, None)]
+    expect("a mob nobody names keeps its name from before",
+           build_data.build(nameless, previous_names={"5": "Old Wolf"})["mobs"]["5"].get("name"), "Old Wolf")
+    expect("but not a Korean one", "name" in build_data.build(nameless, previous_names={"5": "늑대"})["mobs"]["5"], False)
+    expect("a name given now beats the one from before",
+           build_data.build([english], previous_names={"5": "Old Wolf"})["mobs"]["5"]["name"], "Wolf")
+    expect("the names left out are listed", build_data.foreign_names([english] + korean), [("5", "늑대")])
+
+    (root / "data" / "submissions").mkdir(parents=True)
+    (root / "data" / "shared.json").write_text(json.dumps({"mobs": {"5": {"name": "Old Wolf"}}}), encoding="utf-8")
+    (root / "data" / "submissions" / "84-1.json").write_text(json.dumps(nameless[0]), encoding="utf-8")
+    build_data.main(["--root", str(root)])
+    shared = json.loads((root / "data" / "shared.json").read_text(encoding="utf-8"))
+    expect("main keeps the name data/shared.json had", shared["mobs"]["5"].get("name"), "Old Wolf")
+
+
 def main():
     merge_rules()
+    with tempfile.TemporaryDirectory() as folder:
+        names(pathlib.Path(folder))
     shared_is_trusted()
     hotfix_resets()
     with tempfile.TemporaryDirectory() as folder:

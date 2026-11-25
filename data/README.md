@@ -118,7 +118,8 @@ builds of the live servers (`data/wowf/`) and leaves the beta out. From `loot.js
 including the ones tied to a quest, and puts them in the solo bucket. Corpses looted in a group stay out, because
 EG Link doesn't say the group size and counts too many empty corpses there. Quest items, pick pocket, nodes, chests,
 fishing and containers stay out as well. Names and kill spots come from `creatures.json`, where EG Link keeps one
-spot per 5 yards, so each spot counts once.
+spot per 5 yards, so each spot counts once. The newest build's name is taken, unless it isn't in Latin letters: some
+builds carry the names of a player with a Korean client.
 
 Skinning comes from the keys with one of the four Skinning ranks (`npc:<id>|spell:8613` and so on), solo and group
 alike, since the group plays no part in what a skinned corpse gives. EG Link marks the corpses skinned with the
