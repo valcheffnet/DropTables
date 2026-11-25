@@ -1,6 +1,6 @@
 {
  "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables",
- "built": 1795592354,
+ "built": 1795612989,
  "imports": [
   {
    "collectedUntil": "2026-10-21",
@@ -8215,6 +8215,185 @@
     }
    }
   },
+  "11722": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 5
+   },
+   "maxLevel": 59,
+   "minLevel": 58,
+   "name": "Hive'Ashi Defender",
+   "spots": {
+    "1451": {
+     "1162": 1,
+     "1163": 1,
+     "1212": 1,
+     "1213": 1,
+     "1263": 1
+    }
+   }
+  },
+  "11723": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 3
+   },
+   "maxLevel": 59,
+   "minLevel": 58,
+   "name": "Hive'Ashi Sandstalker",
+   "spots": {
+    "1451": {
+     "1164": 1,
+     "1211": 1,
+     "1263": 1
+    }
+   }
+  },
+  "11724": {
+   "buckets": {
+    "5": {
+     "items": {
+      "6300": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "6302": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 3
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 3
+   },
+   "maps": {
+    "1451": 3
+   },
+   "maxLevel": 58,
+   "minLevel": 57,
+   "name": "Hive'Ashi Swarmer",
+   "spots": {
+    "1451": {
+     "1113": 1,
+     "1164": 1,
+     "1212": 1
+    }
+   }
+  },
+  "11727": {
+   "buckets": {
+    "5": {
+     "items": {
+      "6302": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1451": 9
+   },
+   "maxLevel": 59,
+   "minLevel": 58,
+   "name": "Hive'Zora Wasp",
+   "spots": {
+    "1451": {
+     "780": 5,
+     "931": 4
+    }
+   }
+  },
+  "11728": {
+   "buckets": {
+    "5": {
+     "items": {
+      "6300": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1451": 4
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Hive'Zora Reaver",
+   "spots": {
+    "1451": {
+     "682": 1,
+     "781": 1,
+     "881": 1,
+     "932": 1
+    }
+   }
+  },
   "1173": {
    "buckets": {
     "1": {
@@ -8255,6 +8434,145 @@
      "666": 1,
      "673": 1,
      "722": 1
+    }
+   }
+  },
+  "11730": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 2,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1414": 1,
+    "1451": 2
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Hive'Regal Ambusher",
+   "spots": {
+    "1414": {
+     "1142": 1
+    },
+    "1451": {
+     "1344": 1,
+     "1348": 1
+    }
+   }
+  },
+  "11732": {
+   "buckets": {
+    "5": {
+     "items": {
+      "20461": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1414": 1,
+    "1451": 3
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Hive'Regal Spitfire",
+   "spots": {
+    "1414": {
+     "1142": 1
+    },
+    "1451": {
+     "1241": 1,
+     "1291": 1,
+     "1344": 1
+    }
+   }
+  },
+  "11733": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1414": 1,
+    "1451": 5
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Hive'Regal Slavemaker",
+   "spots": {
+    "1414": {
+     "1143": 1
+    },
+    "1451": {
+     "1299": 1,
+     "1340": 1,
+     "1345": 1,
+     "1346": 1,
+     "1347": 1
+    }
+   }
+  },
+  "11734": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1414": 2
+   },
+   "maxLevel": 61,
+   "minLevel": 59,
+   "name": "Hive'Regal Hive Lord",
+   "spots": {
+    "1414": {
+     "1142": 1,
+     "1143": 1
     }
    }
   },
@@ -9116,6 +9434,79 @@
     }
    }
   },
+  "11803": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 371,
+      "drops": 1,
+      "max": 371,
+      "min": 371
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 1
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Keeper Exeter",
+   "spots": {
+    "1451": {
+     "443": 1
+    }
+   }
+  },
+  "11804": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 605,
+      "drops": 1,
+      "max": 605,
+      "min": 605
+     },
+     "opened": 1
+    },
+    "2": {
+     "items": {},
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 1426,
+      "drops": 2,
+      "max": 957,
+      "min": 469
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 4
+   },
+   "maps": {
+    "1451": 4
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Keeper Havunth",
+   "spots": {
+    "1451": {
+     "1020": 3,
+     "1021": 1
+    }
+   }
+  },
   "1181": {
    "buckets": {
     "1": {
@@ -9531,6 +9922,239 @@
      "1685": 1,
      "1687": 1,
      "977": 1
+    }
+   }
+  },
+  "11880": {
+   "buckets": {
+    "1": {
+     "items": {
+      "14047": {
+       "drops": 4,
+       "max": 2,
+       "min": 1,
+       "qty": 6
+      },
+      "3973": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3995": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "8952": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 15,
+     "lootable": 15,
+     "money": {
+      "copper": 7135,
+      "drops": 15,
+      "max": 897,
+      "min": 153
+     },
+     "opened": 15
+    },
+    "2": {
+     "items": {
+      "14047": {
+       "drops": 6,
+       "max": 3,
+       "min": 2,
+       "qty": 15
+      },
+      "8952": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 15,
+     "lootable": 15,
+     "money": {
+      "copper": 6382,
+      "drops": 15,
+      "max": 890,
+      "min": 182
+     },
+     "opened": 15
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 30
+   },
+   "maps": {
+    "1451": 40
+   },
+   "maxLevel": 59,
+   "minLevel": 58,
+   "name": "Twilight Avenger",
+   "spots": {
+    "1451": {
+     "1021": 2,
+     "1022": 13,
+     "1023": 2,
+     "440": 1,
+     "441": 1,
+     "442": 1,
+     "443": 1,
+     "489": 1,
+     "493": 1,
+     "543": 1,
+     "617": 1,
+     "635": 1,
+     "668": 2,
+     "687": 1,
+     "688": 2,
+     "922": 4,
+     "970": 2,
+     "971": 1,
+     "973": 2
+    }
+   }
+  },
+  "11881": {
+   "buckets": {
+    "1": {
+     "items": {
+      "13444": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "13446": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "14047": {
+       "drops": 7,
+       "max": 3,
+       "min": 1,
+       "qty": 17
+      },
+      "8766": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "8952": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 23,
+     "lootable": 23,
+     "money": {
+      "copper": 13438,
+      "drops": 23,
+      "max": 887,
+      "min": 211
+     },
+     "opened": 23
+    },
+    "2": {
+     "items": {
+      "14047": {
+       "drops": 6,
+       "max": 3,
+       "min": 1,
+       "qty": 11
+      }
+     },
+     "kills": 12,
+     "lootable": 12,
+     "money": {
+      "copper": 5923,
+      "drops": 11,
+      "max": 865,
+      "min": 155
+     },
+     "opened": 12
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 35
+   },
+   "maps": {
+    "1451": 47
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Twilight Geolord",
+   "spots": {
+    "1451": {
+     "1020": 1,
+     "1021": 7,
+     "1022": 4,
+     "1023": 1,
+     "440": 1,
+     "442": 2,
+     "443": 2,
+     "490": 1,
+     "493": 1,
+     "541": 2,
+     "542": 2,
+     "543": 1,
+     "544": 2,
+     "617": 2,
+     "922": 2,
+     "923": 1,
+     "970": 5,
+     "971": 4,
+     "973": 6
+    }
+   }
+  },
+  "11883": {
+   "buckets": {
+    "1": {
+     "items": {
+      "14047": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 683,
+      "drops": 1,
+      "max": 683,
+      "min": 683
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 1
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Master",
+   "spots": {
+    "1451": {
+     "1707": 1
     }
    }
   },
@@ -16760,6 +17384,140 @@
     }
    }
   },
+  "15200": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 1
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Keeper Mayna",
+   "spots": {
+    "1451": {
+     "668": 1
+    }
+   }
+  },
+  "15201": {
+   "buckets": {
+    "1": {
+     "items": {
+      "14047": {
+       "drops": 2,
+       "max": 3,
+       "min": 1,
+       "qty": 4
+      },
+      "8952": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 9,
+     "lootable": 9,
+     "money": {
+      "copper": 5529,
+      "drops": 9,
+      "max": 1033,
+      "min": 155
+     },
+     "opened": 9
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 9
+   },
+   "maps": {
+    "1451": 9
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Flamereaver",
+   "spots": {
+    "1451": {
+     "1707": 1,
+     "1757": 4,
+     "1806": 1,
+     "1807": 3
+    }
+   }
+  },
+  "15202": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 494,
+      "drops": 1,
+      "max": 494,
+      "min": 494
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1451": 1
+   },
+   "maxLevel": 61,
+   "minLevel": 61,
+   "name": "Vyral the Vile",
+   "spots": {
+    "1451": {
+     "1807": 1
+    }
+   }
+  },
+  "15213": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 849,
+      "drops": 2,
+      "max": 593,
+      "min": 256
+     },
+     "opened": 2
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1451": 2
+   },
+   "maxLevel": 61,
+   "minLevel": 60,
+   "name": "Twilight Overlord",
+   "spots": {
+    "1451": {
+     "1807": 2
+    }
+   }
+  },
   "1522": {
    "buckets": {
     "1": {
@@ -17684,6 +18442,45 @@
      "1312": 1,
      "1313": 2,
      "1314": 1
+    }
+   }
+  },
+  "15308": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 0,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 0
+    },
+    "2": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 2
+   },
+   "maps": {
+    "1451": 2
+   },
+   "maxLevel": 60,
+   "minLevel": 60,
+   "name": "Twilight Prophet",
+   "spots": {
+    "1451": {
+     "634": 1,
+     "970": 1
     }
    }
   },
@@ -60141,6 +60938,34 @@
      "1635": 1,
      "1683": 3,
      "1684": 5
+    }
+   }
+  },
+  "270451": {
+   "buckets": {
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1428": 1
+   },
+   "maxLevel": 62,
+   "minLevel": 62,
+   "name": "Executor Asharell",
+   "spots": {
+    "1428": {
+     "1834": 1
     }
    }
   },
@@ -103006,8 +103831,8 @@
        "qty": 1
       }
      },
-     "kills": 8,
-     "lootable": 8,
+     "kills": 11,
+     "lootable": 11,
      "money": {
       "copper": 1415,
       "drops": 8,
@@ -103018,11 +103843,12 @@
     }
    },
    "from": {
+    "278b2ad4ab547834": 2,
     "eglink": 5,
     "everloot-933e529a": 3
    },
    "maps": {
-    "1445": 5
+    "1445": 7
    },
    "maxLevel": 36,
    "minLevel": 35,
@@ -103031,7 +103857,7 @@
     "1445": {
      "1362": 1,
      "1409": 1,
-     "1410": 4
+     "1410": 6
     }
    }
   },
@@ -103056,8 +103882,8 @@
        "qty": 1
       }
      },
-     "kills": 6,
-     "lootable": 5,
+     "kills": 9,
+     "lootable": 8,
      "money": {
       "copper": 598,
       "drops": 5,
@@ -103068,18 +103894,19 @@
     }
    },
    "from": {
+    "278b2ad4ab547834": 2,
     "eglink": 5,
     "everloot-933e529a": 1
    },
    "maps": {
-    "1445": 5
+    "1445": 7
    },
    "maxLevel": 36,
    "minLevel": 35,
    "name": "Mirefin Murloc",
    "spots": {
     "1445": {
-     "1410": 4
+     "1410": 6
     }
    }
   },
@@ -103501,6 +104328,36 @@
      "909": 1,
      "959": 1,
      "960": 1
+    }
+   }
+  },
+  "4371": {
+   "buckets": {
+    "1": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 937,
+      "drops": 1,
+      "max": 937,
+      "min": 937
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1445": 1
+   },
+   "maxLevel": 60,
+   "minLevel": 59,
+   "name": "Strashaz Siren",
+   "spots": {
+    "1445": {
+     "1859": 1
     }
    }
   },
@@ -134846,6 +135703,43 @@
     }
    }
   },
+  "8607": {
+   "buckets": {
+    "1": {
+     "items": {
+      "20768": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 425,
+      "drops": 1,
+      "max": 425,
+      "min": 425
+     },
+     "opened": 1
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 1
+   },
+   "maps": {
+    "1423": 1
+   },
+   "maxLevel": 54,
+   "minLevel": 54,
+   "name": "Rotting Sludge",
+   "spots": {
+    "1423": {
+     "1675": 1
+    }
+   }
+  },
   "8636": {
    "buckets": {
     "1": {
@@ -137041,6 +137935,56 @@
     }
    }
   },
+  "9448": {
+   "buckets": {
+    "1": {
+     "items": {
+      "13444": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "5759": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "8085": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 7,
+     "lootable": 7,
+     "money": {
+      "copper": 12270,
+      "drops": 7,
+      "max": 2489,
+      "min": 904
+     },
+     "opened": 7
+    }
+   },
+   "from": {
+    "278b2ad4ab547834": 7
+   },
+   "maps": {
+    "1423": 7
+   },
+   "maxLevel": 57,
+   "minLevel": 56,
+   "name": "Scarlet Praetorian",
+   "spots": {
+    "1423": {
+     "1884": 3,
+     "1885": 4
+    }
+   }
+  },
   "9456": {
    "buckets": {
     "1": {
@@ -137792,5 +138736,5 @@
    }
   }
  },
- "submissions": 8
+ "submissions": 9
 }
