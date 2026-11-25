@@ -86,6 +86,9 @@ def fake_clone(root):
     })
     write(live / "1.60.1.70200", "creatures.json", {"creatures": {
         "10": {"name": "Forest Thing", "positions": [pos(1429, 0.5, 0.5), pos(1430, 0.2, 0.2), {"uiMap": 0}]},
+        # A player with a Korean client recorded these on the later build.
+        "11": {"name": "숲 괴물"},
+        "14": {"name": "얼룩 고양이"},
     }})
     write(root / "data" / "wow_classic_beta" / "1.60.1.70009", "loot.json", {
         "kills": {"npc:13": kills(5)}, "sources": {"npc:13": window(5, {"500": item(5)})},
@@ -114,6 +117,8 @@ def conversion(clone):
     expect("money follows the windows with one corpse", (b["money"]["drops"], b["money"]["copper"]), (10, 833))
     expect("levels span the builds", mobs["10"]["levels"], [5, 8])
     expect("the newest build's name wins", mobs["10"]["name"], "Forest Thing")
+    expect("a Korean name doesn't replace the English one", mobs["14"]["name"], "Skinned Cat")
+    expect("a mob with only a Korean name has none", mobs["11"]["name"], None)
     expect("kills split over the maps the deaths were seen on", mobs["10"]["maps"], {"1429": 15, "1430": 5})
     expect("spots on the addon's 50x50 grid, one per position",
            mobs["10"]["cells"], {"1429": {"260": 2, "1275": 1}, "1430": {"510": 1}})

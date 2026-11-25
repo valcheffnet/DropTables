@@ -98,7 +98,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "달빛야수 현자"
+      "name": null
      },
      "10158": {
       "buckets": {
@@ -146,7 +146,7 @@
       "maps": {
        "1439": 5
       },
-      "name": "달빛야수"
+      "name": null
      },
      "10159": {
       "buckets": {
@@ -192,7 +192,7 @@
       "maps": {
        "1439": 3
       },
-      "name": "어린 달빛야수"
+      "name": null
      },
      "1028": {
       "buckets": {
@@ -3518,7 +3518,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "병든 사슴"
+      "name": "Sickly Deer"
      },
      "1236": {
       "buckets": {
@@ -11677,7 +11677,7 @@
       "maps": {
        "1438": 5
       },
-      "name": "스트리기드 올빼미"
+      "name": "Strigid Owl"
      },
      "1996": {
       "buckets": {
@@ -11721,7 +11721,7 @@
       "maps": {
        "1438": 3
       },
-      "name": "비명소리 스트리기드 올빼미"
+      "name": "Strigid Screecher"
      },
      "1998": {
       "buckets": {
@@ -11777,7 +11777,7 @@
       "maps": {
        "1438": 23
       },
-      "name": "나무그물 늑대거미"
+      "name": "Webwood Lurker"
      },
      "1999": {
       "buckets": {
@@ -11822,7 +11822,7 @@
       "maps": {
        "1438": 13
       },
-      "name": "나무그물 독거미"
+      "name": "Webwood Venomfang"
      },
      "2000": {
       "buckets": {
@@ -11851,7 +11851,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "나무그물 비단거미"
+      "name": "Webwood Silkspinner"
      },
      "2007": {
       "buckets": {
@@ -12084,7 +12084,7 @@
       "maps": {
        "1438": 5
       },
-      "name": "붉은깃털하피"
+      "name": "Bloodfeather Harpy"
      },
      "2017": {
       "buckets": {
@@ -12132,7 +12132,7 @@
       "maps": {
        "1438": 7
       },
-      "name": "붉은깃털일족 약탈자"
+      "name": "Bloodfeather Rogue"
      },
      "2018": {
       "buckets": {
@@ -12171,7 +12171,7 @@
       "maps": {
        "1438": 2
       },
-      "name": "붉은깃털일족 마법사"
+      "name": "Bloodfeather Sorceress"
      },
      "2019": {
       "buckets": {
@@ -12205,7 +12205,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "붉은깃털일족 여전사"
+      "name": null
      },
      "202": {
       "buckets": {
@@ -12328,7 +12328,7 @@
       "maps": {
        "1438": 2
       },
-      "name": "붉은깃털일족 바람마녀"
+      "name": null
      },
      "2021": {
       "buckets": {
@@ -12366,7 +12366,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "붉은깃털일족 우두머리"
+      "name": null
      },
      "2022": {
       "buckets": {
@@ -12433,7 +12433,7 @@
       "maps": {
        "1438": 26
       },
-      "name": "나무괴물"
+      "name": "Timberling"
      },
      "2027": {
       "buckets": {
@@ -12471,7 +12471,7 @@
       "maps": {
        "1438": 2
       },
-      "name": "나무발굽괴물"
+      "name": null
      },
      "203": {
       "buckets": {
@@ -12686,7 +12686,7 @@
       "maps": {
        "1438": 20
       },
-      "name": "흑호",
+      "name": "Nightsaber",
       "skins": {
        "items": {
         "2318": {
@@ -12741,7 +12741,7 @@
       "maps": {
        "1438": 5
       },
-      "name": "긴발톱 흑호",
+      "name": "Nightsaber Stalker",
       "skins": {
        "items": {
         "2318": {
@@ -13338,7 +13338,7 @@
       "maps": {
        "1439": 20
       },
-      "name": "새끼 달표범",
+      "name": "Moonstalker Runt",
       "skins": {
        "items": {
         "2934": {
@@ -13794,7 +13794,7 @@
       "maps": {
        "1439": 10
       },
-      "name": "엉겅퀴곰",
+      "name": "Thistle Bear",
       "skins": {
        "items": {
         "2318": {
@@ -14067,7 +14067,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "오크나무괴물"
+      "name": null
      },
      "2167": {
       "buckets": {
@@ -14111,7 +14111,7 @@
       "maps": {
        "1439": 8
       },
-      "name": "검은나무일족 길잡이"
+      "name": null
      },
      "217": {
       "buckets": {
@@ -14265,7 +14265,7 @@
       "maps": {
        "1439": 3
       },
-      "name": "저주받은 명가의 원혼"
+      "name": null
      },
      "2177": {
       "buckets": {
@@ -14306,7 +14306,7 @@
       "maps": {
        "1439": 9
       },
-      "name": "고뇌하는 명가의 원혼"
+      "name": null
      },
      "2178": {
       "buckets": {
@@ -14367,7 +14367,7 @@
       "maps": {
        "1439": 8
       },
-      "name": "울부짖는 명가의 원혼"
+      "name": null
      },
      "218": {
       "buckets": {
@@ -14569,7 +14569,7 @@
       "maps": {
        "1439": 37
       },
-      "name": "비열한 마귀"
+      "name": "Vile Sprite"
      },
      "2190": {
       "buckets": {
@@ -14626,7 +14626,7 @@
       "maps": {
        "1439": 7
       },
-      "name": "광기어린 그렐"
+      "name": "Wild Grell"
      },
      "2201": {
       "buckets": {
@@ -14660,7 +14660,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "잿빛안개멀록 약탈꾼"
+      "name": "Greymist Raider"
      },
      "2202": {
       "buckets": {
@@ -14703,7 +14703,7 @@
       "maps": {
        "1439": 3
       },
-      "name": "잿빛안개멀록 길잡이"
+      "name": "Greymist Coastrunner"
      },
      "2203": {
       "buckets": {
@@ -14751,7 +14751,7 @@
       "maps": {
        "1439": 5
       },
-      "name": "잿빛안개멀록 점쟁이"
+      "name": "Greymist Seer"
      },
      "2204": {
       "buckets": {
@@ -14789,7 +14789,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "잿빛안개멀록 그물낚시꾼"
+      "name": null
      },
      "2211": {
       "buckets": {
@@ -14854,7 +14854,7 @@
       "maps": {
        "1439": 5
       },
-      "name": "데스릴 사티로스"
+      "name": "Deth'ryll Satyr"
      },
      "222286": {
       "buckets": {
@@ -15033,7 +15033,7 @@
       "maps": {
        "1439": 8
       },
-      "name": "새끼 모래톱게"
+      "name": "Young Reef Crawler"
      },
      "2237": {
       "buckets": {
@@ -16233,7 +16233,7 @@
       "maps": {
        "1439": 8
       },
-      "name": "검은나무일족 풍수사"
+      "name": null
      },
      "2332": {
       "buckets": {
@@ -30253,7 +30253,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "자이바넬"
+      "name": null
      },
      "270201": {
       "buckets": {
@@ -31484,7 +31484,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "덩굴손 묘목"
+      "name": "Lasher Sproutling"
      },
      "275708": {
       "buckets": {
@@ -31513,7 +31513,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "활짝 핀 덩굴손"
+      "name": null
      },
      "2760": {
       "buckets": {
@@ -42652,7 +42652,7 @@
       "maps": {
        "1438": 1
       },
-      "name": "새끼 늪괴물"
+      "name": "Bogling"
      },
      "36": {
       "buckets": {
@@ -43159,7 +43159,7 @@
       "maps": {
        "1439": 1
       },
-      "name": "아나야 돈러너"
+      "name": null
      },
      "3674": {
       "buckets": {},

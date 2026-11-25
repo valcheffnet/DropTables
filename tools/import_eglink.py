@@ -7,7 +7,8 @@ data/wowf/<build>/, holding only what was recorded on that build, so the builds 
 What goes in:
 - corpses looted solo (npc:<id>, and npc:<id>|quest for creatures tied to one of the player's quests), as bucket 1;
 - kills, empty corpses, opened corpses, items with their stack sizes, and money;
-- levels, the English name, and the kill spots of creatures.json.
+- levels, the English name, and the kill spots of creatures.json. A name in other than Latin letters, from a player
+  with a Korean client say, is left out.
 
 - skinning (npc:<id>|spell:<id> with one of the four Skinning ranks), from solo and group corpses alike, since the group
   plays no part in what a skinned corpse gives, but not the corpses skinned with the Bountiful Harvest perk
@@ -134,11 +135,17 @@ def add_build(tallies, loot, skip=()):
             into["qty"] += entry.get("quantity", 0)
 
 
+def latin(name):
+    """Whether a name is written in Latin letters. A build whose players include someone with a Korean client
+    carries that player's names, and those can't stand in for the English ones."""
+    return all(ord(ch) <= 0x24F for ch in name)
+
+
 def add_creatures(info, creatures):
-    """Names and death spots. A later build's name replaces an earlier one."""
+    """Names and death spots. A later build's name replaces an earlier one, unless it isn't in Latin letters."""
     for npc, record in creatures.get("creatures", {}).items():
         into = info.setdefault(npc, {"name": None, "positions": []})
-        if record.get("name"):
+        if record.get("name") and latin(record["name"]):
             into["name"] = record["name"]
         into["positions"].extend(record.get("positions", []))
 

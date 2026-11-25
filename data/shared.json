@@ -578,7 +578,6 @@
    },
    "maxLevel": 13,
    "minLevel": 13,
-   "name": "달빛야수 현자",
    "spots": {
     "1439": {
      "1125": 1
@@ -623,7 +622,6 @@
    },
    "maxLevel": 13,
    "minLevel": 12,
-   "name": "달빛야수",
    "spots": {
     "1439": {
      "1075": 1,
@@ -670,7 +668,6 @@
    },
    "maxLevel": 12,
    "minLevel": 11,
-   "name": "어린 달빛야수",
    "spots": {
     "1439": {
      "1075": 3
@@ -12955,7 +12952,7 @@
    },
    "maxLevel": 5,
    "minLevel": 5,
-   "name": "병든 사슴",
+   "name": "Sickly Deer",
    "spots": {
     "1439": {
      "1175": 1
@@ -29980,7 +29977,7 @@
    },
    "maxLevel": 6,
    "minLevel": 5,
-   "name": "스트리기드 올빼미",
+   "name": "Strigid Owl",
    "spots": {
     "1438": {
      "1480": 4,
@@ -30022,7 +30019,7 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "비명소리 스트리기드 올빼미",
+   "name": "Strigid Screecher",
    "spots": {
     "1438": {
      "1083": 1,
@@ -30065,7 +30062,7 @@
    },
    "maxLevel": 6,
    "minLevel": 5,
-   "name": "나무그물 늑대거미",
+   "name": "Webwood Lurker",
    "spots": {
     "1438": {
      "1124": 1,
@@ -30116,7 +30113,7 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "나무그물 독거미",
+   "name": "Webwood Venomfang",
    "spots": {
     "1438": {
      "1030": 1,
@@ -30151,7 +30148,7 @@
    },
    "maxLevel": 9,
    "minLevel": 9,
-   "name": "나무그물 비단거미",
+   "name": "Webwood Silkspinner",
    "spots": {
     "1438": {
      "866": 1
@@ -30376,7 +30373,7 @@
    },
    "maxLevel": 9,
    "minLevel": 8,
-   "name": "붉은깃털하피",
+   "name": "Bloodfeather Harpy",
    "spots": {
     "1438": {
      "869": 1,
@@ -30423,7 +30420,7 @@
    },
    "maxLevel": 9,
    "minLevel": 8,
-   "name": "붉은깃털일족 약탈자",
+   "name": "Bloodfeather Rogue",
    "spots": {
     "1438": {
      "918": 4,
@@ -30462,7 +30459,7 @@
    },
    "maxLevel": 9,
    "minLevel": 9,
-   "name": "붉은깃털일족 마법사",
+   "name": "Bloodfeather Sorceress",
    "spots": {
     "1438": {
      "869": 1,
@@ -30496,7 +30493,6 @@
    },
    "maxLevel": 10,
    "minLevel": 10,
-   "name": "붉은깃털일족 여전사",
    "spots": {
     "1438": {
      "816": 1
@@ -30624,7 +30620,6 @@
    },
    "maxLevel": 10,
    "minLevel": 10,
-   "name": "붉은깃털일족 바람마녀",
    "spots": {
     "1438": {
      "766": 1,
@@ -30662,7 +30657,6 @@
    },
    "maxLevel": 11,
    "minLevel": 11,
-   "name": "붉은깃털일족 우두머리",
    "spots": {
     "1438": {
      "816": 1
@@ -30858,7 +30852,6 @@
    },
    "maxLevel": 9,
    "minLevel": 9,
-   "name": "나무발굽괴물",
    "spots": {
     "1438": {
      "1337": 2
@@ -31209,7 +31202,7 @@
    },
    "maxLevel": 8,
    "minLevel": 7,
-   "name": "긴발톱 흑호",
+   "name": "Nightsaber Stalker",
    "skins": {
     "from": {
      "eglink": 7
@@ -31939,7 +31932,7 @@
    },
    "maxLevel": 11,
    "minLevel": 10,
-   "name": "새끼 달표범",
+   "name": "Moonstalker Runt",
    "skins": {
     "from": {
      "eglink": 1
@@ -32778,7 +32771,7 @@
    },
    "maxLevel": 12,
    "minLevel": 11,
-   "name": "엉겅퀴곰",
+   "name": "Thistle Bear",
    "skins": {
     "from": {
      "eglink": 3
@@ -33062,7 +33055,6 @@
    },
    "maxLevel": 9,
    "minLevel": 9,
-   "name": "오크나무괴물",
    "spots": {
     "1438": {
      "1337": 1
@@ -33103,7 +33095,6 @@
    },
    "maxLevel": 13,
    "minLevel": 12,
-   "name": "검은나무일족 길잡이",
    "spots": {
     "1439": {
      "1026": 3,
@@ -33276,7 +33267,6 @@
    },
    "maxLevel": 11,
    "minLevel": 10,
-   "name": "저주받은 명가의 원혼",
    "spots": {
     "1439": {
      "1078": 2,
@@ -33314,7 +33304,6 @@
    },
    "maxLevel": 12,
    "minLevel": 11,
-   "name": "고뇌하는 명가의 원혼",
    "spots": {
     "1439": {
      "1030": 3,
@@ -33374,7 +33363,6 @@
    },
    "maxLevel": 13,
    "minLevel": 12,
-   "name": "울부짖는 명가의 원혼",
    "spots": {
     "1439": {
      "1030": 1,
@@ -33575,7 +33563,7 @@
    },
    "maxLevel": 11,
    "minLevel": 10,
-   "name": "비열한 마귀",
+   "name": "Vile Sprite",
    "spots": {
     "1439": {
      "1069": 1,
@@ -33632,7 +33620,7 @@
    },
    "maxLevel": 12,
    "minLevel": 11,
-   "name": "광기어린 그렐",
+   "name": "Wild Grell",
    "spots": {
     "1439": {
      "1118": 4,
@@ -33668,7 +33656,7 @@
    },
    "maxLevel": 12,
    "minLevel": 12,
-   "name": "잿빛안개멀록 약탈꾼",
+   "name": "Greymist Raider",
    "spots": {
     "1439": {
      "925": 1
@@ -33709,7 +33697,7 @@
    },
    "maxLevel": 13,
    "minLevel": 12,
-   "name": "잿빛안개멀록 길잡이",
+   "name": "Greymist Coastrunner",
    "spots": {
     "1439": {
      "1015": 1,
@@ -33755,7 +33743,7 @@
    },
    "maxLevel": 14,
    "minLevel": 13,
-   "name": "잿빛안개멀록 점쟁이",
+   "name": "Greymist Seer",
    "spots": {
     "1439": {
      "1013": 1,
@@ -33794,7 +33782,6 @@
    },
    "maxLevel": 14,
    "minLevel": 14,
-   "name": "잿빛안개멀록 그물낚시꾼",
    "spots": {
     "1439": {
      "1110": 1
@@ -33855,7 +33842,7 @@
    },
    "maxLevel": 13,
    "minLevel": 12,
-   "name": "데스릴 사티로스",
+   "name": "Deth'ryll Satyr",
    "spots": {
     "1439": {
      "1118": 3,
@@ -34030,7 +34017,7 @@
    },
    "maxLevel": 11,
    "minLevel": 10,
-   "name": "새끼 모래톱게",
+   "name": "Young Reef Crawler",
    "spots": {
     "1439": {
      "1015": 2,
@@ -36814,7 +36801,6 @@
    },
    "maxLevel": 14,
    "minLevel": 13,
-   "name": "검은나무일족 풍수사",
    "spots": {
     "1439": {
      "1026": 5,
@@ -63338,7 +63324,6 @@
    },
    "maxLevel": 12,
    "minLevel": 12,
-   "name": "자이바넬",
    "spots": {
     "1439": {
      "1128": 1
@@ -65913,7 +65898,7 @@
    },
    "maxLevel": 7,
    "minLevel": 7,
-   "name": "덩굴손 묘목",
+   "name": "Lasher Sproutling",
    "spots": {
     "1438": {
      "1533": 1
@@ -65941,7 +65926,6 @@
    },
    "maxLevel": 9,
    "minLevel": 9,
-   "name": "활짝 핀 덩굴손",
    "spots": {
     "1438": {
      "1069": 1
@@ -87226,7 +87210,6 @@
    },
    "maxLevel": 16,
    "minLevel": 16,
-   "name": "아나야 돈러너",
    "spots": {
     "1439": {
      "1079": 1
