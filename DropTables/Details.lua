@@ -367,6 +367,9 @@ local function mobSubtitle(npc)
     if bestMap then
         table.insert(parts, ns.MapName(bestMap))
     end
+    if ns.db.looted[npc] then
+        table.insert(parts, "Dungeon: per looted corpse")
+    end
     return table.concat(parts, "  |  ")
 end
 

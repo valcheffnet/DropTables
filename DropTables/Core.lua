@@ -427,6 +427,7 @@ ns.On("ADDON_LOADED", function(name)
     db.installId = db.installId or newInstallId()
     db.mobs = db.mobs or {}
     db.skins = db.skins or {}  -- npc -> { skinned, items }, what skinning its corpses gave
+    db.looted = db.looted or {}  -- npc -> true for mobs counted from their corpses in a dungeon, kills unknown
     db.items = db.items or {}
     db.names = db.names or {}
     db.info = db.info or {}

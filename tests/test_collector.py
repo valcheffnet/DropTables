@@ -249,6 +249,38 @@ def main():
     party.advance(5)
     expect("partner's corpse not counted", party.ns.db.mobs[6], None)
 
+    # In a dungeon the client hides which mob died and which unit is dead, so a corpse opened there counts as a kill
+    # that left loot, on the dungeon's map, and only once when it opens again.
+    delver = Client("Delver")
+    delver.g.instanceType = "party"
+    delver.stand(2999)
+    trash = "Creature-0-1-0-1-15-D1"
+    for _ in range(2):
+        delver.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [trash, 1]}])
+    expect("dungeon corpse counted as a looted kill", counts_of(delver, 15), (1, 1, 1, 1))
+    expect("dungeon mob marked as counted from its corpses", delver.ns.db.looted[15], True)
+    expect("dungeon corpse placed on the dungeon map", delver.ns.db.info[15].maps[2999].kills, 1)
+    # Loot right after Pick Pocket is a living mob's.
+    delver.fire("UNIT_SPELLCAST_SUCCEEDED", "player", "cast", 921)
+    delver.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-16-D2", 1]}])
+    expect("pickpocketed dungeon mob not counted", delver.ns.db.mobs[16], None)
+    delver.advance(2)
+    delver.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-16-D3", 1]}])
+    expect("a corpse looted later counted", counts_of(delver, 16), (1, 1, 1, 1))
+    # Where the client does show the dead mob under the mouse, its kill is known, and the mob isn't marked.
+    shown = "Creature-0-1-0-1-18-S1"
+    delver.g.lootable[shown] = True
+    delver.g.units["mouseover"] = shown
+    delver.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [shown, 1]}])
+    delver.g.units["mouseover"] = None
+    expect("dungeon kill shown under the mouse counted", counts_of(delver, 18), (1, 1, 1, 1))
+    expect("dungeon kill shown under the mouse not marked", delver.ns.db.looted[18], None)
+    # Outside instances a corpse of no kill the player knows of counts for nothing.
+    delver.g.instanceType = None
+    delver.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-17-O1", 1]}])
+    expect("unknown corpse outside a dungeon not counted", delver.ns.db.mobs[17], None)
+    expect("open world mob not marked", delver.ns.db.looted[17], None)
+
     # A /reload keeps the corpses already counted, so reopening one under the mouse doesn't count it again.
     before = Client("Reloader")
     opened = before.kill(13, "O1", True)
@@ -489,6 +521,19 @@ def main():
     reader.fire("GET_ITEM_INFO_RECEIVED", 100)
     reader.advance(1)
     expect("a redraw for an item it lists", reader.g.renders, 2)
+
+    # The details of a mob counted from its corpses in a dungeon say what its chances are per.
+    guide = Client("Guide", files=ALL_FILES + ("Style.lua", "Details.lua"), saved=FINDER_STUBS)
+    guide.g.instanceType = "party"
+    guide.stand(2999)
+    guide.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-19-G1", 1]}])
+    guide.ns.ShowDetails(19)
+    guide.advance(1)
+    expect("dungeon mob's details name the corpses", "Dungeon: per looted corpse" in guide.g.DropTablesDetails.subtitle.text,
+           True)
+    guide.ns.ShowDetails(8)
+    guide.advance(1)
+    expect("other mobs' details don't", "Dungeon" in (guide.g.DropTablesDetails.subtitle.text or ""), False)
 
     # A theme rewrites the shared colours in place and runs every painter again, and Restore defaults goes back.
     ns = reader.ns

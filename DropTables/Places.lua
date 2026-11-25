@@ -75,14 +75,8 @@ local function forgetOldKills(now)
     end
 end
 
-ns.On("PARTY_KILL", function(_, victim)
-    local npc = ns.NpcFromGuid(victim)
-    if not npc or placed[victim] then
-        return
-    end
-    local now = GetTime()
-    forgetOldKills(now)
-    placed[victim] = now
+-- Puts one kill of the mob on the map the player stands on.
+local function placeKill(npc)
     if seen[npc] then
         save(npc, seen[npc])
     end
@@ -107,7 +101,21 @@ ns.On("PARTY_KILL", function(_, victim)
         end
     end
     ns.Fire("DT_INFO_CHANGED", npc)
+end
+
+ns.On("PARTY_KILL", function(_, victim)
+    local npc = ns.NpcFromGuid(victim)
+    if not npc or placed[victim] then
+        return
+    end
+    local now = GetTime()
+    forgetOldKills(now)
+    placed[victim] = now
+    placeKill(npc)
 end)
+
+-- A corpse counted without a kill, as in a dungeon, where the client hides which mob died.
+ns.PlaceCorpse = placeKill
 
 local function remember(unit)
     local npc = ns.UnitMob(unit)

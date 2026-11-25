@@ -13,6 +13,9 @@ local CAST_LOOT_WINDOW = 1
 -- Skinning at its four ranks. A cast of a spell with the same name counts too, in case another source of the skill
 -- has its own spell id.
 local SKINNING_SPELLS = { [8613] = true, [8617] = true, [8618] = true, [10768] = true }
+-- Pick Pocket opens the loot window of a living mob. Outside instances the mob shows as alive, but in a dungeon the
+-- client hides that, so loot this soon after the spell is never a corpse there.
+local PICK_POCKET_SPELLS = { [921] = true }
 -- A corpse is skinned once, but its window opens again when the bags were full, so skinned corpses are remembered for
 -- this long and counted once.
 local SKINNED_TTL = 600
@@ -29,6 +32,7 @@ local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 local pending = {}
 local casting, lastCastEnd, lastCastSkinning, lastSpell = false, -math.huge, false, nil
 local skinned = {}  -- corpse GUID -> GetTime() of its skinning
+local lastPickPocket = -math.huge
 
 local function groupBucket()
     local members = GetNumGroupMembers()
@@ -211,6 +215,26 @@ local function lateKill(guid)
     end
 end
 
+-- In a dungeon or raid the client hides which mob died and which one is under the mouse, so no kill is ever known
+-- there. The corpse whose loot window is open still says which mob it was, so it counts as a kill that left loot, and
+-- the mob's chances there are per looted corpse. Corpses that leave nothing don't sparkle and are never counted.
+local function dungeonCorpse(guid)
+    local npc = ns.NpcFromGuid(guid)
+    local inInstance, kind = IsInInstance()
+    if not npc or ns.IsSecret(inInstance) or ns.IsSecret(kind) or not inInstance
+        or (kind ~= "party" and kind ~= "raid") then
+        return
+    end
+    if GetTime() - lastPickPocket < CAST_LOOT_WINDOW then
+        ns.Debug("  loot right after Pick Pocket left out")
+        return
+    end
+    pending[guid] = { npc = npc, bucket = groupBucket(), at = GetTime(), state = "checking" }
+    ns.db.looted[npc] = true
+    ns.PlaceCorpse(npc)
+    ns.Debug("  %s looted in a dungeon, counted from its corpse", ns.MobName(npc))
+end
+
 -- A value the client hides (a Midnight secret value) reads as nil, since using one in a match or a sum throws and
 -- would lose the whole loot window.
 local function readable(value)
@@ -268,15 +292,20 @@ local function spellName(spellId)
     return C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(spellId) or nil
 end
 
-local function isSkinning(spellId)
+-- True for a spell in ids, or one with the same name as the first of them.
+local function isSpell(spellId, ids, reference)
     if spellId == nil or ns.IsSecret(spellId) then
         return false
     end
-    if SKINNING_SPELLS[spellId] then
+    if ids[spellId] then
         return true
     end
     local name = spellName(spellId)
-    return name ~= nil and name == spellName(8613)
+    return name ~= nil and name == spellName(reference)
+end
+
+local function isSkinning(spellId)
+    return isSpell(spellId, SKINNING_SPELLS, 8613)
 end
 
 ns.On("UNIT_SPELLCAST_START", function()
@@ -284,6 +313,9 @@ ns.On("UNIT_SPELLCAST_START", function()
 end, "player")
 
 ns.On("UNIT_SPELLCAST_SUCCEEDED", function(_, _, spellId)
+    if isSpell(spellId, PICK_POCKET_SPELLS, 921) then
+        lastPickPocket = GetTime()
+    end
     if casting then
         casting, lastCastEnd = false, GetTime()
         lastCastSkinning, lastSpell = isSkinning(spellId), spellId
@@ -324,6 +356,9 @@ ns.On("LOOT_OPENED", function(_, fromItem)
             end
             if not kill then
                 lateKill(guid)
+                if not pending[guid] then
+                    dungeonCorpse(guid)
+                end
             end
             local claimed, data = claim(guid)
             claims[guid] = data or false

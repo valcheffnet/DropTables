@@ -62,6 +62,8 @@ function IsInGroup(category) return category == nil and #groupMembers > 0 end
 function IsInRaid() return false end
 LE_PARTY_CATEGORY_INSTANCE = 2
 function IsEncounterInProgress() return false end
+instanceType = nil  -- "party" or "raid" inside an instance
+function IsInInstance() return instanceType ~= nil, instanceType or "none" end
 function CanLootUnit(guid) return lootable[guid] end
 function UnitGUID(unit) return units[unit] end
 friendly = {}      -- unit token -> true for a living creature the player cannot attack (flight master, vendor)
