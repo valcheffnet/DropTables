@@ -310,23 +310,55 @@ function ns.TryLinkItem(itemId)
     return true
 end
 
+-- What Drop Tables reads of an item, kept for the session once the client has given it. The client's own item cache
+-- lets go of items while the Loot Finder goes through two thousand of them, and asking again for one it let go loads
+-- it again: that arrival redrew the Finder, the redraw asked again, and the game hitched every second.
+local itemInfo = {}
+
+local function readItem(itemId)
+    local name, _, quality, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(itemId)
+    if not name then
+        return nil
+    end
+    local info = { name = name, quality = quality, sellPrice = sellPrice, bindType = bindType }
+    itemInfo[itemId] = info
+    return info
+end
+
 -- Items asked about before the client knew them. The client loads items all the time for other addons and for the
 -- gear of the players around, so only the arrival of these ones fires DT_ITEM_INFO_RECEIVED, the signal to work the
 -- values out again and redraw. An item the server can't load comes back as a failure and changes nothing; a redraw
--- for it would only ask for it again and fail again, every second.
-local awaited = {}
+-- for it would only ask for it again and fail again, every second. An item is waited for once a session: it is read
+-- the moment it arrives, and if the client can't give it even then, another redraw won't help either.
+local awaited, arrived = {}, {}
 function ns.AwaitItem(itemId)
-    awaited[itemId] = true
+    if not arrived[itemId] then
+        awaited[itemId] = true
+    end
 end
 
 ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
     if awaited[itemId] and success ~= false then
-        awaited[itemId] = nil
+        awaited[itemId], arrived[itemId] = nil, true
+        readItem(itemId)
         ns.Fire("DT_ITEM_INFO_RECEIVED", itemId)
     end
 end)
 
+-- Name, quality, sell price and bind type of an item, or nil while the client doesn't know it yet.
+function ns.ItemInfo(itemId)
+    local info = itemInfo[itemId] or readItem(itemId)
+    if not info then
+        ns.AwaitItem(itemId)
+    end
+    return info
+end
+
 function ns.ItemQuality(itemId)
+    local info = itemInfo[itemId]
+    if info and info.quality then
+        return info.quality
+    end
     local quality = C_Item.GetItemQualityByID(itemId)
     if quality == nil then
         ns.AwaitItem(itemId)
@@ -335,11 +367,10 @@ function ns.ItemQuality(itemId)
 end
 
 function ns.ItemName(itemId)
-    local name = C_Item.GetItemInfo(itemId)
-    if name then
-        return name
+    local info = ns.ItemInfo(itemId)
+    if info then
+        return info.name
     end
-    ns.AwaitItem(itemId)
     local meta = ns.db.items[itemId]
     return meta and meta.name or ("item:" .. itemId)
 end

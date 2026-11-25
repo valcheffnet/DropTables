@@ -63,13 +63,12 @@ end
 -- auction house after the cut when that is more. Items bound on pickup and random world drops only go to a vendor.
 -- nil while the client doesn't know the item yet.
 function ns.PriceInfo(itemId, vendorOnly)
-    local name, _, _, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(itemId)
-    if not name then
-        ns.AwaitItem(itemId)
+    local info = ns.ItemInfo(itemId)
+    if not info then
         return nil
     end
-    local vendor = sellPrice or 0
-    if vendorOnly or bindType == BIND_ON_PICKUP then
+    local vendor = info.sellPrice or 0
+    if vendorOnly or info.bindType == BIND_ON_PICKUP then
         return vendor, "vendor"
     end
     local auction, source = auctionPrice(itemId)

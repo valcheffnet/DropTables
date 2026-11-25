@@ -10,11 +10,11 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from wowsim import ALL_FILES, FINDER_STUBS, Client, expect, report  # noqa: E402
 
-# Items: 100 sells for 50c and goes for more at auction, 101 is bound on pickup, 103 is rare, 105 is armor (a random
+# Items: 100 sells for 60c and goes for more at auction, 101 is bound on pickup, 103 is rare, 105 is armor (a random
 # world drop) and 106 is one the client doesn't know yet.
 PRICES = """
 itemInfo = {
-    [100] = { sell = 50, bind = 0 }, [101] = { sell = 20, bind = 1 }, [103] = { sell = 1000, bind = 0 },
+    [100] = { sell = 60, bind = 0 }, [101] = { sell = 20, bind = 1 }, [103] = { sell = 1000, bind = 0 },
     [105] = { sell = 30, bind = 2 },
 }
 C_Item.GetItemInfo = function(id)
@@ -70,7 +70,8 @@ def main():
     expect("an unrelated item keeps the cached g/ph", ns.GoldPerHour(1), int(per_kill * 70))
     c.fire("GET_ITEM_INFO_RECEIVED", 106, True)
     expect("the awaited item's info updates g/ph", ns.GoldPerHour(1) > int(per_kill * 70), True)
-    c.lua.execute("itemInfo[106] = nil")
+    # The client keeps 106 from now on, so the rest goes on without it in the counts.
+    c.lua.execute("for _, bucket in pairs(DropTablesDB.mobs[1]) do bucket.items[106] = nil end")
     c.fire("DT_DATA_CHANGED", 1)
     # With world drops on, the armor counts at its vendor 30 in a quarter of the kills, not at its auction price.
     ns.settings.gphWorldDrops = True
@@ -86,7 +87,7 @@ def main():
     # An auction price older than 21 days doesn't count, and the vendor price takes over.
     c.g.auctionAges[100] = 30
     c.g.auctionatorUpdate()
-    expect("an old auction price falls back to the vendor", ns.GoldPerHour(1), int((10 + 0.5 * 50 + 20) * 70))
+    expect("an old auction price falls back to the vendor", ns.GoldPerHour(1), int((10 + 0.5 * 60 + 20) * 70))
     # Without Auctionator, TradeSkillMaster's market value is used.
     c.lua.execute("""
         Auctionator = nil
@@ -120,7 +121,6 @@ def main():
     c.lua.execute("FojjiCoreNS = nil")
     # A vendor price above the auction price wins.
     c.lua.execute("TSM_API = nil")
-    c.g.itemInfo[100].sell = 60
     c.fire("DT_SETTINGS_CHANGED")
     expect("the vendor price without any auction addon", ns.ValuePerKill(1), 10 + 0.5 * 60 + 20)
     expect("the vendor named as the source", ns.PriceInfo(100), (60, "vendor"))
@@ -166,7 +166,7 @@ def main():
     row = next(s for s in summaries.values() if s.itemId == 101)
     expect("the item list shows the best mob's gold an hour", (row.bestNpc, row.gph), (3, ns.GoldPerHour(3)))
 
-    # Skinning has its own gold an hour: mob 50 gives item 100 (60c at the vendor by now) in half of its 4 skins, two
+    # Skinning has its own gold an hour: mob 50 gives item 100 (60c at the vendor) in half of its 4 skins, two
     # at a time, and the rare item 103 once, which doesn't count. Kills an hour are the 100 of the setting.
     c.lua.execute("""
         DropTablesDB.skins[50] = { skinned = 4, items = {
@@ -234,6 +234,24 @@ def main():
     shower.ns.ShowDetails(1)
     expect("the details window shows the mob's g/ph",
            shower.ns.FormatGold(shower.ns.GoldPerHour(1)) + " |cff999999g/ph|r" in set(shower.g.texts.values()), True)
+    # The client's item cache lets go of items while the Loot Finder reads two thousand of them, and an item it let go
+    # arrives again when asked. What the client gave once is kept for the session, and an item is waited for only
+    # once, so arrivals can't keep the Finder redrawing.
+    arrivals = c.lua.eval("function(ns) local n = 0 ns.On('DT_ITEM_INFO_RECEIVED', function() n = n + 1 end) "
+                          "return function() return n end end")(ns)
+    expect("an unknown item has no price yet", ns.PriceInfo(107), None)
+    c.lua.execute("itemInfo[107] = { sell = 5, bind = 0 }")
+    c.fire("GET_ITEM_INFO_RECEIVED", 107, True)
+    c.lua.execute("itemInfo[107] = nil")
+    expect("an item the client let go keeps its price", ns.PriceInfo(107), (5, "vendor"))
+    expect("and its name", ns.ItemName(107), "Item 107")
+    expect("one arrival, one redraw", arrivals(), 1)
+    expect("an item the client can't give", ns.PriceInfo(108), None)
+    c.fire("GET_ITEM_INFO_RECEIVED", 108, True)
+    expect("arrives once", arrivals(), 2)
+    expect("is still unknown", ns.PriceInfo(108), None)
+    c.fire("GET_ITEM_INFO_RECEIVED", 108, True)
+    expect("and its next arrivals don't redraw again", arrivals(), 2)
     report("gold per hour")
 
 
