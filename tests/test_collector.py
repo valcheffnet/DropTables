@@ -534,6 +534,13 @@ def main():
     guide.ns.ShowDetails(8)
     guide.advance(1)
     expect("other mobs' details don't", "Dungeon" in (guide.g.DropTablesDetails.subtitle.text or ""), False)
+    # There the window follows the corpses the player loots, as it follows the target elsewhere, unless told not to.
+    guide.ns.settings.detailsFollow = True
+    guide.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-20-G2", 1]}])
+    expect("details follow the looted corpse", guide.ns.settings.detailsNpc, 20)
+    guide.ns.settings.detailsFollow = False
+    guide.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": ["Creature-0-1-0-1-21-G3", 1]}])
+    expect("details stay without Follow target", guide.ns.settings.detailsNpc, 20)
 
     # A theme rewrites the shared colours in place and runs every painter again, and Restore defaults goes back.
     ns = reader.ns

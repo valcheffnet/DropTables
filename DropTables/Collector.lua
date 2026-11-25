@@ -233,6 +233,7 @@ local function dungeonCorpse(guid)
     ns.db.looted[npc] = true
     ns.PlaceCorpse(npc)
     ns.Debug("  %s looted in a dungeon, counted from its corpse", ns.MobName(npc))
+    ns.Fire("DT_DUNGEON_CORPSE", npc)
 end
 
 -- A value the client hides (a Midnight secret value) reads as nil, since using one in a match or a sum throws and

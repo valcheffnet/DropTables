@@ -197,7 +197,8 @@ local function toggle(key, label, tooltip, after)
     return check
 end
 
-local follow = toggle("detailsFollow", "Follow target", "Switch to each mob you target. Off keeps the current mob.")
+local follow = toggle("detailsFollow", "Follow target",
+    "Switch to each mob you target. In dungeons, where the game hides the target, switch to each corpse you loot. Off keeps the current mob.")
 toggle("onlyMine", "Only mine", "Count only your own kills, without what other players and the shared database add.",
     follow)
 
@@ -524,16 +525,18 @@ ns.On("DT_SETTINGS_CHANGED", function()
 end)
 ns.On("DT_PRICES_CHANGED", redrawSoon)
 
-ns.On("PLAYER_TARGET_CHANGED", function()
-    if not frame:IsShown() or not ns.settings.detailsFollow then
-        return
-    end
-    local npc = ns.UnitMob("target")
-    if npc and npc ~= shownNpc then
+local function followMob(npc)
+    if frame:IsShown() and ns.settings.detailsFollow and npc and npc ~= shownNpc then
         setNpc(npc)
         render()
     end
+end
+
+ns.On("PLAYER_TARGET_CHANGED", function()
+    followMob(ns.UnitMob("target"))
 end)
+-- In a dungeon the target never says which mob it is, so the corpse being looted does.
+ns.On("DT_DUNGEON_CORPSE", followMob)
 
 local function refresh(npc)
     if npc == shownNpc then
