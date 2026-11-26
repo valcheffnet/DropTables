@@ -80,6 +80,10 @@ def main():
     expect("one part", len(strings), 1)
     parsed = checked(strings[0])
     expect("checker accepts the export", isinstance(parsed, dict), True)
+    key = ns.db.exportKey
+    expect("every export ends with the install's own key", (strings[0].endswith("." + key), len(key), key != own),
+           (True, 32, True))
+    expect("and the key stays the same after a reload", alice.reload().ns.db.exportKey, key)
     mobs = parsed["sources"][own]["mobs"]
     expect("both mobs exported", sorted(mobs), ["1", "2"])
     expect("counts survive", json_view(mobs["1"]["buckets"]["1"]), bucket_view(ns.db.mobs[1][1]))

@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { deflateSync } from "node:zlib";
 import worker from "../src/index.js";
 
 const EXPORT = "DT1:" + "eJzLSM3JyVcozy/KSQEAGgQEXQ".repeat(3) + "==";
@@ -33,10 +34,13 @@ function makeEnv(overrides = {}) {
 }
 
 // Records every outgoing call and answers like Turnstile and GitHub would.
-function mockFetch({ turnstile = true, issueStatus = 201 } = {}) {
+function mockFetch({ turnstile = true, issueStatus = 201, latest = null } = {}) {
     const calls = [];
     globalThis.fetch = async (url, init = {}) => {
         calls.push({ url: String(url), init });
+        if (String(url).endsWith("/releases/latest")) {
+            return latest ? Response.json({ tag_name: latest }) : Response.json({}, { status: 404 });
+        }
         if (String(url).includes("siteverify")) {
             return Response.json({ success: turnstile });
         }
@@ -171,4 +175,65 @@ test("a GitHub error comes back as 502", async () => {
     const response = await worker.fetch(post({ data: EXPORT, token: "t" }), makeEnv());
     console.error = original;
     assert.equal(response.status, 502);
+});
+
+test("the install's export key never reaches the issue, only its hash", async () => {
+    const calls = mockFetch();
+    const key = "0123456789abcdef".repeat(2);
+    const response = await worker.fetch(post({ data: `${EXPORT}.${key}`, token: "t" }), makeEnv());
+    assert.equal(response.status, 200);
+    const issue = JSON.parse(calls.find((call) => call.url.endsWith("/issues")).init.body);
+    assert.ok(issue.body.includes("```text\n" + EXPORT + "\n```"), "the export text goes in without the key");
+    assert.ok(!issue.body.includes(key), "the key itself stays out");
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`DropTables export key ${key}`));
+    const hash = Buffer.from(digest).toString("hex");
+    assert.ok(issue.body.includes("Install key: `" + hash + "`"), "its hash goes in for the merge to pin");
+});
+
+test("an export from an addon without a key opens an issue without one", async () => {
+    const calls = mockFetch();
+    await worker.fetch(post({ data: EXPORT, token: "t" }), makeEnv());
+    const issue = JSON.parse(calls.find((call) => call.url.endsWith("/issues")).init.body);
+    assert.ok(!issue.body.includes("Install key"));
+});
+
+test("a key that isn't 32 hex digits is refused", async () => {
+    mockFetch();
+    for (const tail of [".xyz", ".0123456789abcdef", "." + "0".repeat(33)]) {
+        const response = await worker.fetch(post({ data: EXPORT + tail, token: "t" }), makeEnv());
+        assert.equal(response.status, 400, tail);
+    }
+});
+
+function exportOf(version) {
+    const text = `DTX|1|0123456789abcdef|${version}|1795000000|1/1
+@0123456789abcdef
+M1.1.1.1.1.0.0..
+`;
+    return "DT1:" + deflateSync(Buffer.from(text)).toString("base64");
+}
+
+test("an export from an older version is refused with a link to the latest", async () => {
+    const calls = mockFetch({ latest: "v0.6.5" });
+    const response = await worker.fetch(post({ data: exportOf("0.6.3"), token: "t" }), makeEnv());
+    assert.equal(response.status, 409);
+    const body = await response.json();
+    assert.match(body.error, /0\.6\.3, and 0\.6\.5 is out\. Update the addon first/);
+    assert.equal(body.update, "https://github.com/owner/repo/releases/latest");
+    assert.ok(!calls.some((call) => call.url.endsWith("/issues")), "no issue is opened");
+    assert.ok(!calls.some((call) => call.url.includes("siteverify")), "and the Turnstile check isn't spent");
+});
+
+test("an export from the latest version or a newer one goes through", async () => {
+    for (const version of ["0.6.5", "0.6.10", "1.0.0"]) {
+        mockFetch({ latest: "v0.6.5" });
+        const response = await worker.fetch(post({ data: exportOf(version), token: "t" }), makeEnv());
+        assert.equal(response.status, 200, version);
+    }
+});
+
+test("versions compare by number, so 0.6.10 is newer than 0.6.9", async () => {
+    mockFetch({ latest: "v0.6.10" });
+    const response = await worker.fetch(post({ data: exportOf("0.6.9"), token: "t" }), makeEnv({ REPO_NAME: "other" }));
+    assert.equal(response.status, 409);
 });

@@ -3,12 +3,17 @@
 // the issues later.
 
 const MAX_BODY = 256 * 1024;
-const EXPORT_PATTERN = /^DT1:[A-Za-z0-9+/]+={0,2}$/;
+// The addon puts its install's secret export key after the dot. Only its hash goes into the public issue, and the
+// merge pins the first hash of each install, so nobody can send an export as someone else's install.
+const EXPORT_PATTERN = /^(DT1:[A-Za-z0-9+/]+={0,2})(?:\.([0-9a-f]{32}))?$/;
 const MIN_EXPORT = 24;
 const GITHUB_API = "https://api.github.com";
 const USER_AGENT = "DropTables-Relay";
 
 let cachedToken = null;
+const cachedLatest = new Map();  // "owner/repo" -> { version, at } of its latest release
+const LATEST_TTL = 10 * 60 * 1000;
+const HEADER_BYTES = 4096;  // the header line is short, so no more than this is ever unpacked
 
 function json(status, body) {
     return new Response(JSON.stringify(body), {
@@ -87,8 +92,70 @@ async function turnstileOk(env, token, ip) {
 }
 
 // The same layout GitHub wrote for the old issue form, so the workflow reads either kind of issue.
-function issueBody(data) {
-    return `### Export text\n\n\`\`\`text\n${data}\n\`\`\`\n\n_Sent through the web page._\n`;
+// The addon version in the header line of an export, "DTX|1|<install id>|<version>|...", or null when it can't be read.
+// Only the first bytes are unpacked.
+async function exportVersion(data) {
+    try {
+        const bytes = Uint8Array.from(atob(data.slice(4)), (char) => char.charCodeAt(0));
+        const reader = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate")).getReader();
+        const decoder = new TextDecoder();
+        let text = "";
+        while (!text.includes("\n") && text.length < HEADER_BYTES) {
+            const { value, done } = await reader.read();
+            if (done) {
+                break;
+            }
+            text += decoder.decode(value, { stream: true });
+        }
+        reader.cancel().catch(() => {});
+        const fields = text.split("\n", 1)[0].split("|");
+        return fields[0] === "DTX" && /^\d+\.\d+\.\d+$/.test(fields[3]) ? fields[3] : null;
+    } catch {
+        return null;
+    }
+}
+
+// The version of the latest release on GitHub, or null when GitHub can't say right now.
+async function latestVersion(env) {
+    const repo = `${env.REPO_OWNER}/${env.REPO_NAME}`;
+    const cached = cachedLatest.get(repo);
+    if (cached && Date.now() - cached.at < LATEST_TTL) {
+        return cached.version;
+    }
+    try {
+        const response = await fetch(`${GITHUB_API}/repos/${repo}/releases/latest`, {
+            headers: {
+                authorization: `Bearer ${await installationToken(env)}`,
+                accept: "application/vnd.github+json",
+                "user-agent": USER_AGENT,
+            },
+        });
+        if (!response.ok) {
+            return cached ? cached.version : null;
+        }
+        const match = /^v?(\d+\.\d+\.\d+)$/.exec((await response.json()).tag_name || "");
+        const version = match ? match[1] : null;
+        cachedLatest.set(repo, { version, at: Date.now() });
+        return version;
+    } catch {
+        return cached ? cached.version : null;
+    }
+}
+
+function older(version, than) {
+    const a = version.split(".").map(Number);
+    const b = than.split(".").map(Number);
+    for (let i = 0; i < 3; i++) {
+        if (a[i] !== b[i]) {
+            return a[i] < b[i];
+        }
+    }
+    return false;
+}
+
+function issueBody(data, keyHash) {
+    const key = keyHash ? `Install key: \`${keyHash}\`\n\n` : "";
+    return `### Export text\n\n\`\`\`text\n${data}\n\`\`\`\n\n${key}_Sent through the web page._\n`;
 }
 
 async function submit(request, env) {
@@ -107,14 +174,28 @@ async function submit(request, env) {
     } catch {
         return json(400, { error: "The request could not be read." });
     }
-    const data = typeof input.data === "string" ? input.data.replace(/\s+/g, "") : "";
-    if (data.length < MIN_EXPORT || !EXPORT_PATTERN.test(data)) {
+    const text = typeof input.data === "string" ? input.data.replace(/\s+/g, "") : "";
+    const match = EXPORT_PATTERN.exec(text);
+    const data = match ? match[1] : "";
+    if (data.length < MIN_EXPORT) {
         return json(400, { error: "This is not Drop Tables export text. It starts with DT1: and is copied from /dt export." });
+    }
+    // Counts from an old version can miss what a newer one fixed, so the player updates and exports again first. When
+    // GitHub can't say which version is the latest, the export goes through.
+    const version = await exportVersion(data);
+    const latest = version && (await latestVersion(env));
+    if (latest && older(version, latest)) {
+        return json(409, {
+            error: `This text comes from Drop Tables ${version}, and ${latest} is out. Update the addon first, then `
+                + "type /dt export in game again and send the new text.",
+            update: `https://github.com/${env.REPO_OWNER}/${env.REPO_NAME}/releases/latest`,
+        });
     }
     if (!(await turnstileOk(env, input.token, ip))) {
         return json(403, { error: "The check that you are not a bot failed. Reload the page and try again." });
     }
     const hash = await hashHex(data);
+    const keyHash = match[2] ? await hashHex(`DropTables export key ${match[2]}`) : null;
     try {
         const response = await fetch(`${GITHUB_API}/repos/${env.REPO_OWNER}/${env.REPO_NAME}/issues`, {
             method: "POST",
@@ -124,7 +205,7 @@ async function submit(request, env) {
                 "content-type": "application/json",
                 "user-agent": USER_AGENT,
             },
-            body: JSON.stringify({ title: `Drop tables (web) ${hash.slice(0, 8)}`, body: issueBody(data), labels: ["share", "relay"] }),
+            body: JSON.stringify({ title: `Drop tables (web) ${hash.slice(0, 8)}`, body: issueBody(data, keyHash), labels: ["share", "relay"] }),
         });
         if (!response.ok) {
             console.error("create issue", response.status, await response.text());

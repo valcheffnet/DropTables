@@ -56,6 +56,55 @@ def mob_kills(mob):
     return sum(b["kills"] for b in mob["buckets"].values())
 
 
+UNVERIFIED = "unverified"
+
+
+def trusted(submissions):
+    """The submissions with every exporter id that can't be the install's own turned into UNVERIFIED. The first
+    submission of an exporter that carries a key hash (from the share page, see tools/ingest_issue.py) pins it, and
+    after that only submissions with the same hash are that exporter's. Before an install has sent one with a key, its
+    exports count as before. An unverified export can't replace the install's own counts and isn't taken as its own
+    export, so sending another install's id gets nowhere."""
+    pins = {}
+    for sub in sorted(submissions, key=lambda s: (s["received"], s["issue"], s["index"])):
+        if sub.get("key"):
+            pins.setdefault(sub["result"]["exporter"], sub["key"])
+    out = []
+    for sub in submissions:
+        pin = pins.get(sub["result"]["exporter"])
+        if pin is not None and sub.get("key") != pin:
+            sub = dict(sub, result=dict(sub["result"], exporter=UNVERIFIED))
+        out.append(sub)
+    return out
+
+
+def bucket_kills(mob):
+    """An install's kills of a mob in each bucket (group size)."""
+    return {str(b): data["kills"] for b, data in mob["buckets"].items() if data["kills"]}
+
+
+def from_value(kills):
+    """How from lists an install's kills: a number when they're all solo (bucket 1), as most are, otherwise its kills
+    per bucket, so the addon can tell new solo kills from new group kills (newShares in DropTables/Stats.lua)."""
+    kills = {b: k for b, k in kills.items() if k}
+    if set(kills) <= {"1"}:
+        return kills.get("1", 0)
+    return {b: kills[b] for b in sorted(kills, key=int)}
+
+
+def known_kills(value):
+    """The kills per bucket of a from value."""
+    return {"1": value} if isinstance(value, int) else dict(value)
+
+
+def more_known(value, kills):
+    """A from value raised, bucket by bucket, to at least kills."""
+    known = known_kills(value)
+    for b, k in kills.items():
+        known[b] = max(known.get(b, 0), k)
+    return from_value(known)
+
+
 def complete_buckets(mob):
     """Buckets with kills. A bucket made only of item records (no counts record) is left out, as the addon does."""
     return {b: data for b, data in mob["buckets"].items() if data["kills"] > 0}
@@ -136,7 +185,7 @@ def minus_mob(mob, base):
 
 def minus_loot(v, base):
     mob = minus_mob(v["mob"], base["mob"])
-    return mob and dict(v, mob=mob, kills=mob_kills(mob), total=v["kills"])
+    return mob and dict(v, mob=mob, kills=mob_kills(mob), total=v["kills"], known=bucket_kills(v["mob"]))
 
 
 def minus_skins(v, base):
@@ -154,7 +203,7 @@ def minus_skins(v, base):
 
 def after_reset(candidates, since, minus):
     """The versions of one install's mob with only what was recorded on or after since, the day a hotfix changed the
-    mob's loot, and how many of the install's kills were left out.
+    mob's loot, and the version whose counts were left out (None when nothing was).
 
     An import that says it stopped recording before that day goes. The other imports stay as they are, since they
     leave the older records out themselves. A player's export has no time for each kill, only the time it was
@@ -171,13 +220,13 @@ def after_reset(candidates, since, minus):
     elif after:
         base, rest = after[0], after[1:]
     else:
-        return imports, 0
+        return imports, None
     later = [d for d in (minus(v, base) for v in rest) if d]
-    return imports + later, base["kills"]
+    return imports + later, base
 
 
-def apply_resets(found, resets, minus):
-    """found with after_reset applied to the mobs in resets, and npc -> {origin: kills left out}."""
+def apply_resets(found, resets, minus, kills_of):
+    """found with after_reset applied to the mobs in resets, and npc -> {origin: kills_of(the version left out)}."""
     if not resets:
         return found, {}
     out, left_out = {}, {}
@@ -185,9 +234,9 @@ def apply_resets(found, resets, minus):
         if npc not in resets:
             out[(origin, npc)] = candidates
             continue
-        kept, kills = after_reset(candidates, resets[npc], minus)
-        if kills:
-            left_out.setdefault(npc, {})[origin] = kills
+        kept, base = after_reset(candidates, resets[npc], minus)
+        if base and base["kills"]:
+            left_out.setdefault(npc, {})[origin] = kills_of(base)
         if kept:
             out[(origin, npc)] = kept
     return out, left_out
@@ -494,7 +543,8 @@ def shared_mob(chosen):
         buckets[bucket] = result
     if not buckets:
         return None
-    record = {"buckets": buckets, "from": {o: v.get("total", v["kills"]) for o, v in kept.items()}, "maps": {}}
+    record = {"buckets": buckets, "maps": {},
+              "from": {o: from_value(v.get("known") or bucket_kills(v["mob"])) for o, v in kept.items()}}
     levels = [v["mob"]["levels"] for v in kept.values() if v["mob"].get("levels") and v["mob"]["levels"][0]]
     if levels:
         record["minLevel"] = min(low for low, _ in levels)
@@ -547,8 +597,9 @@ def covered(older, newer, resets=None):
 
 def superseded(submissions, resets=None):
     """Submissions a later one covers. A player who sends everything each time ends up leaving only the last."""
-    ordered = sorted(submissions, key=lambda s: (s["issue"], s["index"]))
-    return [old for i, old in enumerate(ordered) if any(covered(old, new, resets) for new in ordered[i + 1:])]
+    pairs = sorted(zip(trusted(submissions), submissions), key=lambda pair: (pair[0]["issue"], pair[0]["index"]))
+    return [original for i, (old, original) in enumerate(pairs)
+            if any(covered(old, new, resets) for new, _ in pairs[i + 1:])]
 
 
 def skin_versions(submissions, quest_items=frozenset()):
@@ -625,7 +676,7 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
     """The shared database: {"built": time, "submissions": n, "mobs": {npc: record}}, plus "imports" with the source
     and license of each import that went in. resets: npc -> the day a hotfix changed its loot. previous_names: npc ->
     the name it had before, for a mob no source names now."""
-    everything = list(submissions) + list(imports)
+    everything = trusted(list(submissions)) + list(imports)
     import_names = {}
     for imp in imports:
         for npc, name in (imp.get("names") or {}).items():
@@ -639,8 +690,8 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
     for key, candidates in skin_found.items():
         either.setdefault(key, []).extend(candidates)
     cut = unconfirmed_cut(either)
-    found, left_out = apply_resets(found, resets, minus_loot)
-    skin_found, skins_left_out = apply_resets(skin_found, resets, minus_skins)
+    found, left_out = apply_resets(found, resets, minus_loot, lambda v: bucket_kills(v["mob"]))
+    skin_found, skins_left_out = apply_resets(skin_found, resets, minus_skins, lambda v: v["kills"])
     by_npc, skins_by_npc = {}, {}
     for into, versions_found in ((by_npc, found), (skins_by_npc, skin_found)):
         for (origin, npc), candidates in versions_found.items():
@@ -655,10 +706,10 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
             record["skins"] = skins
         if record:
             # The kills left out still count as known, so the addon doesn't add them back from the same install
-            # (newShare in DropTables/Stats.lua) and /dt export doesn't send them again.
+            # (newShares in DropTables/Stats.lua) and /dt export doesn't send them again.
             for origin, kills in left_out.get(npc, {}).items():
                 if origin not in cut and record["buckets"]:
-                    record["from"][origin] = max(record["from"].get(origin, 0), kills)
+                    record["from"][origin] = more_known(record["from"].get(origin, 0), kills)
             for origin, kills in skins_left_out.get(npc, {}).items():
                 if origin not in cut and record.get("skins"):
                     record["skins"]["from"][origin] = max(record["skins"]["from"].get(origin, 0), kills)

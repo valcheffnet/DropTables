@@ -260,8 +260,19 @@ def issues_and_game(root):
     expect("an export is accepted", outcome, "accepted")
     expect("the reply counts what came in", "1 install, 1 mob, 10 kills" in reply, True)
     expect("the same text again adds nothing", ingest_issue.ingest(issue(2, form_body(string)), root)[0], "duplicate")
-    broken = string[:-12] + "AAAAAAAAAAAA"
+    text, key = string.rsplit(".", 1)  # the install's export key comes after the dot
+    broken = text[:-12] + "AAAAAAAAAAAA." + key
     outcome, reply = ingest_issue.ingest(issue(3, form_body(broken)), root)
+    hashed = "Install key: `%s`\n\n" % ("c" * 64)
+    fresh, other = Client("Fresh"), Client("Other")
+    loot_mob(fresh, 2, "F1", [(100, 1)])
+    loot_mob(other, 2, "O1", [(100, 1)])
+    keys = root / "keys"
+    ingest_issue.ingest(issue(20, form_body(export_string(fresh)) + hashed, labels=("share", "relay")), keys)
+    ingest_issue.ingest(issue(21, form_body(export_string(other)) + hashed), keys)
+    subs = {s["issue"]: s for s in build_data.load_submissions(keys)}
+    expect("the share page's key hash goes with the submission", subs[20].get("key"), "c" * 64)
+    expect("in an issue anyone could open it counts for nothing", (21 in subs, subs[21].get("key")), (True, None))
     expect("a damaged text is refused with the checker's reason", (outcome, "damaged" in reply or "cut" in reply),
            ("rejected", True))
     expect("an issue without a text is refused", ingest_issue.ingest(issue(4, "hello"), root)[0], "rejected")
@@ -562,6 +573,67 @@ def other_languages():
     expect("one name compared isn't enough to tell", build_data.other_language(english + [alone]), {})
 
 
+def forged_exports():
+    """The first export of an install that carries a key hash pins it. Another export with that install's id and a
+    different hash, or none, isn't its own: it can't replace the install's counts or make its real export look old."""
+    a, mine, theirs = origin(90), "a" * 64, "b" * 64
+
+    def keyed(number, kills, key):
+        sub = submission(number, a, {a: {7: mob({1: bucket(kills, kills, kills, {100: kills // 5})})}})
+        return dict(sub, key=key) if key else sub
+
+    own = keyed(91, 50, mine)
+    for label, forged in (("with another key", keyed(92, 500, theirs)), ("without a key", keyed(92, 500, None))):
+        expect("a forged export %s doesn't make the real one look old" % label,
+               build_data.superseded([own, forged]), [])
+        expect("and doesn't replace the install's counts (%s)" % label,
+               build_data.build([own, forged])["mobs"]["7"]["from"], {a: 50})
+    newer = keyed(93, 60, mine)
+    expect("the install's next export with its key replaces the old one",
+           (build_data.superseded([own, newer]), build_data.build([own, newer])["mobs"]["7"]["from"]), ([own], {a: 60}))
+    old_style = [keyed(94, 50, None), keyed(95, 60, None)]
+    expect("an install that never sent a key counts as before", build_data.superseded(old_style), [old_style[0]])
+    expect("and its later exports still count once it sends one",
+           build_data.build(old_style + [keyed(96, 70, mine)])["mobs"]["7"]["from"], {a: 70})
+
+
+def own_counts(me, solo, group):
+    """SavedVariables of an install with solo and group kills of mob 12, item 100 in every corpse."""
+    def lua_bucket(kills):
+        return ("{ kills = %d, lootable = %d, opened = %d, items = { [100] = { drops = %d, qty = %d } },"
+                " money = { drops = 0, copper = 0 } }" % ((kills,) * 5))
+    return 'DropTablesDB = { installId = "%s", mobs = { [12] = { [1] = %s, [2] = %s } } }' % (
+        me, lua_bucket(solo), lua_bucket(group))
+
+
+def group_kills():
+    """The shared database lists an install's kills per group size once it has group kills, so new group kills count
+    only themselves: Solo doesn't count the old solo kills again and Group shows all of the new ones."""
+    me = origin(80)
+    solo_only = build_data.build([submission(81, me, {me: {12: mob({1: bucket(100, 100, 100, {100: 100})})}})])
+    expect("an install with only solo kills is listed with a number", solo_only["mobs"]["12"]["from"][me], 100)
+    grouped = Client("Grouped", data=build_data.lua_file(solo_only), saved=own_counts(me, 100, 20))
+    expect("then 20 group kills: Solo doesn't count the old solo kills again",
+           round(grouped.ns.GetStats(12, "solo").kills), 100)
+    expect("and Group shows all 20", round(grouped.ns.GetStats(12, "group").kills), 20)
+    expect("All has both", round(grouped.ns.GetStats(12, "all").kills), 120)
+    both = build_data.build([submission(82, me, {me: {12: mob({1: bucket(100, 100, 100, {100: 100}),
+                                                               2: bucket(20, 20, 20, {100: 20})})}})])
+    expect("once it has group kills, they're listed per group size", both["mobs"]["12"]["from"][me], {"1": 100, "2": 20})
+    same = Client("Same", data=build_data.lua_file(both), saved=own_counts(me, 100, 20))
+    expect("the addon reads them: nothing of it counts twice", round(same.ns.GetStats(12, "all").kills), 120)
+    expect("and nothing is left to export", same.ns.NewCount(), 0)
+    more = Client("More", data=build_data.lua_file(both), saved=own_counts(me, 100, 21))
+    expect("until one more kill", (round(more.ns.GetStats(12, "group").kills), more.ns.NewCount()), (21, 1))
+    # The kills a hotfix reset left out are kept per group size too.
+    old = dict(submission(83, me, {me: {12: mob({1: bucket(30, 30, 30, {100: 30}), 2: bucket(5, 5, 5, {100: 5})})}}),
+               received=build_data.since_time("2026-11-01") - 10)
+    new = dict(submission(84, me, {me: {12: mob({1: bucket(40, 40, 40, {100: 40}), 2: bucket(9, 9, 9, {100: 9})})}}),
+               received=build_data.since_time("2026-11-01") + 10)
+    reset = build_data.build([old, new], resets={"12": "2026-11-01"})
+    expect("a reset keeps what it left out per group size", reset["mobs"]["12"]["from"][me], {"1": 40, "2": 9})
+
+
 def main():
     merge_rules()
     other_languages()
@@ -569,6 +641,8 @@ def main():
         names(pathlib.Path(folder))
     shared_is_trusted()
     hotfix_resets()
+    group_kills()
+    forged_exports()
     with tempfile.TemporaryDirectory() as folder:
         imports(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:

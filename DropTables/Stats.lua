@@ -41,29 +41,31 @@ end
 
 -- Sums one install's buckets that fall in the mode, scaled by factor. Money goes in as the entry MONEY with copper as
 -- its quantity. Returns nil when the install has no kills in the mode.
-local function aggregate(buckets, mode, factor)
+-- shares, when given, is bucket -> the part of that bucket to count (see newShares).
+local function aggregate(buckets, mode, factor, shares)
     local sum = { kills = 0, lootable = 0, opened = 0, entries = {} }
-    local function add(key, drops, qty, from)
+    local function add(key, drops, qty, from, f)
         local entry = sum.entries[key]
         if not entry then
             entry = { drops = 0, qty = 0 }
             sum.entries[key] = entry
         end
-        entry.drops = entry.drops + drops * factor
-        entry.qty = entry.qty + qty * factor
+        entry.drops = entry.drops + drops * f
+        entry.qty = entry.qty + qty * f
         mergeRange(entry, from)
     end
     for bucket, data in pairs(buckets) do
         -- A bucket put together from several messages can claim more drops than opened corpses, so it waits.
         if inMode(bucket, mode) and ns.Wire.Complete(data) then
-            sum.kills = sum.kills + data.kills * factor
-            sum.lootable = sum.lootable + data.lootable * factor
-            sum.opened = sum.opened + data.opened * factor
+            local f = factor * (shares and shares[bucket] or 1)
+            sum.kills = sum.kills + data.kills * f
+            sum.lootable = sum.lootable + data.lootable * f
+            sum.opened = sum.opened + data.opened * f
             if data.money.drops > 0 then
-                add(MONEY, data.money.drops, data.money.copper, data.money)
+                add(MONEY, data.money.drops, data.money.copper, data.money, f)
             end
             for itemId, item in pairs(data.items) do
-                add(itemId, item.drops, item.qty, item)
+                add(itemId, item.drops, item.qty, item, f)
             end
         end
     end
@@ -226,15 +228,37 @@ local function newEntry(key, rate, sums, opened)
     }
 end
 
--- The part of an install's counts the shared database doesn't hold yet. The database lists the installs it was built
--- from with their kills at the time, and since counts only grow, whatever came after that is the new part.
-local function newShare(shared, origin, buckets)
+-- The part of each bucket of an install's counts that the shared database doesn't hold yet, or nil when it holds none
+-- of them. The database lists the installs it was built from with their kills at the time: a number when they were all
+-- solo, or the kills of each bucket. Counts only grow, so whatever came after that is the new part, bucket by bucket,
+-- so that new group kills don't count old solo kills again.
+local function newShares(shared, origin, buckets)
     local before = shared and shared.from[origin]
     if not before then
-        return 1
+        return nil
     end
-    local kills = ns.SumBuckets(buckets, "kills")
-    return kills > before and (kills - before) / kills or 0
+    if type(before) == "number" then
+        before = { [1] = before }
+    end
+    local shares = {}
+    for bucket, data in pairs(buckets) do
+        local old = before[bucket] or 0
+        shares[bucket] = data.kills > old and (data.kills - old) / data.kills or 0
+    end
+    return shares
+end
+
+-- The kills the shared database lists for an install, over all buckets.
+function ns.KnownKills(shared, origin)
+    local before = shared and shared.from[origin]
+    if type(before) == "table" then
+        local kills = 0
+        for _, k in pairs(before) do
+            kills = kills + k
+        end
+        return kills
+    end
+    return before
 end
 
 -- Drop rates for one mob. mode is "all", "solo" or "group".
@@ -246,7 +270,7 @@ local function computeStats(npc, mode)
     local shared = not ns.settings.onlyMine and ns.shared[npc] or nil
     local ownBuckets = ns.db.mobs[npc]
     local ownTotal = ownBuckets and aggregate(ownBuckets, mode, 1) or nil
-    local own = ownBuckets and aggregate(ownBuckets, mode, newShare(shared, ns.db.installId, ownBuckets)) or nil
+    local own = ownBuckets and aggregate(ownBuckets, mode, 1, newShares(shared, ns.db.installId, ownBuckets)) or nil
     local always, peers = {}, {}
     if own then
         own.kind = "own"
@@ -260,8 +284,8 @@ local function computeStats(npc, mode)
     if not ns.settings.onlyMine then
         for origin, peer in pairs(ns.db.peers[npc] or {}) do
             local kills = ns.SumBuckets(peer.buckets, "kills")
-            local factor = (kills > PEER_CAP and PEER_CAP / kills or 1) * newShare(shared, origin, peer.buckets)
-            local sum = aggregate(peer.buckets, mode, factor)
+            local factor = kills > PEER_CAP and PEER_CAP / kills or 1
+            local sum = aggregate(peer.buckets, mode, factor, newShares(shared, origin, peer.buckets))
             if sum then
                 sum.kind = "peer"
                 table.insert(peers, sum)
@@ -352,7 +376,7 @@ local function skinSum(skins, factor)
     return sum
 end
 
--- The part of an install's skinning counts the shared database doesn't hold yet, like newShare for kills.
+-- The part of an install's skinning counts the shared database doesn't hold yet, like newShares for kills.
 local function newSkinShare(shared, origin, skins)
     local before = shared and shared.skins and shared.skins.from[origin]
     if not before then

@@ -11,9 +11,13 @@
 - A mob gets a gold per hour only after 10 looted corpses, in the Loot Finder, the tooltip and the drop table window, and its skinning only after 10 skinned ones. Before that a single lucky drop could make a mob show 48g an hour. Mobs without one go to the bottom when you sort by g/ph, and an item's best mob is one that has one whenever a mob that drops it does.
 - Drop Tables joins and leaves its hidden sharing channel only out of combat and outside battlegrounds, arenas and dungeons. It never takes /1, and right after a loading screen it won't take a free channel number below one of yours, so General and your own channels keep their numbers. When it can't get in, each try waits longer than the one before, where it used to try every 15 seconds.
 - Sorting by chance puts a chance that rests on many corpses ahead of one that rests on a few, so one drop in one corpse, a 100%, no longer tops the list. The chance shown stays the same.
+- Every /dt export ends with a key only your install knows. The share page writes down only a hash of it, and once one of your exports came in with it, an export in your install's name with another key or none no longer counts as yours.
+- The share page turns away an export from an older version of Drop Tables and asks you to update and export again.
 
 ### Fixed
 
+- Loot from a mob killed by a spell with a cast time, a Frostbolt for example, and looted right away was taken for skinning and left out, and the kill counted as an empty corpse.
+- In the drop table window's Solo and Group tabs, a player whose counts were already in the shared database and who then killed the mob in a group had their old solo kills counted again and most of their new group kills left out. The shared database now lists such players' kills per group size.
 - When a whispered answer didn't reach the player who asked, Drop Tables answered each of their new questions again, and those whispers failed too. It now sends the answer once more to the First-Last form of the name, which a name with a letter like ä may need, and if that doesn't arrive either, it leaves that player's questions alone for 30 minutes.
 - Opening the Loot Finder for the first time after a login or /reload could stop with "script ran too long". For the gold per hour it asked the game about every item it didn't know yet each time a mob drops it, close to ten thousand times, where once per item is enough until the item arrives. The mobs' chances are now also worked out a few seconds after login, a slice at a time, so the first open has less left to do.
 

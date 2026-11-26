@@ -36,7 +36,7 @@ One mob:
 | `minLevel`, `maxLevel` | lowest and highest level seen, missing when no level was read |
 | `maps` | kills per map, keyed by uiMapID. Kills recorded without a map aren't in it, so it can add up to less than the kills |
 | `spots` | where on each map the mob was killed: per uiMapID, kills per grid cell, at most the 40 busiest cells. The map is cut into a 50 x 50 grid, and cell `c` is column `floor(c / 50)` and row `c % 50` from the top left, so its centre is at `x = (floor(c / 50) + 0.5) / 50`, `y = (c % 50 + 0.5) / 50`. Missing when nothing tells where |
-| `from` | the installs that went into this mob, keyed by a random install id, with how many kills each had. An import is listed under its `id` from `imports`, with its looted corpses, except Everloot, whose installs are listed one by one as `everloot-` and the start of their install id |
+| `from` | the installs that went into this mob, keyed by a random install id, with how many kills each had: a number when they were all solo kills, otherwise the kills of each group size, keyed like `buckets`, so the addon can tell an install's new group kills from its old solo ones. An import is listed under its `id` from `imports`, with its looted corpses, except Everloot, whose installs are listed one by one as `everloot-` and the start of their install id |
 | `buckets` | the counts, split by group size: `"1"` solo, `"2"` to `"5"` a party of that size, `"6"` a raid. Empty for a mob only skinned |
 | `skins` | what skinning its corpses gave, missing when nobody skinned it: `skinned` (skinned corpses), `items` like a bucket's, and `from` with the skinned corpses of each install. The group plays no part in skinning, so it has no buckets |
 

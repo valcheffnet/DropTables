@@ -124,7 +124,7 @@
     if (link) {
       const a = document.createElement("a");
       a.href = link.url;
-      a.textContent = "#" + link.issue;
+      a.textContent = link.label || "#" + link.issue;
       a.target = "_blank";
       a.rel = "noopener";
       status.append(" ", a, ".");
@@ -188,6 +188,10 @@
         } else {
           show("Got it, thanks. A bot looks at it within a few minutes.", "good");
         }
+      } else if (result.update) {
+        // An export from an old version: a new one is needed, so this text isn't worth keeping.
+        keep("");
+        show(result.error, "bad", { url: result.update, label: "Download the latest version" });
       } else {
         keep(text);
         show((result.error || "Something went wrong. Try again later.") + KEPT, "bad");

@@ -59,6 +59,8 @@ Commands (`/droptables` works too):
 
 The shared database only grows when players send their tables in. Type `/dt export`, or click the share card at the bottom of the Loot Finder or the drop table window, then press Select and Ctrl+C in the window. Open the share page under the text, paste it there and press Send. You don't need an account for it. The export holds everything of yours that the shared database doesn't have yet, plus what other players sent you, so if you copy it and forget to send it, it's still there the next time. A big table can come out in several parts, and you send each part by itself. The page files it on GitHub, where a bot checks it and adds it to the shared database, usually within a few minutes. Players get the new counts with the next release of the addon.
 
+Every export ends with a key that only your install knows. The share page keeps the key out of the public issue and writes down only a hash of it, and once one of your exports has come in that way, only exports with the same hash count as yours, so nobody else can send counts in your install's name. The share page also turns away an export from an older version of Drop Tables and asks you to update and export again, since the old version may still have bugs the new one fixed.
+
 ## Data from other players
 
 Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.

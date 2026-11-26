@@ -2,12 +2,14 @@ local _, ns = ...
 
 -- The export string carries the player's counts and the counts other players shared with them as one line of text.
 -- The player pastes it on the share page, which files it for the shared database.
---   DT1:<base64 of the zlib-compressed text below>
+--   DT1:<base64 of the zlib-compressed text below>.<the install's export key>
 -- The text is a header line, then for each install a line with its id followed by one line per mob:
 --   DTX|1|<own install id>|<addon version>|<unix time>|<part>/<parts>
 --   @<install id>
 --   <Wire records of one mob, joined by ;>
--- Zlib carries a checksum, so a string that was cut short or changed fails to unpack.
+-- Zlib carries a checksum, so a string that was cut short or changed fails to unpack. The key at the end is a secret of
+-- the install (db.exportKey): the share page swaps it for its hash, and the merge only takes an export as this install's
+-- own when the hash is the one its first export with a key had.
 local Wire = ns.Wire
 local PREFIX = "DT1:"
 local FORMAT = "1"
@@ -22,8 +24,7 @@ local reminded = false
 -- True when the shared database lacks this install's counts, either because it never got them or because it got
 -- fewer kills. Counts only grow, so more kills than the database lists means there's something new.
 local function missing(npc, origin, buckets)
-    local shared = ns.shared[npc]
-    local known = shared and shared.from[origin]
+    local known = ns.KnownKills(ns.shared[npc], origin)
     return not known or ns.SumBuckets(buckets, "kills") > known
 end
 
@@ -206,7 +207,7 @@ end
 
 local function encode(text)
     local packed = C_EncodingUtil.CompressString(text, Enum.CompressionMethod.Zlib)
-    return PREFIX .. C_EncodingUtil.EncodeBase64(packed)
+    return PREFIX .. C_EncodingUtil.EncodeBase64(packed) .. "." .. ns.db.exportKey
 end
 
 -- Builds the export and returns { strings, copied, mobs, kills, sources, builtAt }. strings is empty when there's

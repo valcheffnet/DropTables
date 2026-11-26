@@ -18,7 +18,9 @@ import zlib
 MAX_STRING = 200_000
 MAX_TEXT = 2_000_000
 MAX_NUMBER_DIGITS = 6  # as Wire.lua: below 2^32
-STRING_RE = re.compile(r"DT1:([A-Za-z0-9+/]+={0,2})")
+# An addon from 0.6.5 on puts its export key after a dot. The share page swaps it for a hash before the issue is
+# public, and the key plays no part in what the string holds.
+STRING_RE = re.compile(r"DT1:([A-Za-z0-9+/]+={0,2})(?:\.[0-9a-f]{32})?")
 HEADER_RE = re.compile(r"DTX\|1\|([0-9a-f]{16})\|([0-9A-Za-z.\-]{1,20}|\?)\|(\d{1,12})\|(\d{1,3})/(\d{1,3})")
 SECTION_RE = re.compile(r"@([0-9a-f]{16})")
 NUMBER_RE = re.compile(r"[0-9a-z]{0,%d}" % MAX_NUMBER_DIGITS)

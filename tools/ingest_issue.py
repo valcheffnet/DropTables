@@ -27,6 +27,9 @@ MAX_BODY = 1_000_000
 MAX_STRINGS = 10   # parts in one issue
 DAILY_LIMIT = 20   # accepted strings per submitter per UTC day, counted on the day they were taken in
 STRING_RE = re.compile(r"DT1:[A-Za-z0-9+/]+={0,2}")
+# The share page writes the hash of the install's export key (see relay/src/index.js). Only the bot opens issues with
+# the relay label, so the line counts only there.
+KEY_RE = re.compile(r"^Install key: `([0-9a-f]{64})`$", re.M)
 SHARE_PAGE = "https://droptables-relay.valcheffnet.workers.dev"
 
 
@@ -80,6 +83,7 @@ def ingest(issue, root, now=None):
     hashes = {s["sha256"] for s in known}
     received = received_time(issue)
     relay = "relay" in labels(issue)
+    key = KEY_RE.search(body) if relay else None
     new, problems, duplicates = [], [], 0
     for index, string in enumerate(strings, 1):
         digest = hashlib.sha256(string.encode("ascii")).hexdigest()
@@ -93,8 +97,11 @@ def ingest(issue, root, now=None):
             continue
         hashes.add(digest)
         submitter = "relay:" + result["exporter"] if relay else author(issue)
-        new.append({"issue": number, "index": index, "submitter": submitter, "received": received, "accepted": now,
-                    "sha256": digest, "string": string, "result": result})
+        sub = {"issue": number, "index": index, "submitter": submitter, "received": received, "accepted": now,
+               "sha256": digest, "string": string, "result": result}
+        if key:
+            sub["key"] = key.group(1)
+        new.append(sub)
     if new:
         submitter = new[0]["submitter"]
         today = sum(1 for s in known

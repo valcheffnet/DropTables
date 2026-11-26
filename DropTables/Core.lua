@@ -320,6 +320,9 @@ ns.On("ADDON_LOADED", function(name)
     local db = DropTablesDB
     db.version = 1
     db.installId = db.installId or newInstallId()
+    -- Goes at the end of every export string and never anywhere else. The share page turns it into a hash before
+    -- anything is public, so nobody else can send an export as this install.
+    db.exportKey = db.exportKey or (newInstallId() .. newInstallId())
     db.mobs = db.mobs or {}
     db.skins = db.skins or {}  -- npc -> { skinned, items }, what skinning its corpses gave
     db.looted = db.looted or {}  -- npc -> true for mobs counted from their corpses in a dungeon, kills unknown
