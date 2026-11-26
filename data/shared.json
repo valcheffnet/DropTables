@@ -1,6 +1,6 @@
 {
  "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables",
- "built": 1795730168,
+ "built": 1795733818,
  "imports": [
   {
    "collectedUntil": "2026-10-21",
@@ -2925,29 +2925,41 @@
    "buckets": {
     "1": {
      "items": {
+      "1828": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
       "2592": {
        "drops": 1,
        "qty": 1
+      },
+      "3770": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
       }
      },
-     "kills": 5,
-     "lootable": 5,
+     "kills": 6,
+     "lootable": 6,
      "money": {
-      "copper": 489,
-      "drops": 5,
+      "copper": 520,
+      "drops": 6,
       "max": 129,
-      "min": 35
+      "min": 31
      },
-     "opened": 5
+     "opened": 6
     }
    },
    "from": {
-    "2750ad299c178787": 2,
+    "2750ad299c178787": 3,
     "eglink": 2,
     "everloot-f8c829b9": 1
    },
    "maps": {
-    "1441": 4
+    "1441": 5
    },
    "maxLevel": 26,
    "minLevel": 26,
@@ -2956,6 +2968,7 @@
     "1441": {
      "616": 1,
      "666": 1,
+     "716": 1,
      "914": 1,
      "965": 3
     }
@@ -112437,9 +112450,29 @@
       "min": 160
      },
      "opened": 7
+    },
+    "5": {
+     "items": {
+      "274161": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-0512e71f": 1,
     "everloot-bab301d5": 2,
     "everloot-c8df3474": 1,
@@ -112499,9 +112532,29 @@
       "min": 420
      },
      "opened": 9
+    },
+    "5": {
+     "items": {
+      "17008": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-0512e71f": 1,
     "everloot-83ea498a": 2,
     "everloot-bab301d5": 2,
@@ -112566,9 +112619,35 @@
       "drops": 0
      },
      "opened": 8
+    },
+    "5": {
+     "items": {
+      "3172": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "3403": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 2,
     "everloot-bab301d5": 2,
     "everloot-c8df3474": 1,
@@ -112626,9 +112705,41 @@
       "min": 198
      },
      "opened": 6
+    },
+    "5": {
+     "items": {
+      "251353": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2786": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "6681": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-0512e71f": 1,
     "everloot-83ea498a": 1,
     "everloot-bab301d5": 2,
@@ -112738,9 +112849,41 @@
       "min": 194
      },
      "opened": 4
+    },
+    "5": {
+     "items": {
+      "1755": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "6685": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 1,
     "everloot-c8df3474": 1,
     "everloot-c8ee0b15": 1,
@@ -112830,9 +112973,24 @@
       "min": 35
      },
      "opened": 13
+    },
+    "5": {
+     "items": {},
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 232,
+      "drops": 1,
+      "max": 232,
+      "min": 232
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 2,
     "everloot-bab301d5": 1,
     "everloot-c8df3474": 3,
@@ -113100,9 +113258,55 @@
       "min": 82
      },
      "opened": 32
+    },
+    "5": {
+     "items": {
+      "1205": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "15340": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2592": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4538": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 317,
+      "drops": 2,
+      "max": 197,
+      "min": 120
+     },
+     "opened": 4
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 4
+    },
     "everloot-83ea498a": 3,
     "everloot-bab301d5": 10,
     "everloot-c8df3474": 2,
@@ -114186,9 +114390,59 @@
       "drops": 0
      },
      "opened": 31
+    },
+    "5": {
+     "items": {
+      "211855": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2295": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "262888": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2677": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      },
+      "3172": {
+       "drops": 3,
+       "max": 1,
+       "min": 1,
+       "qty": 3
+      },
+      "3403": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 7,
+     "lootable": 7,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 7
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 7
+    },
     "everloot-83ea498a": 7,
     "everloot-bab301d5": 8,
     "everloot-c8df3474": 5,
@@ -114357,9 +114611,41 @@
       "drops": 0
      },
      "opened": 28
+    },
+    "5": {
+     "items": {
+      "2295": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2677": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      },
+      "3172": {
+       "drops": 2,
+       "max": 1,
+       "min": 1,
+       "qty": 2
+      }
+     },
+     "kills": 4,
+     "lootable": 4,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 4
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 4
+    },
     "everloot-0512e71f": 1,
     "everloot-83ea498a": 5,
     "everloot-bab301d5": 7,
@@ -114516,9 +114802,31 @@
       "min": 99
      },
      "opened": 8
+    },
+    "5": {
+     "items": {
+      "4306": {
+       "drops": 1,
+       "max": 3,
+       "min": 3,
+       "qty": 3
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 231,
+      "drops": 1,
+      "max": 231,
+      "min": 231
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-0512e71f": 1,
     "everloot-83ea498a": 1,
     "everloot-bab301d5": 1,
@@ -114561,9 +114869,43 @@
       "min": 64
      },
      "opened": 9
+    },
+    "5": {
+     "items": {
+      "1478": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "1782": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 130,
+      "drops": 1,
+      "max": 130,
+      "min": 130
+     },
+     "opened": 2
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 2
+    },
     "everloot-83ea498a": 1,
     "everloot-bab301d5": 3,
     "everloot-c8df3474": 1,
@@ -114628,9 +114970,29 @@
       "min": 138
      },
      "opened": 13
+    },
+    "5": {
+     "items": {
+      "14194": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 2,
     "everloot-bab301d5": 5,
     "everloot-c8df3474": 1,
@@ -114882,9 +115244,35 @@
       "min": 164
      },
      "opened": 11
+    },
+    "5": {
+     "items": {
+      "1206": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "14402": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-bab301d5": 6,
     "everloot-c8df3474": 1,
     "everloot-c8ee0b15": 4
@@ -114930,9 +115318,31 @@
       "min": 164
      },
      "opened": 6
+    },
+    "5": {
+     "items": {
+      "2592": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 518,
+      "drops": 1,
+      "max": 518,
+      "min": 518
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 1,
     "everloot-c8df3474": 1,
     "everloot-c8ee0b15": 4
@@ -115081,9 +115491,31 @@
       "min": 137
      },
      "opened": 8
+    },
+    "5": {
+     "items": {
+      "4306": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 1017,
+      "drops": 2,
+      "max": 535,
+      "min": 482
+     },
+     "opened": 2
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 2
+    },
     "everloot-83ea498a": 1,
     "everloot-bab301d5": 1,
     "everloot-c8df3474": 3,
@@ -115188,9 +115620,35 @@
       "drops": 0
      },
      "opened": 31
+    },
+    "5": {
+     "items": {
+      "11392": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "11394": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-83ea498a": 7,
     "everloot-bab301d5": 8,
     "everloot-c8df3474": 3,
@@ -115261,9 +115719,29 @@
       "drops": 0
      },
      "opened": 5
+    },
+    "5": {
+     "items": {
+      "5635": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 2
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 2
+    },
     "everloot-bab301d5": 1,
     "everloot-c8df3474": 1,
     "everloot-c8ee0b15": 2,
@@ -116149,9 +116627,37 @@
       "min": 129
      },
      "opened": 26
+    },
+    "5": {
+     "items": {
+      "1205": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 2,
+       "min": 2,
+       "qty": 2
+      }
+     },
+     "kills": 3,
+     "lootable": 3,
+     "money": {
+      "copper": 560,
+      "drops": 2,
+      "max": 293,
+      "min": 267
+     },
+     "opened": 3
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 3
+    },
     "everloot-83ea498a": 4,
     "everloot-bab301d5": 7,
     "everloot-c8df3474": 4,
@@ -133311,9 +133817,31 @@
       "min": 194
      },
      "opened": 4
+    },
+    "5": {
+     "items": {
+      "1829": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      }
+     },
+     "kills": 2,
+     "lootable": 2,
+     "money": {
+      "copper": 538,
+      "drops": 2,
+      "max": 461,
+      "min": 77
+     },
+     "opened": 2
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 2
+    },
     "everloot-83ea498a": 1,
     "everloot-bab301d5": 1,
     "everloot-c8df3474": 1,
@@ -133929,9 +134457,47 @@
       "drops": 0
      },
      "opened": 5
+    },
+    "5": {
+     "items": {
+      "248706": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "274149": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "2785": {
+       "drops": 1,
+       "max": 1,
+       "min": 1,
+       "qty": 1
+      },
+      "4306": {
+       "drops": 1,
+       "max": 3,
+       "min": 3,
+       "qty": 3
+      }
+     },
+     "kills": 1,
+     "lootable": 1,
+     "money": {
+      "copper": 0,
+      "drops": 0
+     },
+     "opened": 1
     }
    },
    "from": {
+    "2750ad299c178787": {
+     "5": 1
+    },
     "everloot-0512e71f": 1,
     "everloot-83ea498a": 2,
     "everloot-c8df3474": 1,
@@ -151335,5 +151901,5 @@
    }
   }
  },
- "submissions": 11
+ "submissions": 12
 }
