@@ -8,7 +8,8 @@ local FINAL_CHECK = 4
 local PENDING_TTL = 900
 -- Skinning is a spell with a cast time that opens the corpse's loot window when it finishes, while plain corpse loot
 -- needs no cast. So loot opened this soon after a cast is profession loot, unless the corpse was already known to hold
--- loot, since a caster may loot one corpse right after casting at the next mob.
+-- loot, since a caster may loot one corpse right after casting at the next mob, or the cast was a known spell other than
+-- skinning and the corpse is a kill still being checked, as when a Frostbolt kills the mob and it's looted at once.
 local CAST_LOOT_WINDOW = 1
 -- Skinning at its four ranks. A cast of a spell with the same name counts too, in case another source of the skill
 -- has its own spell id.
@@ -30,7 +31,7 @@ local CORPSE_UNITS = { "softinteract", "mouseover", "target" }
 --   unclaimed  in a group, no loot for the player at the last check, often someone else's corpse; nothing counted
 --   done       the corpse is recorded
 local pending = {}
-local casting, lastCastEnd, lastCastSkinning, lastSpell = false, -math.huge, false, nil
+local casting, lastCastEnd, lastCastSkinning, lastCastKnown, lastSpell = false, -math.huge, false, false, nil
 local skinned = {}  -- corpse GUID -> GetTime() of its skinning
 local lastPickPocket = -math.huge
 
@@ -321,6 +322,7 @@ ns.On("UNIT_SPELLCAST_SUCCEEDED", function(_, _, spellId)
     if casting then
         casting, lastCastEnd = false, GetTime()
         lastCastSkinning, lastSpell = isSkinning(spellId), spellId
+        lastCastKnown = spellId ~= nil and not ns.IsSecret(spellId)
     end
 end, "player")
 
@@ -347,7 +349,9 @@ ns.On("LOOT_OPENED", function(_, fromItem)
         end
         if claims[guid] == nil then
             local kill = pending[guid]
-            if afterCast and not (kill and kill.state == "lootable") then
+            local ownLoot = kill and (kill.state == "lootable"
+                or kill.state == "checking" and lastCastKnown and not lastCastSkinning)
+            if afterCast and not ownLoot then
                 claims[guid] = false
                 if lastCastSkinning and ns.NpcFromGuid(guid) then
                     skins[guid] = {}

@@ -226,6 +226,24 @@ def main():
     skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player")
     skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [caster, 1]}])
     expect("loot right after a cast at another mob counted", counts_of(skinner, 10), (1, 1, 1, 1))
+    # A Frostbolt that kills the mob, and its corpse looted at once while the kill is still being checked: the loot is
+    # the mob's, and the kill isn't counted again as an empty one later.
+    skinner.advance(2)
+    skinner.fire("UNIT_SPELLCAST_START", "player")
+    skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player", "cast", 116)
+    bolted = skinner.kill(13, "B1", True)
+    skinner.loot([{"type": 1, "item": 100, "name": "Wolf Fang", "qty": 1, "sources": [bolted, 1]}])
+    skinner.advance(5)
+    expect("loot right after a cast-time kill counted", counts_of(skinner, 13), (1, 1, 1, 1))
+    # Skinning a fresh kill right away still goes to skinning.
+    fresh = skinner.kill(14, "K1", False)
+    skinner.advance(1)
+    skinner.fire("UNIT_SPELLCAST_START", "player")
+    skinner.fire("UNIT_SPELLCAST_SUCCEEDED", "player", "cast", 8613)
+    skinner.loot([{"type": 1, "item": 300, "name": "Light Leather", "qty": 1, "sources": [fresh, 1]}])
+    skinner.advance(5)
+    expect("skinning a fresh kill is skinning", (skinner.ns.db.skins[14].skinned, skinner.ns.db.mobs[14][1]["items"][300]),
+           (1, None))
 
     # A mob finished by someone outside the group (a guard) counts when its corpse is opened under the mouse.
     skinner.advance(2)
