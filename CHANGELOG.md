@@ -15,6 +15,7 @@
 ### Fixed
 
 - When a whispered answer didn't reach the player who asked, Drop Tables answered each of their new questions again, and those whispers failed too. It now sends the answer once more to the First-Last form of the name, which a name with a letter like ä may need, and if that doesn't arrive either, it leaves that player's questions alone for 30 minutes.
+- Opening the Loot Finder for the first time after a login or /reload could stop with "script ran too long". For the gold per hour it asked the game about every item it didn't know yet each time a mob drops it, close to ten thousand times, where once per item is enough until the item arrives. The mobs' chances are now also worked out a few seconds after login, a slice at a time, so the first open has less left to do.
 
 ## [0.6.4] - 2026-11-26
 

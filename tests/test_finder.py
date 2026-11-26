@@ -324,6 +324,41 @@ def main():
     options.g.StaticPopupDialogs.DROPTABLES_RESTORE_DEFAULTS.OnAccept()
     expect("Restore defaults tells the addon once", options.g.changes, 1)
     expect("and the settings are back", options.ns.settings.stripIcons, options.ns.DEFAULTS.stripIcons)
+    # An unknown item is asked for once while it's on its way: the Loot Finder's gold per hour needs the items of
+    # every mob, and asking again each time ran into the game's time limit.
+    asker = Client("Asker")
+    asker.lua.execute("asked = 0 C_Item.GetItemInfo = function() asked = asked + 1 return nil end")
+    for _ in range(5):
+        asker.ns.ItemInfo(4242)
+    expect("an unknown item is asked for once while it's on its way", asker.g.asked, 1)
+    asker.lua.execute('C_Item.GetItemInfo = function() asked = asked + 1 return "Thing", nil, 1 end')
+    asker.fire("GET_ITEM_INFO_RECEIVED", 4242, True)
+    expect("and read when it arrives", asker.ns.ItemName(4242), "Thing")
+
+    # A while after login the stats of every known mob are worked out a slice at a time and the index built from them,
+    # so the first open of the Loot Finder doesn't do all of it at once.
+    warmer = Client("Warmer", saved="""DropTablesDB = { mobs = {} }
+        for npc = 1, 400 do
+            DropTablesDB.mobs[npc] = { [1] = { kills = 1, lootable = 1, opened = 1, items = {},
+                money = { drops = 1, copper = 5, min = 5, max = 5 } } }
+        end""")
+    warmer.lua.globals().ns = warmer.ns
+    warmer.lua.execute("""
+        seen, calls = {}, 0
+        local get = ns.GetStats
+        ns.GetStats = function(npc, ...) seen[npc], calls = true, calls + 1 return get(npc, ...) end
+    """)
+    warmed = lambda: sum(1 for _ in warmer.g.seen.keys())
+    warmer.advance(4)
+    expect("nothing is worked out right at login", warmed(), 0)
+    warmer.advance(1)
+    expect("then a slice of mobs a frame", warmed(), 150)
+    warmer.advance(5)
+    expect("until every known mob is done", warmed(), 400)
+    warmer.lua.execute("calls = 0")
+    warmer.ns.SearchMobs("")
+    expect("and the index is ready before the Finder opens", warmer.g.calls, 0)
+
     report("finder")
 
 

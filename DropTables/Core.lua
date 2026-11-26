@@ -203,9 +203,15 @@ ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
     end
 end)
 
--- Name, quality, sell price and bind type of an item, or nil while the client doesn't know it yet.
+-- Name, quality, sell price and bind type of an item, or nil while the client doesn't know it yet. An item already
+-- asked for isn't asked for again until it arrives: the Loot Finder's gold per hour needs the items of two thousand
+-- mobs, and asking for each unknown one every time a mob drops it ran into the game's time limit.
 function ns.ItemInfo(itemId)
-    local info = itemInfo[itemId] or readItem(itemId)
+    local info = itemInfo[itemId]
+    if info or awaited[itemId] then
+        return info
+    end
+    info = readItem(itemId)
     if not info then
         ns.AwaitItem(itemId)
     end

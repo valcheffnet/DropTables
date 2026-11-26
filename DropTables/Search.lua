@@ -263,6 +263,37 @@ ns.On("DT_SETTINGS_CHANGED", function()
     allDirty = true
 end)
 
+-- A while after login the stats of every known mob are worked out WARM_SLICE mobs a frame, and the index is built from
+-- them, so the first open of the Loot Finder doesn't do all of it at once and run into the game's time limit.
+local WARM_DELAY, WARM_SLICE = 5, 150
+
+local function warm()
+    local npcs = {}
+    for npc in pairs(ns.KnownNpcs()) do
+        table.insert(npcs, npc)
+    end
+    local done = 0
+    local function step()
+        if index then
+            return
+        end
+        for i = done + 1, math.min(done + WARM_SLICE, #npcs) do
+            ns.GetStats(npcs[i], "all")
+            ns.GetSkinStats(npcs[i])
+        end
+        done = done + WARM_SLICE
+        if done < #npcs then
+            C_Timer.After(0, step)
+        else
+            currentIndex()
+        end
+    end
+    step()
+end
+ns.On("DT_READY", function()
+    C_Timer.After(WARM_DELAY, warm)
+end)
+
 -- Every mob with recorded drops of the item, with its chance over all kills, its level range and its maps by kill
 -- count. The list is new on every call, but the droppers in it are shared, so don't change them.
 function ns.FindDroppers(itemId)
