@@ -20,8 +20,8 @@ before 0.6.4 on a client in another language sent them in that language. Names n
 Russian) are left out one by one, and so is every name of an exporter whose names mostly differ from what the others
 call the same mobs (German, French, Spanish, Italian, Portuguese). A mob that gets no name this way takes the one
 an import's "names" list gives it (EG Link names every creature it saw, also the ones it has no loot of), or else
-keeps the one data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left out is
-printed.
+keeps the one data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left
+out is printed.
 
 Usage:
     python tools/build_data.py [--root DIR]

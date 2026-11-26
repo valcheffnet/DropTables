@@ -41,7 +41,7 @@ import pathlib
 import subprocess
 import sys
 
-from build_data import load_resets
+from build_data import latin, load_resets
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ORIGIN = "eglink"
@@ -137,14 +137,9 @@ def add_build(tallies, loot, skip=()):
             into["qty"] += entry.get("quantity", 0)
 
 
-def latin(name):
-    """Whether a name is written in Latin letters. A build whose players include someone with a Korean client
-    carries that player's names, and those can't stand in for the English ones."""
-    return all(ord(ch) <= 0x24F for ch in name)
-
-
 def add_creatures(info, creatures):
-    """Names and death spots. A later build's name replaces an earlier one, unless it isn't in Latin letters."""
+    """Names and death spots. A later build's name replaces an earlier one, unless it isn't in Latin letters: a build
+    whose players include someone with a Korean client carries that player's names."""
     for npc, record in creatures.get("creatures", {}).items():
         into = info.setdefault(npc, {"name": None, "positions": []})
         if record.get("name") and latin(record["name"]):
