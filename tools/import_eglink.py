@@ -9,6 +9,8 @@ What goes in:
 - kills, empty corpses, opened corpses, items with their stack sizes, and money;
 - levels, the English name, and the kill spots of creatures.json. A name in other than Latin letters, from a player
   with a Korean client say, is left out.
+- "names": the name of every creature in creatures.json, the mobs EG Link has no loot of too, by the same rules. The
+  merge names a mob with it when none of its sources does, like the ones only Everloot has, which sends no names.
 
 - skinning (npc:<id>|spell:<id> with one of the four Skinning ranks), from solo and group corpses alike, since the group
   plays no part in what a skinned corpse gives, but not the corpses skinned with the Bountiful Harvest perk
@@ -269,6 +271,7 @@ def make_import(clone, resets=None):
     mobs = convert(tallies, info, skins)
     return {
         "index": 2, "issue": 0, "partial": False, "received": when, "submitter": "import:" + ORIGIN,
+        "names": {npc: about["name"] for npc, about in info.items() if about["name"]},
         "result": {"exporter": ORIGIN, "part": 1, "parts": 1, "sources": {ORIGIN: {"mobs": mobs}}},
         "source": {"name": "EG Link output, recorded by players on WoW Forever",
                    "copyright": "Efficient Games, https://efficient.games", "license": "CC BY 4.0",

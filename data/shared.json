@@ -2123,7 +2123,8 @@
     "1434": 1
    },
    "maxLevel": 45,
-   "minLevel": 45
+   "minLevel": 45,
+   "name": "Ana'thek the Cruel"
   },
   "1061": {
    "buckets": {
@@ -3364,6 +3365,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Monstrous Crawler",
    "spots": {
     "1435": {
      "2259": 1,
@@ -7174,7 +7176,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Timbermaw Mystic"
   },
   "11559": {
    "buckets": {
@@ -7686,7 +7689,8 @@
    "from": {
     "everloot-86f7f239": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "First Mate Snellig"
   },
   "116": {
    "buckets": {
@@ -8357,7 +8361,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Ghostly Raider"
   },
   "11687": {
    "buckets": {
@@ -8377,7 +8382,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Ghostly Marauder"
   },
   "1169": {
    "buckets": {
@@ -9184,7 +9190,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Shadowshard Smasher"
   },
   "1178": {
    "buckets": {
@@ -9266,7 +9273,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Ambershard Crusher"
   },
   "11783": {
    "buckets": {
@@ -9489,7 +9497,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Rock Borer"
   },
   "11788": {
    "buckets": {
@@ -9507,7 +9516,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Rock Worm"
   },
   "11789": {
    "buckets": {
@@ -12678,7 +12688,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Spirit of Gelk"
   },
   "1224": {
    "buckets": {
@@ -12745,7 +12756,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Kolk"
   },
   "12241": {
    "buckets": {
@@ -12763,7 +12775,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Spirit of Magra"
   },
   "12242": {
    "buckets": {
@@ -14933,7 +14946,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "The Nameless Prophet"
   },
   "1380": {
    "buckets": {
@@ -15783,7 +15797,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Kidnapper"
   },
   "1488": {
    "buckets": {
@@ -15828,6 +15843,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Zanzil Zombie",
    "spots": {
     "1434": {
      "876": 8,
@@ -15915,6 +15931,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Zanzil Hunter",
    "spots": {
     "1434": {
      "875": 4,
@@ -15972,6 +15989,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Zanzil Witch Doctor",
    "spots": {
     "1434": {
      "875": 4,
@@ -16023,6 +16041,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Zanzil Naga",
    "spots": {
     "1434": {
      "875": 6,
@@ -16057,7 +16076,8 @@
     "1434": 1
    },
    "maxLevel": 47,
-   "minLevel": 47
+   "minLevel": 47,
+   "name": "Gorlash"
   },
   "1501": {
    "buckets": {
@@ -17373,6 +17393,7 @@
    },
    "maxLevel": 42,
    "minLevel": 41,
+   "name": "Enraged Silverback Gorilla",
    "skins": {
     "from": {
      "eglink": 1
@@ -17755,7 +17776,8 @@
     "1434": 1
    },
    "maxLevel": 44,
-   "minLevel": 44
+   "minLevel": 44,
+   "name": "Mokk the Savage"
   },
   "1520": {
    "buckets": {
@@ -20698,6 +20720,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Ironjaw Basilisk",
    "skins": {
     "from": {
      "eglink": 24
@@ -21289,6 +21312,7 @@
    },
    "maxLevel": 43,
    "minLevel": 42,
+   "name": "Silverback Patriarch",
    "spots": {
     "1434": {
      "931": 1
@@ -21335,6 +21359,7 @@
    },
    "maxLevel": 51,
    "minLevel": 51,
+   "name": "King Mukla",
    "spots": {
     "1434": {
      "990": 1
@@ -21482,6 +21507,7 @@
    },
    "maxLevel": 43,
    "minLevel": 42,
+   "name": "Bloodsail Swashbuckler",
    "spots": {
     "1434": {
      "691": 2,
@@ -21547,6 +21573,7 @@
    },
    "maxLevel": 43,
    "minLevel": 42,
+   "name": "Bloodsail Warlock",
    "spots": {
     "1434": {
      "691": 4,
@@ -21605,6 +21632,7 @@
    },
    "maxLevel": 45,
    "minLevel": 44,
+   "name": "Bloodsail Sea Dog",
    "spots": {
     "1434": {
      "744": 2,
@@ -21818,6 +21846,7 @@
    },
    "maxLevel": 45,
    "minLevel": 44,
+   "name": "Bloodsail Elder Magus",
    "spots": {
     "1434": {
      "744": 2,
@@ -31992,6 +32021,7 @@
     "everloot-86f7f239": 7
    },
    "maps": {},
+   "name": "Giant Wetlands Crocolisk",
    "skins": {
     "from": {
      "everloot-86f7f239": 6
@@ -46857,6 +46887,7 @@
    },
    "maxLevel": 50,
    "minLevel": 50,
+   "name": "Skymane Gorilla",
    "spots": {
     "1434": {
      "990": 1
@@ -46928,6 +46959,7 @@
    },
    "maxLevel": 50,
    "minLevel": 50,
+   "name": "Jaguero Stalker",
    "spots": {
     "1434": {
      "990": 1
@@ -47497,7 +47529,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Al'Aketh Skypriest"
   },
   "252765": {
    "buckets": {
@@ -47608,7 +47641,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Al'Aketh Honor Guard"
   },
   "252802": {
    "buckets": {
@@ -47928,6 +47962,7 @@
    },
    "maxLevel": 41,
    "minLevel": 41,
+   "name": "Yenniku",
    "spots": {
     "1434": {
      "978": 1,
@@ -48178,6 +48213,7 @@
    },
    "maxLevel": 46,
    "minLevel": 46,
+   "name": "Zanzil the Outcast",
    "spots": {
     "1434": {
      "978": 1
@@ -48215,6 +48251,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Maury \"Club Foot\" Wilkins",
    "spots": {
     "1434": {
      "875": 2
@@ -48404,6 +48441,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Jon-Jon the Crow",
    "spots": {
     "1434": {
      "875": 3
@@ -48502,6 +48540,7 @@
    },
    "maxLevel": 43,
    "minLevel": 43,
+   "name": "Chucky \"Ten Thumbs\"",
    "spots": {
     "1434": {
      "1028": 3
@@ -48609,6 +48648,7 @@
    },
    "maxLevel": 39,
    "minLevel": 39,
+   "name": "\"Pretty Boy\" Duncan",
    "spots": {
     "1434": {
      "684": 1
@@ -48979,6 +49019,7 @@
    },
    "maxLevel": 48,
    "minLevel": 48,
+   "name": "Fleet Master Firallon",
    "spots": {
     "1434": {
      "795": 1
@@ -49123,6 +49164,7 @@
    },
    "maxLevel": 43,
    "minLevel": 43,
+   "name": "Ironpatch",
    "spots": {
     "1434": {
      "794": 1
@@ -49152,6 +49194,7 @@
    },
    "maxLevel": 47,
    "minLevel": 47,
+   "name": "Captain Keelhaul",
    "spots": {
     "1434": {
      "744": 1
@@ -49181,6 +49224,7 @@
    },
    "maxLevel": 43,
    "minLevel": 43,
+   "name": "Garr Salthoof",
    "spots": {
     "1434": {
      "744": 1
@@ -49210,6 +49254,7 @@
    },
    "maxLevel": 46,
    "minLevel": 46,
+   "name": "Captain Stillwater",
    "spots": {
     "1434": {
      "844": 1
@@ -55937,7 +55982,8 @@
    "from": {
     "everloot-cde2ce19": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Syndicate Magus"
   },
   "259158": {
    "buckets": {
@@ -56581,7 +56627,8 @@
    "from": {
     "everloot-cde2ce19": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Lord Falconcrest"
   },
   "259897": {
    "buckets": {
@@ -56632,7 +56679,8 @@
    "from": {
     "everloot-cde2ce19": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Otto"
   },
   "259979": {
    "buckets": {
@@ -60891,7 +60939,8 @@
    "from": {
     "everloot-1340189e": 4
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Axe Thrower"
   },
   "264079": {
    "buckets": {
@@ -61209,7 +61258,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Shadow Hunter"
   },
   "264508": {
    "buckets": {
@@ -61345,7 +61395,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Aman'zasi Guard"
   },
   "2649": {
    "buckets": {
@@ -61413,6 +61464,7 @@
    },
    "maxLevel": 41,
    "minLevel": 40,
+   "name": "Witherbark Scalper",
    "spots": {
     "1425": {
      "528": 3,
@@ -61479,6 +61531,7 @@
    },
    "maxLevel": 42,
    "minLevel": 41,
+   "name": "Witherbark Zealot",
    "spots": {
     "1425": {
      "528": 1,
@@ -61521,7 +61574,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Witherbark Hideskinner"
   },
   "2654": {
    "buckets": {
@@ -61720,7 +61774,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Razorbeak Gryphon"
   },
   "2659": {
    "buckets": {
@@ -61738,7 +61793,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Razorbeak Skylord"
   },
   "266216": {
    "buckets": {
@@ -62393,7 +62449,8 @@
    "from": {
     "everloot-1340189e": 5
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Wolf Pup"
   },
   "2681": {
    "buckets": {
@@ -62418,7 +62475,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Raiding Wolf"
   },
   "268300": {
    "buckets": {
@@ -62959,6 +63017,7 @@
    },
    "maxLevel": 40,
    "minLevel": 39,
+   "name": "Plains Prowler",
    "spots": {
     "2548": {
      "1718": 1
@@ -62983,7 +63042,8 @@
    "from": {
     "everloot-1340189e": 4
    },
-   "maps": {}
+   "maps": {},
+   "name": "Highvale Outrunner"
   },
   "269134": {
    "buckets": {
@@ -63119,7 +63179,8 @@
    "from": {
     "everloot-1340189e": 6
    },
-   "maps": {}
+   "maps": {},
+   "name": "Highvale Scout"
   },
   "2693": {
    "buckets": {
@@ -63297,6 +63358,7 @@
    },
    "maxLevel": 38,
    "minLevel": 38,
+   "name": "Dustbelcher Ogre",
    "spots": {
     "1418": {
      "1533": 3
@@ -63894,7 +63956,8 @@
     "1418": 1
    },
    "maxLevel": 40,
-   "minLevel": 40
+   "minLevel": 40,
+   "name": "Dustbelcher Brute"
   },
   "271530": {
    "buckets": {
@@ -64085,6 +64148,7 @@
    },
    "maxLevel": 40,
    "minLevel": 40,
+   "name": "Dustbelcher Wyrmhunter",
    "spots": {
     "1418": {
      "1532": 1,
@@ -64123,6 +64187,7 @@
    },
    "maxLevel": 42,
    "minLevel": 42,
+   "name": "Dustbelcher Mauler",
    "spots": {
     "1418": {
      "1534": 1,
@@ -65184,7 +65249,8 @@
    "from": {
     "everloot-cde2ce19": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Shadowforge Tunneler"
   },
   "2742": {
    "buckets": {
@@ -65211,7 +65277,8 @@
    "from": {
     "everloot-cde2ce19": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Shadowforge Chanter"
   },
   "274715": {
    "buckets": {
@@ -67436,6 +67503,7 @@
    },
    "maxLevel": 37,
    "minLevel": 37,
+   "name": "Dustbelcher Mystic",
    "spots": {
     "1418": {
      "1533": 1
@@ -67545,6 +67613,7 @@
    },
    "maxLevel": 42,
    "minLevel": 42,
+   "name": "Mangy Silvermane",
    "spots": {
     "1425": {
      "528": 1
@@ -67928,6 +67997,7 @@
    },
    "maxLevel": 42,
    "minLevel": 42,
+   "name": "Boss Tho'grun",
    "spots": {
     "1418": {
      "1533": 1
@@ -95069,7 +95139,8 @@
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Nancy Vishas"
   },
   "3985": {
    "buckets": {
@@ -95115,7 +95186,8 @@
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Grandpa Vishas"
   },
   "3987": {
    "buckets": {
@@ -103974,7 +104046,8 @@
    "from": {
     "everloot-c8ee0b15": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Scarlet Preserver"
   },
   "4281": {
    "buckets": {
@@ -104046,7 +104119,8 @@
     "everloot-c8ee0b15": 1,
     "everloot-f8c829b9": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Scarlet Magician"
   },
   "4283": {
    "buckets": {
@@ -107432,6 +107506,7 @@
     "everloot-cde2ce19": 5
    },
    "maps": {},
+   "name": "Mudrock Tortoise",
    "skins": {
     "from": {
      "everloot-cde2ce19": 2
@@ -107471,6 +107546,7 @@
     "everloot-cde2ce19": 3
    },
    "maps": {},
+   "name": "Mudrock Spikeshell",
    "skins": {
     "from": {
      "everloot-cde2ce19": 4
@@ -109150,7 +109226,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Warrior"
   },
   "4466": {
    "buckets": {
@@ -109309,7 +109386,8 @@
    "from": {
     "everloot-1340189e": 14
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Soothsayer"
   },
   "448": {
    "buckets": {
@@ -109642,6 +109720,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Bloodsail Deckhand",
    "spots": {
     "1434": {
      "744": 7,
@@ -109705,6 +109784,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Bloodsail Swabby",
    "spots": {
     "1434": {
      "744": 6,
@@ -112477,7 +112557,8 @@
    "from": {
     "everloot-f8c829b9": 4
    },
-   "maps": {}
+   "maps": {},
+   "name": "Maraudine Mauler"
   },
   "4657": {
    "buckets": {
@@ -112516,7 +112597,8 @@
    "from": {
     "everloot-f8c829b9": 6
    },
-   "maps": {}
+   "maps": {},
+   "name": "Maraudine Windchaser"
   },
   "4659": {
    "buckets": {
@@ -119494,7 +119576,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Gordunni Battlemaster"
   },
   "5239": {
    "buckets": {
@@ -119664,7 +119747,8 @@
     "everloot-1340189e": 5,
     "everloot-cde2ce19": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Gordunni Warlock"
   },
   "5241": {
    "buckets": {
@@ -119692,7 +119776,8 @@
     "everloot-1340189e": 2,
     "everloot-cde2ce19": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Gordunni Warlord"
   },
   "5244": {
    "buckets": {
@@ -120344,7 +120429,8 @@
     "everloot-1340189e": 5,
     "everloot-cde2ce19": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Groddoc Ape"
   },
   "5268": {
    "buckets": {
@@ -120375,6 +120461,7 @@
    },
    "maxLevel": 42,
    "minLevel": 41,
+   "name": "Ironfur Bear",
    "spots": {
     "1444": {
      "1425": 1,
@@ -120405,6 +120492,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Grizzled Ironfur Bear",
    "spots": {
     "1444": {
      "1426": 2
@@ -120514,6 +120602,7 @@
    },
    "maxLevel": 40,
    "minLevel": 40,
+   "name": "Longtooth Runner",
    "skins": {
     "from": {
      "everloot-cde2ce19": 1
@@ -120562,6 +120651,7 @@
    },
    "maxLevel": 43,
    "minLevel": 43,
+   "name": "Longtooth Howler",
    "spots": {
     "1444": {
      "1374": 2
@@ -121083,6 +121173,7 @@
     "everloot-1340189e": 2
    },
    "maps": {},
+   "name": "Frayfeather Patriarch",
    "skins": {
     "from": {
      "eglink": 3
@@ -121174,6 +121265,7 @@
    },
    "maxLevel": 46,
    "minLevel": 45,
+   "name": "Rogue Vale Screecher",
    "skins": {
     "from": {
      "eglink": 2,
@@ -121866,6 +121958,7 @@
    },
    "maxLevel": 41,
    "minLevel": 40,
+   "name": "Scorpid Hunter",
    "skins": {
     "from": {
      "eglink": 1
@@ -121910,6 +122003,7 @@
     "everloot-1340189e": 1
    },
    "maps": {},
+   "name": "Scorpid Tail Lasher",
    "skins": {
     "from": {
      "eglink": 1
@@ -121946,7 +122040,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Scorpid Dunestalker"
   },
   "5425": {
    "buckets": {
@@ -122498,7 +122593,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Centipaar Worker"
   },
   "5459": {
    "buckets": {
@@ -122559,7 +122655,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Centipaar Sandreaver"
   },
   "547": {
    "buckets": {
@@ -123952,7 +124049,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Sandfury Firecaller"
   },
   "5648": {
    "buckets": {
@@ -125786,7 +125884,8 @@
    "from": {
     "everloot-1340189e": 8
    },
-   "maps": {}
+   "maps": {},
+   "name": "Dark Iron Geologist"
   },
   "5840": {
    "buckets": {
@@ -125825,7 +125924,8 @@
    "from": {
     "everloot-1340189e": 6
    },
-   "maps": {}
+   "maps": {},
+   "name": "Dark Iron Steamsmith"
   },
   "5841": {
    "buckets": {
@@ -125928,7 +126028,8 @@
    "from": {
     "everloot-1340189e": 15
    },
-   "maps": {}
+   "maps": {},
+   "name": "Dark Iron Slaver"
   },
   "5846": {
    "buckets": {
@@ -125991,7 +126092,8 @@
    "from": {
     "everloot-1340189e": 19
    },
-   "maps": {}
+   "maps": {},
+   "name": "Dark Iron Taskmaster"
   },
   "5848": {
    "buckets": {
@@ -126054,6 +126156,7 @@
    },
    "maxLevel": 48,
    "minLevel": 48,
+   "name": "Inferno Elemental",
    "spots": {
     "1427": {
      "1381": 1
@@ -126085,7 +126188,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Tempered War Golem"
   },
   "5854": {
    "buckets": {
@@ -126331,7 +126435,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Twilight Fire Guard"
   },
   "5863": {
    "buckets": {
@@ -126540,7 +126645,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Cursed Sycamore"
   },
   "589": {
    "buckets": {
@@ -127629,7 +127735,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Haldarr Satyr"
   },
   "6126": {
    "buckets": {
@@ -131277,6 +131384,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Skullsplitter Spiritchaser",
    "spots": {
     "1434": {
      "1122": 2,
@@ -136687,6 +136795,7 @@
     "everloot-f8c829b9": 10
    },
    "maps": {},
+   "name": "Dreaming Whelp",
    "skins": {
     "from": {
      "everloot-f8c829b9": 18
@@ -137509,6 +137618,7 @@
    },
    "maxLevel": 45,
    "minLevel": 45,
+   "name": "Wandering Forest Walker",
    "spots": {
     "1444": {
      "1373": 2
@@ -138585,7 +138695,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Marauding Owlbeast"
   },
   "7809": {
    "buckets": {
@@ -138618,7 +138729,8 @@
    "from": {
     "everloot-1340189e": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Vilebranch Ambusher"
   },
   "781": {
    "buckets": {
@@ -138656,6 +138768,7 @@
    },
    "maxLevel": 44,
    "minLevel": 43,
+   "name": "Skullsplitter Headhunter",
    "spots": {
     "1434": {
      "1170": 1,
@@ -138833,6 +138946,7 @@
    },
    "maxLevel": 44,
    "minLevel": 44,
+   "name": "Skullsplitter Berserker",
    "spots": {
     "1434": {
      "1120": 1,
@@ -138985,7 +139099,8 @@
    "from": {
     "everloot-1340189e": 5
    },
-   "maps": {}
+   "maps": {},
+   "name": "Lurking Feral Scar"
   },
   "785": {
    "buckets": {
@@ -139901,7 +140016,8 @@
    "from": {
     "everloot-1340189e": 1
    },
-   "maps": {}
+   "maps": {},
+   "name": "Qiaga the Keeper"
   },
   "80": {
    "buckets": {
@@ -140991,7 +141107,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Morta'gya the Keeper"
   },
   "8637": {
    "buckets": {
@@ -141024,7 +141141,8 @@
    "from": {
     "everloot-1340189e": 2
    },
-   "maps": {}
+   "maps": {},
+   "name": "Dark Iron Watchman"
   },
   "871": {
    "buckets": {
@@ -142560,7 +142678,8 @@
     "1435": 1
    },
    "maxLevel": 41,
-   "minLevel": 40
+   "minLevel": 40,
+   "name": "Silt Crawler"
   },
   "923": {
    "buckets": {
@@ -144016,7 +144135,8 @@
    "from": {
     "everloot-cde2ce19": 3
    },
-   "maps": {}
+   "maps": {},
+   "name": "Kurzen Shadow Hunter"
   },
   "9878": {
    "buckets": {

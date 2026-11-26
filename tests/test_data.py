@@ -515,6 +515,19 @@ def names(root):
            build_data.build([english], previous_names={"5": "Old Wolf"})["mobs"]["5"]["name"], "Wolf")
     expect("the names left out are listed", build_data.foreign_names([english] + korean), [("5", "늑대")])
 
+    def naming(names):
+        return dict(named(9, None), names=names, source={"name": "creature names"})
+
+    gryphon = naming({"5": "Razorbeak Gryphon"})
+    expect("a mob no source names takes an import's name",
+           build_data.build(nameless, [gryphon])["mobs"]["5"].get("name"), "Razorbeak Gryphon")
+    expect("before the name it had", build_data.build(nameless, [gryphon], previous_names={"5": "Old Wolf"})
+           ["mobs"]["5"].get("name"), "Razorbeak Gryphon")
+    expect("a source's name beats it", build_data.build([english], [gryphon])["mobs"]["5"]["name"], "Wolf")
+    expect("a Korean one in the list is left out",
+           build_data.build(nameless, [naming({"5": "늑대"})], previous_names={"5": "Old Wolf"})["mobs"]["5"]
+           .get("name"), "Old Wolf")
+
     (root / "data" / "submissions").mkdir(parents=True)
     (root / "data" / "shared.json").write_text(json.dumps({"mobs": {"5": {"name": "Old Wolf"}}}), encoding="utf-8")
     (root / "data" / "submissions" / "84-1.json").write_text(json.dumps(nameless[0]), encoding="utf-8")

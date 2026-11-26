@@ -18,8 +18,9 @@ dates.
 A mob's name is the one most sources gave in English. The addon sends the names its game client shows, so versions
 before 0.6.4 on a client in another language sent them in that language. Names not in Latin letters (Korean, Chinese,
 Russian) are left out one by one, and so is every name of an exporter whose names mostly differ from what the others
-call the same mobs (German, French, Spanish, Italian, Portuguese). A mob that gets no name this way keeps the one
-data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left out is
+call the same mobs (German, French, Spanish, Italian, Portuguese). A mob that gets no name this way takes the one
+an import's "names" list gives it (EG Link names every creature it saw, also the ones it has no loot of), or else
+keeps the one data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left out is
 printed.
 
 Usage:
@@ -625,6 +626,11 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
     and license of each import that went in. resets: npc -> the day a hotfix changed its loot. previous_names: npc ->
     the name it had before, for a mob no source names now."""
     everything = list(submissions) + list(imports)
+    import_names = {}
+    for imp in imports:
+        for npc, name in (imp.get("names") or {}).items():
+            if latin(name):
+                import_names.setdefault(str(npc), name)
     other = other_language(everything)
     everything = [unnamed(s) if s["result"]["exporter"] in other else s for s in everything]
     found = versions(everything, quest_items)
@@ -657,7 +663,9 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
                 if origin not in cut and record.get("skins"):
                     record["skins"]["from"][origin] = max(record["skins"]["from"].get(origin, 0), kills)
             previous = (previous_names or {}).get(npc)
-            if "name" not in record and previous and latin(previous):
+            if "name" not in record and npc in import_names:
+                record["name"] = import_names[npc]
+            elif "name" not in record and previous and latin(previous):
                 record["name"] = previous
             mobs[npc] = record
     built = max((s["received"] for s in submissions), default=0)

@@ -71,6 +71,7 @@ def fake_clone(root):
     write(live / "1.60.1.70100", "creatures.json", {"creatures": {
         "10": {"name": "Old Name", "positions": [pos(1429, 0.101, 0.205), pos(1429, 0.105, 0.209)]},
         "14": {"name": "Skinned Cat", "positions": [pos(1431, 0.5, 0.5)]},
+        "15": {"name": "Lonely Owl"},
     }})
     # Later the server hid 288842 (not public yet) and 288900 (no such item), and showed 289086 after hiding it.
     write(live / "1.60.1.70100", "item_hotfixes.enUS.json", {"items": {
@@ -89,6 +90,7 @@ def fake_clone(root):
         # A player with a Korean client recorded these on the later build.
         "11": {"name": "숲 괴물"},
         "14": {"name": "얼룩 고양이"},
+        "16": {"name": "부엉이"},
     }})
     write(root / "data" / "wow_classic_beta" / "1.60.1.70009", "loot.json", {
         "kills": {"npc:13": kills(5)}, "sources": {"npc:13": window(5, {"500": item(5)})},
@@ -119,6 +121,8 @@ def conversion(clone):
     expect("the newest build's name wins", mobs["10"]["name"], "Forest Thing")
     expect("a Korean name doesn't replace the English one", mobs["14"]["name"], "Skinned Cat")
     expect("a mob with only a Korean name has none", mobs["11"]["name"], None)
+    expect("every creature with a name is in names, with or without loot", imp["names"],
+           {"10": "Forest Thing", "14": "Skinned Cat", "15": "Lonely Owl"})
     expect("kills split over the maps the deaths were seen on", mobs["10"]["maps"], {"1429": 15, "1430": 5})
     expect("spots on the addon's 50x50 grid, one per position",
            mobs["10"]["cells"], {"1429": {"260": 2, "1275": 1}, "1430": {"510": 1}})

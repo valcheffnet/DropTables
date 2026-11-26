@@ -78,7 +78,7 @@ The numbers are not plain sums of everything sent in:
 - A mob's `name` is the one most sources gave. Names in other scripts, like the Korean ones a player with a Korean
   client sends, are left out one by one. When most of a player's names differ from what everyone else calls the same
   mobs, the player's client is in another language (German, say), and all of their names are left out. A mob no
-  source names any more keeps the name it had before.
+  source names takes the name from an import's `names` list (EG Link's), or else keeps the name it had before.
 - An install's kill spots weigh like its counts, at most 300 kills' worth, and only the player's own spots come
   in. Counts that other players passed on in the game carry none.
 - Skinning follows the same rules with skinned corpses in place of kills: at most 300 per install, and an install
@@ -121,7 +121,8 @@ including the ones tied to a quest, and puts them in the solo bucket. Corpses lo
 EG Link doesn't say the group size and counts too many empty corpses there. Quest items, pick pocket, nodes, chests,
 fishing and containers stay out as well. Names and kill spots come from `creatures.json`, where EG Link keeps one
 spot per 5 yards, so each spot counts once. The newest build's name is taken, unless it isn't in Latin letters: some
-builds carry the names of a player with a Korean client.
+builds carry the names of a player with a Korean client. The import also lists the name of every creature there under
+`names`, the ones it has no loot of too, so the merge can name a mob only Everloot knows.
 
 Skinning comes from the keys with one of the four Skinning ranks (`npc:<id>|spell:8613` and so on), solo and group
 alike, since the group plays no part in what a skinned corpse gives. EG Link marks the corpses skinned with the
