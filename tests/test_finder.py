@@ -331,9 +331,27 @@ def main():
     for _ in range(5):
         asker.ns.ItemInfo(4242)
     expect("an unknown item is asked for once while it's on its way", asker.g.asked, 1)
+    asker.lua.execute("redraws = 0")
+    asker.ns.On("DT_ITEM_INFO_RECEIVED", asker.lua.eval("function() redraws = redraws + 1 end"))
+    asker.advance(29)
+    asker.ns.ItemInfo(4242)
+    expect("still once before 30 seconds", asker.g.asked, 1)
+    asker.advance(1)
+    for _ in range(5):
+        asker.ns.ItemInfo(4242)
+    expect("an answer that never came is asked for again after 30 seconds, once", asker.g.asked, 2)
+    expect("and asking again redraws nothing", asker.g.redraws, 0)
     asker.lua.execute('C_Item.GetItemInfo = function() asked = asked + 1 return "Thing", nil, 1 end')
     asker.fire("GET_ITEM_INFO_RECEIVED", 4242, True)
-    expect("and read when it arrives", asker.ns.ItemName(4242), "Thing")
+    expect("and read when it arrives", (asker.ns.ItemName(4242), asker.g.redraws), ("Thing", 1))
+    # An item the server can't load isn't asked for again, however long it takes, so it can't start a redraw loop.
+    asker.lua.execute("asked = 0 C_Item.GetItemInfo = function() asked = asked + 1 return nil end")
+    asker.ns.ItemInfo(4343)
+    asker.fire("GET_ITEM_INFO_RECEIVED", 4343, False)
+    asker.advance(120)
+    for _ in range(5):
+        asker.ns.ItemInfo(4343)
+    expect("a failed item isn't asked for again", (asker.g.asked, asker.g.redraws), (1, 1))
 
     # A while after login the stats of every known mob are worked out a slice at a time and the index built from them,
     # so the first open of the Loot Finder doesn't do all of it at once.

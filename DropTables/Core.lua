@@ -183,36 +183,48 @@ local function readItem(itemId)
     return info
 end
 
--- Items asked about before the client knew them. The client loads items all the time for other addons and for the
--- gear of the players around, so only the arrival of these ones fires DT_ITEM_INFO_RECEIVED, the signal to work the
--- values out again and redraw. An item the server can't load comes back as a failure and changes nothing; a redraw
--- for it would only ask for it again and fail again, every second. An item is waited for once a session: it is read
--- the moment it arrives, and if the client can't give it even then, another redraw won't help either.
-local awaited, arrived = {}, {}
+-- Items asked about before the client knew them, with the GetTime() of the last ask. The client loads items all the
+-- time for other addons and for the gear of the players around, so only the arrival of these ones fires
+-- DT_ITEM_INFO_RECEIVED, the signal to work the values out again and redraw. An item the server can't load comes back
+-- as a failure, changes nothing and isn't asked for again this session: a redraw for it would only ask again and fail
+-- again, every second. An item whose answer never comes is asked for again ASK_AGAIN seconds later, the next time
+-- something needs it; asking again redraws nothing by itself. An item is read the moment it arrives, and if the client
+-- can't give it even then, another redraw won't help either.
+local ASK_AGAIN = 30
+local awaited, arrived, failed = {}, {}, {}
 function ns.AwaitItem(itemId)
-    if not arrived[itemId] then
-        awaited[itemId] = true
+    if not arrived[itemId] and not failed[itemId] then
+        awaited[itemId] = awaited[itemId] or GetTime()
     end
 end
 
 ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
-    if awaited[itemId] and success ~= false then
-        awaited[itemId], arrived[itemId] = nil, true
-        readItem(itemId)
-        ns.Fire("DT_ITEM_INFO_RECEIVED", itemId)
+    if not awaited[itemId] and not failed[itemId] then
+        return
     end
+    awaited[itemId] = nil
+    if success == false then
+        failed[itemId] = true
+        return
+    end
+    -- It can still come later, when something else asks for it.
+    arrived[itemId], failed[itemId] = true, nil
+    readItem(itemId)
+    ns.Fire("DT_ITEM_INFO_RECEIVED", itemId)
 end)
 
 -- Name, quality, sell price and bind type of an item, or nil while the client doesn't know it yet. An item already
--- asked for isn't asked for again until it arrives: the Loot Finder's gold per hour needs the items of two thousand
--- mobs, and asking for each unknown one every time a mob drops it ran into the game's time limit.
+-- asked for isn't asked for again until ASK_AGAIN seconds have passed: the Loot Finder's gold per hour needs the items
+-- of two thousand mobs, and asking for each unknown one every time a mob drops it ran into the game's time limit.
 function ns.ItemInfo(itemId)
     local info = itemInfo[itemId]
-    if info or awaited[itemId] then
+    local asked = awaited[itemId]
+    if info or failed[itemId] or asked and GetTime() - asked < ASK_AGAIN then
         return info
     end
     info = readItem(itemId)
     if not info then
+        awaited[itemId] = nil
         ns.AwaitItem(itemId)
     end
     return info
