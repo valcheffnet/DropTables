@@ -41,8 +41,49 @@ def loot(client, npc, spawn, items, copper):
     client.loot(slots)
 
 
+def priced(name, **kwargs):
+    """A client whose mobs get a g/ph from their first corpse, for the checks on prices and kills an hour. The corpses a
+    mob needs before it gets one have their own check in too_few_corpses()."""
+    client = Client(name, **kwargs)
+    client.ns.GPH_MIN_CORPSES = 1
+    return client
+
+
+def too_few_corpses():
+    """A mob gets no g/ph until it has ns.GPH_MIN_CORPSES looted (or skinned) corpses, and it sorts after the mobs that
+    have one, whichever way the list goes."""
+    c = Client("Counter", saved=FINDER_STUBS + PRICES)
+    ns = c.ns
+    for i in range(9):
+        loot(c, 1, "A%d" % i, [(100, 1)], 10)
+    expect("no g/ph with 9 looted corpses", ns.GoldPerHour(1), None)
+    expect("which shows as nothing", ns.FormatGold(ns.GoldPerHour(1)), "")
+    loot(c, 1, "A9", [(100, 1)], 10)
+    expect("a g/ph from the 10th", ns.GoldPerHour(1), int((10 + 190) * 70))
+    for i in range(3):
+        loot(c, 2, "B%d" % i, [(100, 1)], 5000)
+    expect("a mob worth more but with 3 corpses has none", ns.GoldPerHour(2), None)
+    order = c.lua.eval("""function(ns, descending)
+        local out = {}
+        for i, d in ipairs(ns.FilterDroppers(ns.FindDroppers(100), {}, "gph", descending)) do out[i] = d.npc end
+        return out
+    end""")
+    expect("a mob without g/ph sorts last, highest first", [order(ns, True)[i] for i in (1, 2)], [1, 2])
+    expect("and lowest first", [order(ns, False)[i] for i in (1, 2)], [1, 2])
+    best = c.lua.eval("function(ns) return ns.BestDropper(ns.FindDroppers(100)).npc end")
+    expect("the best mob is the one with a g/ph", best(ns), 1)
+    c.lua.execute("""
+        DropTablesDB.skins[50] = { skinned = 9, items = { [100] = { drops = 9, qty = 9, min = 1, max = 1 } } }
+    """)
+    c.fire("DT_DATA_CHANGED", 50)
+    expect("no skinning g/ph with 9 skinned corpses", ns.SkinGoldPerHour(50), None)
+    c.lua.execute("DropTablesDB.skins[50].skinned = 10")
+    c.fire("DT_DATA_CHANGED", 50)
+    expect("a skinning g/ph from the 10th", ns.SkinGoldPerHour(50) > 0, True)
+
+
 def main():
-    c = Client("Farmer", saved=PRICES)
+    c = priced("Farmer", saved=PRICES)
     ns = c.ns
     gold, silver, copper_ = "|cffffd700g|r", "|cffc7c7cfs|r", "|cffeda55fc|r"
     for amount, text in ((0, ""), (5, "5" + copper_), (100, "1" + silver), (10005, "1%s 5%s" % (gold, copper_)),
@@ -175,7 +216,7 @@ def main():
     c.fire("DT_DATA_CHANGED", 50)
     expect("skinning is worth its items at their price", ns.SkinValue(50), 0.5 * 2 * 60)
     expect("skinning gold an hour", ns.SkinGoldPerHour(50), int(0.5 * 2 * 60 * 100))
-    expect("the loot gold an hour of a mob only skinned", ns.GoldPerHour(50), 0)
+    expect("a mob only skinned has no loot gold an hour", ns.GoldPerHour(50), None)
     skinners = ns.FindSkinners(100)
     expect("a skinner's g/ph is its skinning", ns.MobGoldPerHour(skinners[1]), ns.SkinGoldPerHour(50))
     skin_rows = ns.SummarizeSkinItems(ns.SkinItems(""))[0]
@@ -183,7 +224,7 @@ def main():
            next(s.gph for s in skin_rows.values() if s.itemId == 100), ns.SkinGoldPerHour(50))
 
     # The Loot Finder writes the g/ph of every mob that drops the item into its row.
-    viewer = Client("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=FINDER_STUBS + PRICES)
+    viewer = priced("Viewer", files=ALL_FILES + ("Style.lua", "Finder.lua"), saved=FINDER_STUBS + PRICES)
     loot(viewer, 1, "A", [(100, 1)], 10)
     viewer.lua.execute("texts = {}")
     viewer.ns.OpenFinder(100)
@@ -191,7 +232,7 @@ def main():
     expect("the Loot Finder shows the mob's g/ph", viewer.ns.FormatGold(viewer.ns.GoldPerHour(1)) in shown, True)
 
     # The mob tooltip shows the g/ph at the right end of the level line, which sits lower when the mob has a title.
-    tipper = Client("Tipper", files=ALL_FILES + ("Tooltip.lua",), saved=FINDER_STUBS + PRICES + """
+    tipper = priced("Tipper", files=ALL_FILES + ("Tooltip.lua",), saved=FINDER_STUBS + PRICES + """
         GetCoinTextureString = function(copper) return copper .. "c" end
         TOOLTIP_UNIT_LEVEL = "Level %s"
         TooltipDataProcessor = { AddTooltipPostCall = function(_, fn) tooltipHook = fn end }
@@ -227,7 +268,7 @@ def main():
         expect("short format of %d copper" % amount, ns.FormatGoldShort(amount), text)
 
     # The details window shows the mob's g/ph next to the All / Solo / Group tabs.
-    shower = Client("Shower", files=ALL_FILES + ("Style.lua", "Details.lua"),
+    shower = priced("Shower", files=ALL_FILES + ("Style.lua", "Details.lua"),
                     saved=FINDER_STUBS + PRICES + "GetCoinTextureString = function(c) return c .. \"c\" end")
     loot(shower, 1, "A", [(100, 1)], 10)
     shower.lua.execute("texts = {}")
@@ -252,6 +293,7 @@ def main():
     expect("is still unknown", ns.PriceInfo(108), None)
     c.fire("GET_ITEM_INFO_RECEIVED", 108, True)
     expect("and its next arrivals don't redraw again", arrivals(), 2)
+    too_few_corpses()
     report("gold per hour")
 
 

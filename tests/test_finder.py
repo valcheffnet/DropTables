@@ -136,7 +136,22 @@ def main():
         table = c.lua.table_from(filters)
         return [d.npc for d in lua_list(ns.FilterDroppers(droppers, table, sort_key, descending))]
 
-    expect("sorted by chance", names({}), [3, 1, 2])
+    # By chance means by the lowest the chance is likely to be, so mob 1's 2 in 3 comes before mob 3's 1 in 1.
+    expect("sorted by chance", names({}), [1, 3, 2])
+    sure = c.lua.eval("""function(ns)
+        local list = ns.FilterDroppers({ { npc = 1, rate = 1, opened = 1, maps = {} },
+            { npc = 2, rate = 0.45, opened = 100, maps = {} } }, {}, "rate", true)
+        return list[1].npc, list[2].npc
+    end""")
+    expect("45 in 100 before 1 in 1", sure(ns), (2, 1))
+    expect("kills at least", names({"minKills": 3}), [1, 2])
+    expect("kills at least 1 keeps every mob", names({"minKills": 1}), [1, 3, 2])
+    expect("chance at least", names({"minRate": 30}), [1, 3])
+    expect("chance at least, as the chance shows", names({"minRate": 25}), [1, 3, 2])
+    rounded = c.lua.eval("""function(ns)
+        return #ns.FilterDroppers({ { npc = 1, rate = 0.0496, opened = 500, maps = {} } }, { minRate = 5 }, "rate", true)
+    end""")
+    expect("a chance that reads 5.0% passes a 5% minimum", rounded(ns), 1)
     expect("filter by zone", names({"mapId": 40}), [2])
     expect("filter by level from", names({"minLevel": 10}), [2])
     expect("filter by level to", names({"maxLevel": 6}), [1])
@@ -161,6 +176,9 @@ def main():
     expect("zone filter keeps only items dropped there", sorted(zone40), [2589])
     expect("zone filter counts only mobs there", (zone40[2589].mobs, zone40[2589].bestNpc), (1, 2))
     expect("zone list ignores the zone filter", lua_list(zone40_maps), [12, 40])
+    sure_cloth, _ = ns.SummarizeItems(ns.SearchItems(""), c.lua.table_from({"minKills": 4}))
+    sure_cloth = {s.itemId: s for s in lua_list(sure_cloth)}
+    expect("kills at least on categories", (sorted(sure_cloth), sure_cloth[2589].mobs), ([2589], 1))
     level_low, _ = ns.SummarizeItems(ns.SearchItems(""), c.lua.table_from({"maxLevel": 6}))
     expect("level filter on categories", sorted(s.itemId for s in lua_list(level_low)), [100, 2589])
     mob3 = c.lua.table_from([by_npc[3]])
@@ -255,6 +273,17 @@ def main():
     viewer.advance(1)
     expect("a shown item's info redraws it",
            any("Linen Cloth, loaded" in str(text) for text in viewer.g.texts.values()), True)
+
+    # The kills and chance a mob needs are kept in the settings, start at 1 kill and show in the header.
+    expect("kills at least starts at 1", (viewer.ns.settings.finderMinKills, viewer.ns.settings.finderMinRate), (1, 0))
+    viewer.ns.settings.finderMinKills, viewer.ns.settings.finderMinRate = 2, 30
+    viewer.fire("DT_SETTINGS_CHANGED")
+    viewer.lua.execute("texts = {}")
+    viewer.ns.OpenFinder("linen")
+    note = [str(text) for text in viewer.g.texts.values() if "items  |" in str(text)]
+    expect("the saved minimums filter and show in the header", any("2+ kills, 30%+ chance" in n for n in note), True)
+    viewer.ns.settings.finderMinKills, viewer.ns.settings.finderMinRate = 1, 0
+    viewer.fire("DT_SETTINGS_CHANGED")
 
     # Opening an item from skinning moves the Finder to the Skinning category, and a settings change keeps it there.
     viewer.ns.OpenFinder(2589, "skin")

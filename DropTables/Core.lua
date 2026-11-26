@@ -19,6 +19,8 @@ ns.DEFAULTS = {
     sharePlayers = true,  -- ask, answer and swap counts with other players in game
     killsPerHour = 70,  -- on mobs of the player's level, for g/ph in the Loot Finder
     gphWorldDrops = false,  -- random gear and recipes count in g/ph, at their vendor price
+    finderMinKills = 1,  -- the Loot Finder lists mobs with at least this many kills
+    finderMinRate = 0,  -- and at least this chance in percent, 0 for any
     minimapAngle = 200,
 }
 

@@ -24,7 +24,7 @@ The drop table window follows your target and shows where the kills behind each 
 
 ![The drop table window for a Greater Plainstrider with item prices](screenshots/lootTable.png)
 
-The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance. The search box finds mobs as well: type part of a name and they show up under Mobs, where a click opens the mob's drop table.
+The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance. The search box finds mobs as well: type part of a name and they show up under Mobs, where a click opens the mob's drop table. The boxes above the list narrow it down by zone, level, kills and chance.
 
 ![The Loot Finder listing all items sorted by gold per hour](screenshots/LootFinder.png)
 
@@ -42,7 +42,7 @@ The addon starts with an empty table and fills it as you kill and loot. Target o
 
 Skinning is counted apart from the loot, per skinned corpse, since every skin gives something. The drop table window shows it in a section of its own, the tooltip on a line of its own, and the Loot Finder in its own category, where each leather lists the mobs that give it with the Skinning skill they need.
 
-The g/ph column in the Loot Finder says roughly what farming a mob is worth in an hour. It takes auction prices from Auctionator, FojjiCore or TradeSkillMaster if you have one of them, in that order, the vendor price otherwise, and the kills per hour from the options.
+The g/ph column in the Loot Finder says roughly what farming a mob is worth in an hour. It takes auction prices from Auctionator, FojjiCore or TradeSkillMaster if you have one of them, in that order, the vendor price otherwise, and the kills per hour from the options. A mob gets one only after 10 looted corpses, since a lucky drop in the first few can make it look worth far more than it is.
 
 Commands (`/droptables` works too):
 

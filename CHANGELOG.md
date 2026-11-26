@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- The Loot Finder has a second row of filters, Kills at least and Chance at least, for hiding mobs with too few kills or too low a chance. Kills at least starts at 1, and both keep what you set.
+
+### Changed
+
+- A mob gets a gold per hour only after 10 looted corpses, in the Loot Finder, the tooltip and the drop table window, and its skinning only after 10 skinned ones. Before that a single lucky drop could make a mob show 48g an hour. Mobs without one go to the bottom when you sort by g/ph, and an item's best mob is one that has one whenever a mob that drops it does.
+- Sorting by chance puts a chance that rests on many corpses ahead of one that rests on a few, so one drop in one corpse, a 100%, no longer tops the list. The chance shown stays the same.
+
 ## [0.6.4] - 2026-11-26
 
 ### Changed

@@ -23,7 +23,7 @@ local LEVEL_TEXT = (TOOLTIP_UNIT_LEVEL or "Level %s"):match("^(.-)%%s") or "Leve
 -- Writes the mob's gold an hour at the right end of its level line. The line can sit lower when the mob has a title.
 local function addGoldPerHour(tooltip, npc)
     local gph = ns.GoldPerHour(npc)
-    if gph <= 0 or not tooltip.GetName then
+    if not gph or gph <= 0 or not tooltip.GetName then
         return
     end
     local name = tooltip:GetName()

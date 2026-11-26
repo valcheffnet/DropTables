@@ -196,9 +196,13 @@ local function droppersOf(npc)
     return found
 end
 
--- What a dropper's mob brings in an hour: its loot, or for a skinner what skinning it brings.
+-- What a dropper's mob brings in an hour: its loot, or for a skinner what skinning it brings. nil for a mob with too few
+-- corpses to tell.
 function ns.MobGoldPerHour(dropper)
-    return dropper.skin and ns.SkinGoldPerHour(dropper.npc) or ns.GoldPerHour(dropper.npc)
+    if dropper.skin then
+        return ns.SkinGoldPerHour(dropper.npc)
+    end
+    return ns.GoldPerHour(dropper.npc)
 end
 
 -- itemId -> { dropper, ... } from npc -> { [itemId] = dropper }.
@@ -304,17 +308,18 @@ end
 local BEST_MIN_KILLS = 3
 
 -- The dropper that brings the most gold an hour, and among mobs worth the same (without any prices, say) the one with
--- the best chance and then the most kills behind it. One or two lucky kills say little, so mobs with fewer than
--- BEST_MIN_KILLS kills only count when no other mob drops the item.
+-- the best chance and then the most kills behind it. A mob with too few corpses for a gold an hour comes after those
+-- that have one. One or two lucky kills say little, so mobs with fewer than BEST_MIN_KILLS kills only count when no
+-- other mob drops the item.
 function ns.BestDropper(droppers)
     local best, bestFew
     for _, dropper in ipairs(droppers) do
-        local gold = ns.GoldPerHour(dropper.npc)
+        local gold = ns.GoldPerHour(dropper.npc) or -1
         local better = function(current)
             if not current then
                 return true
             end
-            local currentGold = ns.GoldPerHour(current.npc)
+            local currentGold = ns.GoldPerHour(current.npc) or -1
             if gold ~= currentGold then
                 return gold > currentGold
             end
@@ -362,11 +367,12 @@ function ns.LowestSkinner(skinners)
 end
 
 -- One line per item for a category, saying how many mobs give it and which one is the best of them, as pick chooses
--- it. Only mobs that pass the zone and level filters count, and with a filter set, items none of those mobs give are
--- left out. Also returns the maps of all the mobs before filtering, for the zone choice.
+-- it. Only mobs that pass the filters count, and with a filter set, items none of those mobs give are left out. Also
+-- returns the maps of all the mobs before filtering, for the zone choice.
 local function summarize(items, filters, find, pick)
     filters = filters or {}
-    local active = filters.mapId or filters.minLevel or filters.maxLevel
+    local active = filters.mapId or filters.minLevel or filters.maxLevel or (filters.minKills or 0) > 1
+        or (filters.minRate or 0) > 0
     local results, maps, seenMaps = {}, {}, {}
     for _, item in ipairs(items) do
         local droppers = find(item.itemId)
@@ -385,7 +391,7 @@ local function summarize(items, filters, find, pick)
             local best = pick(droppers)
             if best then
                 summary.rate, summary.best, summary.bestNpc = best.rate, best.name, best.npc
-                summary.kills, summary.small = best.kills, best.small
+                summary.kills, summary.opened, summary.small = best.kills, best.opened, best.small
                 summary.minLevel, summary.maxLevel = best.minLevel, best.maxLevel
                 summary.gph = ns.MobGoldPerHour(best)
             end
@@ -433,11 +439,14 @@ function ns.SkinItems(text, qualities)
 end
 
 -- Sorts by value(entry) in either direction, falling back to entry[idKey] on equal values so the order stays stable.
+-- Entries without a value come last either way.
 local function sortBy(list, value, descending, idKey)
     table.sort(list, function(a, b)
         local va, vb = value(a), value(b)
         if va == vb then
             return a[idKey] < b[idKey]
+        elseif va == nil or vb == nil then
+            return vb == nil
         end
         if descending then
             return va > vb
@@ -447,14 +456,28 @@ local function sortBy(list, value, descending, idKey)
     return list
 end
 
+-- How low a chance could really be, given the corpses it was seen in: the lower end of its Wilson score interval at
+-- 95%. Sorting by it keeps one drop in one corpse, a 100% that means little, below 45 drops in 100 corpses.
+local SURE_Z = 1.96
+
+local function lowestLikely(rate, opened)
+    if not rate or not opened or opened <= 0 then
+        return rate
+    end
+    local z2 = SURE_Z * SURE_Z
+    local center = rate + z2 / (2 * opened)
+    local spread = SURE_Z * math.sqrt(math.max(0, rate * (1 - rate)) / opened + z2 / (4 * opened * opened))
+    return (center - spread) / (1 + z2 / opened)
+end
+
 local SUMMARY_SORT = {
     name = function(s) return s.name end,
     mobs = function(s) return s.mobs end,
     best = function(s) return s.best end,
-    rate = function(s) return s.rate end,
+    rate = function(s) return lowestLikely(s.rate, s.opened) end,
     kills = function(s) return s.kills end,
     level = function(s) return s.minLevel or math.huge end,
-    gph = function(s) return s.gph or 0 end,
+    gph = function(s) return s.gph end,
 }
 
 function ns.SortSummaries(summaries, sortKey, descending)
@@ -492,13 +515,24 @@ local SORT_VALUES = {
     level = function(d) return d.minLevel or 0 end,
     skill = function(d) return d.minLevel or 0 end,
     zone = function(d) return d.zone end,
-    rate = function(d) return d.rate end,
+    rate = function(d) return lowestLikely(d.rate, d.opened) end,
     drops = function(d) return d.drops end,
     kills = function(d) return d.kills or 0 end,
     gph = function(d) return ns.MobGoldPerHour(d) end,
 }
 
--- filters can hold mapId, minLevel and maxLevel, all optional. A level filter leaves out mobs whose level is unknown.
+-- The chance in percent as ns.FormatRate shows it, so that a minimum of 5% keeps a row that reads 5.0%.
+local function shownPercent(rate)
+    if rate >= 0.995 then
+        return 100
+    elseif rate >= 0.1 then
+        return math.floor(rate * 100 + 0.5)
+    end
+    return math.floor(rate * 1000 + 0.5) / 10
+end
+
+-- filters can hold mapId, minLevel, maxLevel, minKills and minRate (a chance in percent), all optional. A level filter
+-- leaves out mobs whose level is unknown, and minRate leaves the mobs of the mob search alone, as they have no chance.
 function ns.FilterDroppers(droppers, filters, sortKey, descending)
     local results = {}
     for _, dropper in ipairs(droppers) do
@@ -508,6 +542,12 @@ function ns.FilterDroppers(droppers, filters, sortKey, descending)
         end
         if keep and filters.maxLevel then
             keep = dropper.minLevel ~= nil and dropper.minLevel <= filters.maxLevel
+        end
+        if keep and filters.minKills then
+            keep = (dropper.kills or 0) >= filters.minKills
+        end
+        if keep and filters.minRate and dropper.rate then
+            keep = shownPercent(dropper.rate) >= filters.minRate
         end
         if keep then
             table.insert(results, dropper)

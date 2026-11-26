@@ -1,7 +1,7 @@
 local _, ns = ...
 
 -- Loot finder, laid out like the auction house with categories on the left and the items of the chosen category on
--- the right, which turn into the mobs that drop an item once one is picked. Zone and level filters work on both lists.
+-- the right, which turn into the mobs that drop an item once one is picked. The filters work on both lists.
 local Style = ns.Style
 local C = Style.colors
 local TOP = Style.HEADER
@@ -424,24 +424,46 @@ local levelLabel = Style.Text(frame, "label")
 levelLabel:SetPoint("LEFT", zoneDropdown, "RIGHT", 18, 0)
 levelLabel:SetText("LEVEL")
 
-local function levelBox(key)
+-- A box for a whole number that sets filters[key]. With a setting, the number is kept there too, 0 for an empty box.
+local function numberBox(key, letters, setting)
     local edit = Style.Input(frame, 34, "")
     edit:SetNumeric(true)
-    edit:SetMaxLetters(2)
+    edit:SetMaxLetters(letters)
     edit:SetJustifyH("CENTER")
     edit:HookScript("OnTextChanged", function(self)
         filters[key] = tonumber(self:GetText())
-        renderMain()
+        if setting then
+            ns.settings[setting] = filters[key] or 0
+        end
+        if frame:IsShown() then
+            renderMain()
+        end
     end)
     return edit
 end
-local levelFrom = levelBox("minLevel")
+local levelFrom = numberBox("minLevel", 2)
 levelFrom.box:SetPoint("LEFT", levelLabel, "RIGHT", 8, 0)
 local levelDash = Style.Text(frame, "muted")
 levelDash:SetPoint("LEFT", levelFrom.box, "RIGHT", 5, 0)
 levelDash:SetText("to")
-local levelTo = levelBox("maxLevel")
+local levelTo = numberBox("maxLevel", 2)
 levelTo.box:SetPoint("LEFT", levelDash, "RIGHT", 5, 0)
+
+-- A second row: the kills a mob needs and the chance it needs to be listed. Both stay set between sessions.
+local filterY2 = filterY - 28
+local killsLabel = Style.Text(frame, "label")
+killsLabel:SetPoint("TOPLEFT", RIGHT, filterY2 - 6)
+killsLabel:SetText("KILLS AT LEAST")
+local minKills = numberBox("minKills", 4, "finderMinKills")
+minKills.box:SetPoint("LEFT", killsLabel, "RIGHT", 8, 0)
+local rateLabel = Style.Text(frame, "label")
+rateLabel:SetPoint("LEFT", minKills.box, "RIGHT", 18, 0)
+rateLabel:SetText("CHANCE AT LEAST")
+local minRate = numberBox("minRate", 3, "finderMinRate")
+minRate.box:SetPoint("LEFT", rateLabel, "RIGHT", 8, 0)
+local percent = Style.Text(frame, "muted")
+percent:SetPoint("LEFT", minRate.box, "RIGHT", 5, 0)
+percent:SetText("%")
 
 -- Whether random world drops count in g/ph. The loot lists have that column, so the box shows there, at the right end
 -- of the filters where skinning has its result count.
@@ -497,7 +519,7 @@ local function setupZones(maps)
     return cleared
 end
 
-local headerY = -(TOP + 100)
+local headerY = -(TOP + 128)
 local filterRule = Style.Line(frame, C.faint)
 filterRule:SetHeight(1)
 filterRule:SetPoint("TOPLEFT", RIGHT, headerY + 6)
@@ -690,6 +712,12 @@ local function filterNote()
     if filters.minLevel or filters.maxLevel then
         table.insert(parts, ("level %s-%s"):format(filters.minLevel or "1", filters.maxLevel or "60"))
     end
+    if (filters.minKills or 0) > 1 then
+        table.insert(parts, ("%d+ kills"):format(filters.minKills))
+    end
+    if (filters.minRate or 0) > 0 then
+        table.insert(parts, ("%d%%+ chance"):format(filters.minRate))
+    end
     return #parts > 0 and ("  |  " .. table.concat(parts, ", ")) or ""
 end
 
@@ -741,7 +769,7 @@ local function renderCategory()
     end
     tbl:Finish(#summaries, #items == 0 and "Nothing here yet" or "No item matches",
         #items == 0 and (skinning and "Skin a mob, or change the search and quality."
-            or "Loot more, or change the search and quality.") or "Widen the zone or level filter.")
+            or "Loot more, or change the search and quality.") or "Widen the filters.")
     placeTitle(false)
     headTitle:SetText(title)
     headTitle:SetTextColor(unpack(C.gold))
@@ -785,7 +813,7 @@ local function renderMobs()
         row.map:SetShown(dropper.spots)
         row:Show()
     end
-    tbl:Finish(#list, "No mob matches", "Widen the zone or level filter.")
+    tbl:Finish(#list, "No mob matches", "Widen the filters.")
     resultCount:SetText(("%d of %d mobs"):format(#list, #droppers))
 
     local meta = ns.db.items[selectedItem]
@@ -839,7 +867,7 @@ local function renderMobList()
         row:Show()
     end
     mobListTable:Finish(#list, "No mob matches",
-        #mobs == 0 and "Change the search." or "Widen the zone or level filter.")
+        #mobs == 0 and "Change the search." or "Widen the filters.")
     placeTitle(false)
     headTitle:SetText(strtrim(search:GetText()) ~= "" and "Mobs matching your search" or "Mobs")
     headTitle:SetTextColor(unpack(C.gold))
@@ -941,6 +969,11 @@ local function loadSettings()
     category = ns.settings.finderCategory or "all"
     openClass = ns.settings.finderOpenClass
     worldDrops:SetChecked(ns.settings.gphWorldDrops)
+    for key, box in pairs({ minKills = { minKills, "finderMinKills" }, minRate = { minRate, "finderMinRate" } }) do
+        local value = ns.settings[box[2]] or 0
+        filters[key] = value > 0 and value or nil
+        box[1]:SetText(value > 0 and tostring(value) or "")
+    end
     for _, button in pairs(qualityButtons) do
         button:Refresh()
     end

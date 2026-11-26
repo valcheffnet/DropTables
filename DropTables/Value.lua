@@ -150,8 +150,16 @@ function ns.SkinValue(npc)
     return value
 end
 
+-- A mob gets a g/ph once it has this many looted corpses, or skinned ones for skinning, as many as its chances need to
+-- stop showing dimmed. Before that a lucky drop in the first few would make it look worth far more than it is.
+ns.GPH_MIN_CORPSES = ns.SMALL_SAMPLE
+
+local function enough(corpses)
+    return math.floor(corpses + 0.5) >= ns.GPH_MIN_CORPSES
+end
+
 -- Worked out once per mob until its counts, the prices, the setting or the player's level change, because the Loot
--- Finder sorts long lists by it. Loot and skinning are kept apart.
+-- Finder sorts long lists by it. Loot and skinning are kept apart, and false stands for no value.
 local cache, skinCache = {}, {}
 
 local function forget(npc)
@@ -162,23 +170,26 @@ local function forget(npc)
     end
 end
 
+-- nil until the mob has ns.GPH_MIN_CORPSES looted corpses.
 function ns.GoldPerHour(npc)
     local value = cache[npc]
-    if not value then
-        value = math.floor(ns.ValuePerKill(npc) * ns.KillsPerHour(npc))
+    if value == nil then
+        local stats = ns.GetStats(npc, "all")
+        value = stats and enough(stats.opened) and math.floor(ns.ValuePerKill(npc) * ns.KillsPerHour(npc)) or false
         cache[npc] = value
     end
-    return value
+    return value or nil
 end
 
--- What skinning alone brings in an hour, with every kill skinned.
+-- What skinning alone brings in an hour, with every kill skinned. nil until the mob was skinned ns.GPH_MIN_CORPSES times.
 function ns.SkinGoldPerHour(npc)
     local value = skinCache[npc]
-    if not value then
-        value = math.floor(ns.SkinValue(npc) * ns.KillsPerHour(npc))
+    if value == nil then
+        local skin = ns.GetSkinStats(npc)
+        value = skin and enough(skin.skinned) and math.floor(ns.SkinValue(npc) * ns.KillsPerHour(npc)) or false
         skinCache[npc] = value
     end
-    return value
+    return value or nil
 end
 
 -- The coins' own colours for the letters.
