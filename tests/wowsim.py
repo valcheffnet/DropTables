@@ -93,6 +93,10 @@ C_Map = {
 function JoinTemporaryChannel() end
 function LeaveChannelByName() end
 function GetChannelName() return 7, "DropTablesShare" end
+gameChannels = { 1, "General", false, 2, "Trade", false }  -- what GetChannelList gives: number, name, disabled
+function GetChannelList() return unpack(gameChannels) end
+inCombat = false
+function InCombatLockdown() return inCombat end
 C_ChatInfo = {
     RegisterAddonMessagePrefix = function() end,
     InChatMessagingLockdown = function() return false end,

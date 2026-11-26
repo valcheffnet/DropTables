@@ -63,6 +63,14 @@ The shared database only grows when players send their tables in. Type `/dt expo
 
 Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.
 
+## What the addon sends
+
+With Share with other players on, the addon talks to other copies of itself in the background, in addon messages that never show up in anyone's chat. When you target a mob it knows little about, it asks on a hidden channel and says whose counts it already holds, and once it has heard enough it says so there too. When someone else asks about a mob you have counts of, it whispers those counts to them. In a group it also sends your counts of the mobs you killed to the group once a minute.
+
+The counts of a mob are its kills, its looted and skinned corpses, the items and money they gave, the mob's level and the zones it died in, and its name if your game is in English. They're filed under a random install id the addon made up the first time it ran, not under your character's name. Where exactly you killed something only leaves your game through /dt export, when you send that yourself. Your gold, bags, gear, item prices and chat don't go anywhere.
+
+The addon joins its channel a few seconds after you log in, but not in combat, a battleground, an arena or a dungeon, and never as /1. Right after a loading screen it won't take a free channel number below one of yours either, since the game may still be putting General or Trade back there, so your channels keep their numbers. If it can't get in, say because you're in as many channels as the game allows, it waits a little longer after each try. Turning Share with other players off leaves the channel (after the fight, if you're in one) and stops all of it.
+
 ## Known issues
 
 Dungeons work only halfway. Inside an instance the game hides which mob you're targeting or have killed, so Drop Tables can't count kills there. The loot window still says which corpse the loot came from, so every corpse you loot in a dungeon or raid counts as a kill that left loot. Corpses that leave nothing never show up, which makes dungeon chances come out a little high, the same as the Everloot counts the shared database already had for those mobs. The icons under the target and the drop lines in the mob tooltip don't work in there either, because they need to know your target. The drop table window does: with Follow target on, it switches to each corpse you loot.

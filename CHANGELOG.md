@@ -9,7 +9,12 @@
 ### Changed
 
 - A mob gets a gold per hour only after 10 looted corpses, in the Loot Finder, the tooltip and the drop table window, and its skinning only after 10 skinned ones. Before that a single lucky drop could make a mob show 48g an hour. Mobs without one go to the bottom when you sort by g/ph, and an item's best mob is one that has one whenever a mob that drops it does.
+- Drop Tables joins and leaves its hidden sharing channel only out of combat and outside battlegrounds, arenas and dungeons. It never takes /1, and right after a loading screen it won't take a free channel number below one of yours, so General and your own channels keep their numbers. When it can't get in, each try waits longer than the one before, where it used to try every 15 seconds.
 - Sorting by chance puts a chance that rests on many corpses ahead of one that rests on a few, so one drop in one corpse, a 100%, no longer tops the list. The chance shown stays the same.
+
+### Fixed
+
+- When a whispered answer didn't reach the player who asked, Drop Tables answered each of their new questions again, and those whispers failed too. It now sends the answer once more to the First-Last form of the name, which a name with a letter like ä may need, and if that doesn't arrive either, it leaves that player's questions alone for 30 minutes.
 
 ## [0.6.4] - 2026-11-26
 

@@ -146,8 +146,10 @@ function ChatFrame_AddMessageEventFilter(event, fn) chatFilters[event] = fn end
 
 
 def offline_asker():
-    """An asker who logs off before every answer went out: the server's "No player named" line for the addon's own
-    whisper is hidden, and the answers still waiting for that player are dropped."""
+    """An asker the whispers don't reach: the server's "No player named" line for the addon's own whisper is hidden,
+    and the whisper goes once more to "First-Last" (a name with letters like ä may need it). When that doesn't arrive
+    either, the asker is offline or on the other faction, so the answers still waiting are dropped and their questions
+    go unanswered for 30 minutes."""
     ann, bob = Client("Ann Lee", saved=ERROR_STUBS), Client("Bob", saved=ERROR_STUBS)
     fixed_random(bob, 0)
     net = Net(ann, bob)
@@ -165,10 +167,36 @@ def offline_asker():
             break
     expect("the big install's answer went out first", len(net.sent("Bob", "D|", start)), 1)
     hide = bob.g.chatFilters["CHAT_MSG_SYSTEM"]
-    expect("the error for a player just whispered is hidden",
-           hide(None, "CHAT_MSG_SYSTEM", "No player named 'Ann-Lee' is currently playing."), True)
+    error = "No player named 'Ann-Lee' is currently playing."
+    expect("the error for a player just whispered is hidden", hide(None, "CHAT_MSG_SYSTEM", error), True)
+    expect("so is a second error for the same whispers", hide(None, "CHAT_MSG_SYSTEM", error), True)
+    net.run(1)
+    expect("the whisper goes once more to First-Last", [m[3] for m in net.sent("Bob", "D|", start)],
+           ["Ann Lee", "Ann-Lee"])
+    expect("and that error is hidden too", hide(None, "CHAT_MSG_SYSTEM", error), True)
     net.run(10)
-    expect("the answers still waiting for that player are dropped", len(net.sent("Bob", "D|", start)), 1)
+    expect("then the answers still waiting for that player are dropped", len(net.sent("Bob", "D|", start)), 2)
+    question = "Q|%s|%s|" % (ann.ns.db.installId, b36(1))
+    bob.fire("CHAT_MSG_ADDON", "DropTables", question, "CHANNEL", "Ann Lee")
+    net.run(10)
+    expect("and their questions go unanswered", len(net.sent("Bob", "D|", start)), 2)
+    bob.advance(1800)
+    bob.fire("CHAT_MSG_ADDON", "DropTables", question, "CHANNEL", "Ann Lee")
+    net.run(10)
+    expect("for 30 minutes, then the first form is tried again", net.sent("Bob", "D|", start)[-1][3], "Ann Lee")
+    # When First-Last does arrive, the next answers go straight to it.
+    kim = "Q|%s|%s|" % (origin_id(700), b36(1))
+    start = len(net.log)
+    bob.fire("CHAT_MSG_ADDON", "DropTables", kim, "CHANNEL", "Kim Bärth")
+    net.run(10)
+    hide(None, "CHAT_MSG_SYSTEM", "No player named 'Kim Bärth' is currently playing.")
+    net.run(10)
+    bob.advance(30)
+    bob.fire("CHAT_MSG_ADDON", "DropTables", kim, "CHANNEL", "Kim Bärth")
+    net.run(10)
+    targets = [m[3] for m in net.sent("Bob", "D|", start)]
+    expect("a First-Last that arrived is used from then on", (targets[0], targets[-1], len(set(targets))),
+           ("Kim Bärth", "Kim-Bärth", 2))
     expect("the error for anyone else stays",
            hide(None, "CHAT_MSG_SYSTEM", "No player named 'Carl' is currently playing."), False)
     expect("other system lines stay", hide(None, "CHAT_MSG_SYSTEM", "Ann Lee has gone offline."), False)
@@ -244,6 +272,85 @@ def sharing_off():
     net.add(fay)
     net.run(10)
     expect("off at login leaves the channel", (fay.g.leaves, fay.g.inChannel, fay.g.joins), (1, False, 0))
+
+
+def channel_care():
+    """The channel is joined and left only when it's safe: not in combat, a chat lockdown or an instance. It never takes
+    /1 or a free number below the player's channels right after a loading screen, a failed try waits longer each
+    time, and an error or a blocked call stops nothing else."""
+    def client(name, extra=""):
+        c = Client(name, saved=CHANNEL_STUBS + extra)
+        c.advance(7)  # the first try comes JOIN_DELAY seconds after login
+        return c
+
+    fighter = Client("Fighter", saved=CHANNEL_STUBS + "inCombat = true")
+    fighter.advance(40)
+    expect("no join in combat", fighter.g.joins, 0)
+    fighter.lua.execute("inCombat = false")
+    fighter.advance(16)
+    expect("joins once out of combat", (fighter.g.joins, fighter.g.inChannel), (1, True))
+    fighter.lua.execute("inCombat = true")
+    fighter.ns.settings.sharePlayers = False
+    fighter.fire("DT_SETTINGS_CHANGED")
+    expect("turning it off in combat leaves later", (fighter.g.leaves, fighter.g.inChannel), (0, True))
+    fighter.lua.execute("inCombat = false")
+    fighter.advance(16)
+    expect("and leaves once out of combat", (fighter.g.leaves, fighter.g.inChannel), (1, False))
+
+    for kind in ("party", "raid", "pvp", "arena"):
+        inside = Client("Inside", saved=CHANNEL_STUBS + 'instanceType = "%s"' % kind)
+        inside.advance(40)
+        expect("no join in a %s instance" % kind, inside.g.joins, 0)
+    inside.lua.execute("instanceType = nil")
+    inside.advance(16)
+    expect("joins after leaving the instance", inside.g.joins, 1)
+    locked = Client("Locked", saved=CHANNEL_STUBS + "C_ChatInfo.InChatMessagingLockdown = function() return true end")
+    locked.advance(40)
+    expect("no join in a chat lockdown", locked.g.joins, 0)
+
+    # Without /1 in use the channel would take it, so it waits.
+    lonely = client("Lonely", "gameChannels = {}")
+    lonely.advance(100)
+    expect("never takes /1", lonely.g.joins, 0)
+    lonely.lua.execute('gameChannels = { 1, "General", false }')
+    lonely.advance(16)
+    expect("joins once /1 is taken", lonely.g.joins, 1)
+    # /2 free below the player's /3 just after a loading screen: General or Trade may still be on the way.
+    gap = Client("Gap", saved=CHANNEL_STUBS + 'gameChannels = { 1, "General", false, 3, "Guildies", false }')
+    gap.fire("PLAYER_ENTERING_WORLD", True, False)
+    gap.advance(50)
+    expect("no number below the player's channels right after a loading screen", gap.g.joins, 0)
+    gap.advance(30)
+    expect("a gap left for a minute is the player's choice", gap.g.joins, 1)
+    in_order = client("InOrder", 'gameChannels = { 1, "General", false, 2, "Trade", false, 3, "Guildies", false }')
+    expect("the next free number is taken at once", in_order.g.joins, 1)
+
+    # A channel limit: every try fails, and each waits twice as long as the one before.
+    full = Client("Full", saved=CHANNEL_STUBS + "JoinTemporaryChannel = function() joins = joins + 1 end")
+    full.advance(300)
+    expect("failed tries back off", full.g.joins, 5)
+    # Taking /1 anyway (the player left General a moment before) leaves it again.
+    first = client("First", 'GetChannelName = function() if inChannel then return 1, "DropTablesShare" end return 0 end')
+    first.advance(2)  # whether the join worked is looked at 2 seconds later
+    expect("a channel that lands on /1 is left", (first.g.joins, first.g.leaves, first.g.inChannel), (1, 1, False))
+    first.advance(14)
+    expect("and tried again only later", first.g.joins, 1)
+    # An error in the call, or the game blocking it, stops nothing else and waits too.
+    broken = client("Broken", "JoinTemporaryChannel = function() joins = joins + 1 error('blocked') end")
+    expect("an error in the call is caught", broken.g.joins, 1)
+    broken.advance(10)
+    expect("and waits before the next try", broken.g.joins, 1)
+    stopped = Client("Stopped", saved=CHANNEL_STUBS + "JoinTemporaryChannel = function() joins = joins + 1 end")
+    stopped.advance(7)
+    stopped.fire("ADDON_ACTION_BLOCKED", "DropTables", "JoinTemporaryChannel")
+    stopped.fire("ADDON_ACTION_BLOCKED", "DropTables", "JoinTemporaryChannel")
+    stopped.advance(60)
+    expect("a blocked call makes the next try wait longer", stopped.g.joins, 1)
+    other = Client("Other", saved=CHANNEL_STUBS + "JoinTemporaryChannel = function() joins = joins + 1 end")
+    other.advance(7)
+    other.fire("ADDON_ACTION_BLOCKED", "SomeAddon", "JoinTemporaryChannel")
+    other.advance(31)
+    expect("another addon's blocked call changes nothing", other.g.joins, 2)
 
 
 def names_by_language():
@@ -813,6 +920,7 @@ def main():
 
     offline_asker()
     sharing_off()
+    channel_care()
     names_by_language()
     report("sharing")
 

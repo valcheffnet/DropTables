@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON, ns = ...
 
 -- Sharing between players. When a player targets a mob the addon knows little about, it asks on a hidden channel and
 -- says whose counts it already holds, and players with other or bigger counts whisper theirs back:
@@ -18,7 +18,9 @@ local PREFIX = "DropTables"
 local CHANNEL = "DropTablesShare"
 local TICK = 1.1
 local JOIN_DELAY = 6
-local JOIN_RETRY = 15       -- seconds between tries while the player is not in the channel
+local JOIN_RETRY = 15       -- seconds between tries while the player is not in the channel, at first
+local JOIN_BACKOFF = 600    -- every try that fails doubles the wait, up to this many seconds
+local SETTLE = 60           -- seconds after a loading screen while the game may still be joining its own channels
 local MAX_SOURCES = 12      -- other installs kept per mob
 local SAMPLE_TARGET = 100   -- looted corpses of a mob (own plus other installs') worth asking for
 local MAX_ORIGINS_PER_QUESTION = 10
@@ -66,6 +68,12 @@ local groupOrigins = {}     -- group member -> the one install they send; this s
 local groupDirty = {}  -- npc -> true: the player's own counts changed since the last group send
 local lastGroupSend = 0
 local whispered = {}  -- player key (see playerKey) -> GetTime() of the last whisper sent to them
+-- player key -> { target, texts } of the whispers sent to them in the last WHISPER_ERROR_WINDOW seconds, the name in
+-- the form they went to, so whispers the server says didn't arrive can go again under the other form
+local recentWhispers = {}
+local hyphenated = {}   -- player key -> true: whispers to them go as "First-Last" since "First Last" didn't arrive
+local unreachable = {}  -- player key -> GetTime() when whispers in both forms didn't arrive
+local UNREACHABLE = 1800  -- seconds a player whispers can't reach gets no answers
 local playerKey
 local session = { queries = 0, answers = 0, received = 0, refused = 0, failed = 0, groupSent = 0, groupReceived = 0 }
 
@@ -271,6 +279,12 @@ end
 -- at a time, for their latest question, and nothing gets planned while many whispers are waiting, so one player
 -- flooding questions can't hold up the answers to everyone else.
 local function planAnswer(asker, npc, heldText, sender)
+    local key = playerKey(sender)
+    if unreachable[key] and GetTime() - unreachable[key] < UNREACHABLE then
+        ns.Debug("%s asks about mob %d: not answering, whispers to them don't arrive", sender, npc)
+        return
+    end
+    unreachable[key] = nil
     local waiting = waitingWhispers()
     if waiting >= MAX_WAITING_WHISPERS then
         ns.Debug("%s asks about mob %d: not answering, %d whispers still waiting", sender, npc, waiting)
@@ -297,7 +311,7 @@ local function planAnswer(asker, npc, heldText, sender)
         end
     end
     if count > 0 then
-        planned[sender] = { npc = npc, target = sender, due = due }
+        planned[sender] = { npc = npc, target = hyphenated[key] and (sender:gsub(" ", "-")) or sender, due = due }
     end
     ns.Debug("%s asks about mob %d: answering with %d installs", sender, npc, count)
 end
@@ -585,6 +599,26 @@ function playerKey(name)
     return (name:gsub("-", " "):lower())
 end
 
+-- Sends what waits for the player, and what went to them a moment ago, to the "First-Last" form of their name.
+local function hyphenate(key, sent)
+    hyphenated[key] = true
+    local target = sent.target:gsub(" ", "-")
+    for _, message in ipairs(queue) do
+        if message.chatType == "WHISPER" and playerKey(message.target) == key then
+            message.target = target
+        end
+    end
+    for _, plan in pairs(planned) do
+        if playerKey(plan.target) == key then
+            plan.target = target
+        end
+    end
+    for _, text in ipairs(sent.texts) do
+        enqueue(text, "WHISPER", target)
+    end
+    return target
+end
+
 local function stopWhispers(name)
     local key, dropped = playerKey(name), 0
     for i = #queue, 1, -1 do
@@ -626,8 +660,24 @@ function ns.HideWhisperError(_, _, text)
     if not at or GetTime() - at > WHISPER_ERROR_WINDOW then
         return false
     end
+    -- A whisper to "First Last" that didn't arrive goes once more to "First-Last", which a name with letters like ä
+    -- may need. When that doesn't arrive either, the player is offline, or on the other faction or realm, and gets no
+    -- answers for a while. One error comes per whisper, and the errors after the first of a batch only get hidden.
+    local key = playerKey(name)
+    local sent = recentWhispers[key]
+    recentWhispers[key] = nil
+    if not sent then
+        return true
+    end
+    if sent.target:find(" ") and not hyphenated[key] then
+        ns.Debug("%s didn't get the whisper: sending it again to %s", name, hyphenate(key, sent))
+        return true
+    end
+    hyphenated[key] = nil
+    unreachable[key] = GetTime()
     local dropped = stopWhispers(name)
-    ns.Debug("%s is offline: the error was hidden and %d waiting whispers to them dropped", name, dropped)
+    ns.Debug("%s can't be whispered: the error was hidden, %d waiting whispers to them dropped and no answers for %d "
+        .. "minutes", name, dropped, UNREACHABLE / 60)
     return true
 end
 
@@ -648,7 +698,7 @@ local function tick()
     local now = GetTime()
     for key, at in pairs(whispered) do
         if now - at > WHISPER_ERROR_WINDOW then
-            whispered[key] = nil
+            whispered[key], recentWhispers[key] = nil, nil
         end
     end
     refreshChannel()
@@ -678,7 +728,12 @@ local function tick()
                 ns.Debug("sent %s%s %s", message.chatType,
                     message.chatType == "WHISPER" and " to " .. message.target or "", shown(message.text))
                 if message.chatType == "WHISPER" then
-                    whispered[playerKey(message.target)] = now
+                    local player = playerKey(message.target)
+                    whispered[player] = now
+                    local sent = recentWhispers[player] or { texts = {} }
+                    sent.target = message.target
+                    table.insert(sent.texts, message.text)
+                    recentWhispers[player] = sent
                 end
                 table.remove(queue, i)
                 budget[key] = budget[key] - 1
@@ -745,32 +800,116 @@ ns.On("PLAYER_TARGET_CHANGED", function()
     end
 end)
 
--- Joins the hidden channel and tries again every JOIN_RETRY seconds while the player isn't in it, which happens after
--- loading screens, a /leave or hitting the channel limit.
+local joinWait, nextJoin, lastLoading = JOIN_RETRY, 0, 0
+ns.On("PLAYER_ENTERING_WORLD", function()
+    lastLoading = GetTime()
+end)
+
+-- Whether the channel may be joined or left now: not in combat or a chat lockdown, when the game blocks more, and not
+-- in a battleground, arena or dungeon, where nobody wants their channels touched. Otherwise it waits for later.
+local function channelSafe()
+    if InCombatLockdown() or C_ChatInfo.InChatMessagingLockdown and C_ChatInfo.InChatMessagingLockdown() then
+        return false
+    end
+    return not IsInInstance()
+end
+
+-- The channel takes the lowest free channel number. It never takes /1, and right after a loading screen, while the
+-- game may still be joining General and the rest, it doesn't take a free number below one of the player's channels
+-- either, or that channel would come back under another number. A gap that is still there after SETTLE seconds is
+-- one the player left free.
+local function numberFree()
+    local list, used, highest = { GetChannelList() }, {}, 0
+    for i = 1, #list, 3 do
+        used[list[i]] = true
+        highest = math.max(highest, list[i])
+    end
+    if not used[1] then
+        return false
+    end
+    local lowest = 1
+    while used[lowest] do
+        lowest = lowest + 1
+    end
+    return lowest > highest or GetTime() - lastLoading >= SETTLE
+end
+
+-- A failed try waits joinWait seconds, and the wait doubles up to JOIN_BACKOFF, so a channel limit or a blocked call
+-- doesn't turn into a try every few seconds.
+local function backOff(reason)
+    nextJoin = GetTime() + joinWait
+    ns.Debug("could not join the sharing channel (%s), next try in %d s", reason, joinWait)
+    joinWait = math.min(joinWait * 2, JOIN_BACKOFF)
+end
+
+local function leaveChannel()
+    local ok, err = pcall(LeaveChannelByName, CHANNEL)
+    if not ok then
+        ns.Debug("could not leave the sharing channel: %s", tostring(err))
+    end
+    channelId = nil
+end
+
+-- Joins the hidden channel and tries again while the player isn't in it, which happens after loading screens, a
+-- /leave or hitting the channel limit.
 local function joinChannel()
-    if not sharing() or refreshChannel() then
+    if refreshChannel() then
+        joinWait = JOIN_RETRY
         return
     end
-    JoinTemporaryChannel(CHANNEL)
+    if GetTime() < nextJoin or not channelSafe() or not numberFree() then
+        return
+    end
+    local ok, err = pcall(JoinTemporaryChannel, CHANNEL)
+    if not ok then
+        backOff(tostring(err))
+        return
+    end
+    nextJoin = GetTime() + joinWait
     C_Timer.After(2, function()
-        ns.Debug(refreshChannel() and "joined the sharing channel" or "could not join the sharing channel, trying again")
+        if not refreshChannel() then
+            backOff("not in it")
+        elseif channelId == 1 then
+            leaveChannel()
+            backOff("it took /1")
+        else
+            joinWait, nextJoin = JOIN_RETRY, 0
+            ns.Debug("joined the sharing channel")
+        end
     end)
 end
 
--- With the option on, joins the channel (at once when it was just turned on). With it off, leaves the channel, which
--- a /reload doesn't do, and drops whatever waited to go out.
-local function applySharing()
+-- Joins the channel while the option is on and leaves it while it's off, which a /reload doesn't do, each once it's
+-- safe to (see channelSafe).
+local function syncChannel()
     if sharing() then
         joinChannel()
-        return
+    elseif refreshChannel() and channelSafe() then
+        leaveChannel()
     end
-    if refreshChannel() then
-        LeaveChannelByName(CHANNEL)
-        channelId = nil
+end
+
+-- The game blocked a channel call from Drop Tables: no more tries for a while.
+local CHANNEL_CALLS = { JoinTemporaryChannel = true, LeaveChannelByName = true }
+local function blocked(addon, call)
+    if addon == ADDON and CHANNEL_CALLS[call] then
+        backOff(call .. " blocked")
     end
-    wipe(queue)
-    wipe(planned)
-    wipe(waiting)
+end
+ns.On("ADDON_ACTION_BLOCKED", blocked)
+ns.On("ADDON_ACTION_FORBIDDEN", blocked)
+
+-- Turning the option on joins at once, when it's safe. Turning it off leaves the channel and drops whatever waited
+-- to go out.
+local function applySharing()
+    if sharing() then
+        joinWait, nextJoin = JOIN_RETRY, 0
+    else
+        wipe(queue)
+        wipe(planned)
+        wipe(waiting)
+    end
+    syncChannel()
 end
 ns.On("DT_SETTINGS_CHANGED", applySharing)
 
@@ -812,7 +951,7 @@ ns.On("DT_READY", function()
     C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
     C_Timer.After(JOIN_DELAY, function()
         applySharing()
-        C_Timer.NewTicker(JOIN_RETRY, joinChannel)
+        C_Timer.NewTicker(JOIN_RETRY, syncChannel)
     end)
     C_Timer.NewTicker(TICK, tick)
 end)
