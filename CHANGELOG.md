@@ -2,13 +2,19 @@
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-11-26
+
 ### Changed
 
 - The addon is called Forever Drop Tables now, in the addon list and on its windows, so it's clear which game it's for. The folder is still DropTables, so your recorded drops stay where they are, and /dt works as before.
+- Four more shares and two refreshes of the EG Link and Everloot counts went into the shared database, which now knows 2,344 mobs, with 44,086 kills and 8,158 skinned corpses.
 
 ### Fixed
 
 - A game client in another language sent its mob names along with its counts, so an export from a German client carried German names. Only an English client sends names now. A name another player's addon sent is still shown, but it no longer goes out with your counts.
+- 32 mobs had Korean names in the shared database, which came in with the EG Link counts. 18 of them have their English names back, and the other 14 show "NPC" and a number for now.
+- 103 mobs had no name in the shared database and showed up as "NPC" and a number, NPC 2658 for example, which is a Razorbeak Gryphon. They take their names from EG Link's list of creatures now.
+- The shared database still counted Obsidian Sentinel, Vitrix and Snowtalon corpses from before the hotfixes that fixed their loot, on November 23 for Obsidian Sentinel and November 9 for the other two. As with Ridgeshade Lurker in 0.6.2, only what was recorded from the day after the hotfix counts now.
 
 ## [0.6.3] - 2026-11-25
 
@@ -270,7 +276,9 @@
 
 First test build. It records your own kills and loot and shows drop chances under the target frame, in the tooltip and in the drop table window, with the Loot Finder and kill spots on the map.
 
-[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/valcheffnet/DropTables/compare/v0.6.4...HEAD
+[0.6.4]: https://github.com/valcheffnet/DropTables/compare/v0.6.3...v0.6.4
+[0.6.3]: https://github.com/valcheffnet/DropTables/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/valcheffnet/DropTables/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/valcheffnet/DropTables/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/valcheffnet/DropTables/compare/v0.5.4...v0.6.0
