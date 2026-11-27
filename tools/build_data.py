@@ -23,8 +23,12 @@ an import's "names" list gives it (EG Link names every creature it saw, also the
 keeps the one data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left
 out is printed.
 
+A build that leaves less than 95% of the mobs, kills, skinned corpses or mob and item pairs that data/shared.json
+had stops before it writes or deletes anything, since no new export or refresh takes that much away. --allow-shrink
+lets it through when that is on purpose.
+
 Usage:
-    python tools/build_data.py [--root DIR]
+    python tools/build_data.py [--root DIR] [--allow-shrink]
 """
 import calendar
 import json
@@ -50,6 +54,7 @@ MAX_SPOTS = 40  # kill spots kept per map of a mob, the busiest, as MAX_CELLS in
 NOT_MOBS = frozenset({"2673", "2674", "12426"})
 # Pristine Leather, Pristine Hide and Pristine Scale, as SCARCE_SKINS in DropTables/Stats.lua.
 SCARCE_SKINS = frozenset({"249427", "249428", "249429"})
+SHRINK_FLOOR = 0.95
 
 
 def mob_kills(mob):
@@ -788,6 +793,23 @@ def lua_file(database):
     return "\n".join(lines) + "\n"
 
 
+def measures(database):
+    mobs = database["mobs"].values()
+    buckets = [list((m.get("buckets") or {}).values()) for m in mobs]
+    return {
+        "mobs": len(mobs),
+        "kills": sum(b["kills"] for mob in buckets for b in mob),
+        "skinned corpses": sum((m.get("skins") or {}).get("skinned", 0) for m in mobs),
+        "mob and item pairs": sum(len({item for b in mob for item in b["items"]}) for mob in buckets),
+    }
+
+
+def shrunk(old, new):
+    """(measure, old value, new value) for each measure that fell below SHRINK_FLOOR of the old database's."""
+    before, after = measures(old), measures(new)
+    return [(name, before[name], after[name]) for name in before if after[name] < before[name] * SHRINK_FLOOR]
+
+
 def load_submissions(root, folder="submissions"):
     folder = root / "data" / folder
     subs = [json.loads(path.read_text(encoding="utf-8")) for path in folder.glob("*.json")]
@@ -811,12 +833,15 @@ def load_resets(root):
     return {npc: entry["since"] for npc, entry in json.loads(path.read_text(encoding="utf-8"))["mobs"].items()}
 
 
-def load_names(root):
-    """npc -> name from the data/shared.json there is now."""
+def load_shared(root):
+    """The data/shared.json there is now, or None."""
     path = root / "data" / "shared.json"
-    if not path.exists():
-        return {}
-    mobs = json.loads(path.read_text(encoding="utf-8"))["mobs"]
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+
+
+def names_in(database):
+    """npc -> name in a shared database."""
+    mobs = database["mobs"] if database else {}
     return {npc: mob["name"] for npc, mob in mobs.items() if mob.get("name")}
 
 
@@ -841,11 +866,21 @@ def main(argv):
     root = pathlib.Path(argv[argv.index("--root") + 1]) if "--root" in argv else ROOT
     submissions = load_submissions(root)
     resets = load_resets(root)
-    for old in superseded(submissions, resets):
-        (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
+    gone = superseded(submissions, resets)
+    for old in gone:
         submissions.remove(old)
     imports = load_imports(root)
-    database = build(submissions, imports, load_quest_items(root), resets, load_names(root))
+    previous = load_shared(root)
+    database = build(submissions, imports, load_quest_items(root), resets, names_in(previous))
+    lost = shrunk(previous, database) if previous and "--allow-shrink" not in argv else []
+    if lost:
+        for name, before, after in lost:
+            print("The new database has %d %s, where data/shared.json has %d (%.1f%%)."
+                  % (after, name, before, 100 * after / before))
+        print("Nothing was written. If the database should shrink this much, build again with --allow-shrink.")
+        return 1
+    for old in gone:
+        (root / "data" / "submissions" / ("%d-%d.json" % (old["issue"], old["index"]))).unlink()
     changed = write_outputs(root, database)
     print("%d submissions, %d imports, %d mobs%s" % (database["submissions"], len(imports), len(database["mobs"]),
                                                      "" if changed else ", nothing changed"))

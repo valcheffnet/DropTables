@@ -14,6 +14,10 @@ on:
       issue:
         description: An issue to take in even without the share label (number); empty only rebuilds
         required: false
+      allow_shrink:
+        description: Let the database shrink below 95% of what it was (a source taken out on purpose)
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ["tools/build_data.py", "tools/check_export.py", "tools/ingest_issue.py", "data/loot-resets.json"]
@@ -60,7 +64,24 @@ jobs:
         run: python tools/ingest_issue.py "$RUNNER_TEMP/issues.json" --replies "$RUNNER_TEMP/replies"
 
       - name: Build the shared database
-        run: python tools/build_data.py
+        env:
+          ALLOW_SHRINK: ${{ inputs.allow_shrink }}
+        run: |
+          set -euo pipefail
+          if [ "${ALLOW_SHRINK:-}" = "true" ]; then
+            python tools/build_data.py --allow-shrink
+          else
+            python tools/build_data.py
+          fi
+
+      - name: Back up the data folder
+        # To R2, as it was before this build (tools/backup_data.py). Without the R2 secrets it only warns.
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python tools/backup_data.py
 
       - name: Commit
         run: |

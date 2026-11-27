@@ -372,6 +372,39 @@ def pruning(root):
     expect("the database does not change", after, before)
 
 
+def shrink_guard(root):
+    """A build that takes away much of the database stops before it writes or deletes anything."""
+    a, b = origin(910), origin(911)
+    first = submission(1, a, {a: {7: mob({1: bucket(50, 50, 40, {100: 10, 101: 2})})}})
+    other = submission(2, b, {b: {8: mob({1: bucket(50, 50, 50, {102: 5})})}})
+    folder = root / "data" / "submissions"
+    folder.mkdir(parents=True)
+    for sub in (first, other):
+        (folder / ("%d-1.json" % sub["issue"])).write_text(json.dumps(sub), encoding="utf-8")
+    expect("the first build goes through", build_data.main(["--root", str(root)]), 0)
+    shared = root / "data" / "shared.json"
+    expect("all four measures are counted", build_data.measures(json.loads(shared.read_text(encoding="utf-8"))),
+           {"mobs": 2, "kills": 100, "skinned corpses": 0, "mob and item pairs": 3})
+    before = shared.read_text(encoding="utf-8")
+
+    # The other player's counts go missing, and a new export of the first player's makes the old one superseded.
+    (folder / "2-1.json").unlink()
+    newer = submission(3, a, {a: {7: mob({1: bucket(60, 60, 45, {100: 12, 101: 2})})}})
+    (folder / "3-1.json").write_text(json.dumps(newer), encoding="utf-8")
+    expect("the build stops", build_data.main(["--root", str(root)]), 1)
+    expect("shared.json stays as it was", shared.read_text(encoding="utf-8"), before)
+    expect("the superseded export is still there", (folder / "1-1.json").exists(), True)
+    expect("--allow-shrink lets it through", build_data.main(["--root", str(root), "--allow-shrink"]), 0)
+    after = build_data.measures(json.loads(shared.read_text(encoding="utf-8")))
+    expect("the database shrank", (after["mobs"], after["kills"]), (1, 60))
+    expect("and then the superseded export is deleted", (folder / "1-1.json").exists(), False)
+    expect("a small drop goes through", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
+                                                          {"mobs": {"7": mob({1: bucket(96, 96, 96)})}}), [])
+    expect("a drop below 95% does not", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
+                                                          {"mobs": {"7": mob({1: bucket(94, 94, 94)})}}),
+           [("kills", 100, 94)])
+
+
 def shared_is_trusted():
     """Another install claiming hundreds of empty corpses is left out, never the shared database."""
     lua = build_data.lua_file(build_data.build([submission(80, origin(800), {origin(800): {4: mob({1: bucket(
@@ -653,6 +686,8 @@ def main():
         issue_list(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:
         pruning(pathlib.Path(folder))
+    with tempfile.TemporaryDirectory() as folder:
+        shrink_guard(pathlib.Path(folder))
     # A control character in a name can't break Data.lua: it goes in as an escape and reads back the same.
     literal = build_data.lua_string('Line\none "two"\\')
     expect("control characters escaped", "\n" in literal, False)

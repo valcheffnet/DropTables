@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: "0 4 * * *"
   workflow_dispatch:
+    inputs:
+      allow_shrink:
+        description: Let the database shrink below 95% of what it was (a source taken out on purpose)
+        type: boolean
+        default: false
 
 concurrency:
   group: shared-data
@@ -44,7 +49,24 @@ jobs:
           python tools/import_everloot.py "$RUNNER_TEMP/everloot" --names data/shared.json
 
       - name: Build the shared database
-        run: python tools/build_data.py
+        env:
+          ALLOW_SHRINK: ${{ inputs.allow_shrink }}
+        run: |
+          set -euo pipefail
+          if [ "${ALLOW_SHRINK:-}" = "true" ]; then
+            python tools/build_data.py --allow-shrink
+          else
+            python tools/build_data.py
+          fi
+
+      - name: Back up the data folder
+        # To R2, as it was before this build (tools/backup_data.py). Without the R2 secrets it only warns.
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: python tools/backup_data.py
 
       - name: Commit
         run: |

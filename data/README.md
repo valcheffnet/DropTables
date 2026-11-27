@@ -172,6 +172,17 @@ sighting names it.
 client. `import_everloot.py` writes it, and `build_data.py` leaves those items out of every source, because the
 addon never records them and an import can't always tell them apart.
 
+## Shrinking and backups
+
+A build stops before it writes or deletes anything when the new database would have less than 95% of the mobs,
+kills, skinned corpses or mob and item pairs that `shared.json` has now. No share or refresh takes that much away, so
+a drop like that means a bug or a source that lost its data. To shrink it on purpose, for example when a source is
+taken out, run `python tools/build_data.py --allow-shrink`, or start the workflow by hand with "allow_shrink" ticked.
+
+Before the bot commits a build that changed something, it uploads this folder as it was before the build to a
+Cloudflare R2 bucket (`tools/backup_data.py`). It keeps the newest 10 backups and the newest one of each day for 30
+days.
+
 ## Changes to the format
 
 New fields can appear. Existing ones won't be renamed or removed without a note in CHANGELOG.md first.
