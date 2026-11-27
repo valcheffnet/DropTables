@@ -199,6 +199,7 @@ function ns.AwaitItem(itemId)
 end
 
 ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
+    -- An item that failed can still arrive later, when something else asks the client for it.
     if not awaited[itemId] and not failed[itemId] then
         return
     end
@@ -207,7 +208,6 @@ ns.On("GET_ITEM_INFO_RECEIVED", function(itemId, success)
         failed[itemId] = true
         return
     end
-    -- It can still come later, when something else asks for it.
     arrived[itemId], failed[itemId] = true, nil
     readItem(itemId)
     ns.Fire("DT_ITEM_INFO_RECEIVED", itemId)
@@ -215,7 +215,7 @@ end)
 
 -- Name, quality, sell price and bind type of an item, or nil while the client doesn't know it yet. An item already
 -- asked for isn't asked for again until ASK_AGAIN seconds have passed: the Loot Finder's gold per hour needs the items
--- of two thousand mobs, and asking for each unknown one every time a mob drops it ran into the game's time limit.
+-- of two thousand mobs, and asking for each unknown one every time a mob drops it would run into the game's time limit.
 function ns.ItemInfo(itemId)
     local info = itemInfo[itemId]
     local asked = awaited[itemId]
