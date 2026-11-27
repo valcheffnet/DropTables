@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.6.5] - 2026-11-27
 
 ### Added
 
@@ -13,6 +13,7 @@
 - Sorting by chance puts a chance that rests on many corpses ahead of one that rests on a few, so one drop in one corpse, a 100%, no longer tops the list. The chance shown stays the same.
 - Every /dt export ends with a key only your install knows. The share page writes down only a hash of it, and once one of your exports came in with it, an export in your install's name with another key or none no longer counts as yours.
 - The share page turns away an export from an older version of Drop Tables and asks you to update and export again.
+- Two more shares and two refreshes of the EG Link and Everloot counts went into the shared database, which now knows 2,393 mobs, with 46,055 kills and 8,748 skinned corpses.
 
 ### Fixed
 
