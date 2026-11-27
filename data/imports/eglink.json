@@ -188,6 +188,7 @@
   "1097": "Venture Co. Mechanic",
   "10977": "Quixxil",
   "1098": "Watcher Merant",
+  "10988": "Kodo Spirit",
   "10992": "Enraged Panther",
   "1100": "Watcher Selkin",
   "1101": "Watcher Thayer",
@@ -495,6 +496,7 @@
   "12241": "Magra",
   "12245": "Vendor-Tron 1000",
   "12246": "Super-Seller 680",
+  "12277": "Melizza Brimbuzzle",
   "12296": "Sickly Gazelle",
   "12298": "Sickly Deer",
   "123": "Riverpaw Mongrel",
@@ -714,7 +716,6 @@
   "14377": "Scout Tharr",
   "14378": "Huntress Skymane",
   "14379": "Huntress Ravenoak",
-  "14380": "Huntress Leafrunner",
   "14387": "Lothos Riftwaker",
   "14388": "Rogue Black Drake",
   "14392": "Overlord Runthak",
@@ -1790,6 +1791,7 @@
   "253844": "Valennia Stormfist",
   "253847": "Elaadrin Evengale",
   "253849": "Ayessa Dawnsinger",
+  "253851": "Hagiak",
   "2540": "Dalaran Serpent",
   "254040": "Rokren",
   "254081": "Naeluna Swiftmend",
@@ -1985,6 +1987,7 @@
   "256807": "Shore Crawler",
   "256809": "Predatory Hyjal Stag",
   "256831": "Apprentice Claire",
+  "256840": "Lieutenant Prenish",
   "256881": "Overlord Kilgar",
   "256891": "Executioner Morg",
   "256899": "Chogg'Zac",
@@ -2066,6 +2069,7 @@
   "257944": "Elegael Thornpaw",
   "258": "Joshua Maclure",
   "2580": "Elder Mesa Buzzard",
+  "258023": "Sergeant Riftan",
   "258031": "Neza Bloodsnout",
   "258032": "Twilight Forgemaster",
   "258048": "Jom-jom",
@@ -2238,6 +2242,7 @@
   "260560": "Krikshank",
   "260561": "Dina Mite",
   "260564": "Rex Hardwire",
+  "260565": "Kor'gar",
   "260566": "Fizzix Boomshot",
   "260568": "Jazzle Cheapshot",
   "260569": "Shady Smuggler",
@@ -2621,6 +2626,7 @@
   "2715": "Dustbelcher Brute",
   "2716": "Dustbelcher Wyrmhunter",
   "271613": "Unfinished Abomination",
+  "271637": "Vigilantes Active",
   "271642": "Missed You",
   "271645": "I Went This Way",
   "271649": "Death Trap",
@@ -2749,6 +2755,7 @@
   "275789": "Malah Longwind",
   "275811": "Pal'juh",
   "275954": "Bareth Dawnstone",
+  "275980": "Farholde Miner",
   "276": "Viktori Prism'Antras",
   "2760": "Burning Exile",
   "276003": "Minor Ice Elemental",
@@ -3741,7 +3748,6 @@
   "4083": "Jeeda",
   "40833": "Tiala Whitemane",
   "4087": "Arias'ta Bladesinger",
-  "4088": "Elanaria",
   "4092": "Lariia",
   "4093": "Galak Wrangler",
   "4094": "Galak Scout",
@@ -3785,15 +3791,12 @@
   "4151": "Saltstone Crystalhide",
   "4154": "Salt Flats Scavenger",
   "4158": "Salt Flats Vulture",
-  "4159": "Me'lynn",
   "4164": "Cylania",
   "4166": "Gazelle",
   "4167": "Dendrythis",
   "4168": "Elynna",
   "4169": "Jaeana",
-  "4170": "Ellandrieth",
   "4182": "Dalmond",
-  "4183": "Naram Longclaw",
   "4184": "Geenia Sunshadow",
   "41861": "Fayran Elthas",
   "4188": "Illyanie",
@@ -4319,6 +4322,7 @@
   "5428": "Roc",
   "5429": "Fire Roc",
   "5430": "Searing Roc",
+  "5431": "Surf Glider",
   "5434": "Coral Shark",
   "5435": "Sand Shark",
   "5441": "Hazzali Wasp",
@@ -4335,6 +4339,8 @@
   "5460": "Centipaar Sandreaver",
   "5464": "Watchmaster Sorigal",
   "5465": "Land Rager",
+  "5466": "Coast Strider",
+  "5469": "Dune Smasher",
   "547": "Great Goretusk",
   "5471": "Dunemaul Ogre",
   "5472": "Dunemaul Enforcer",
@@ -4408,6 +4414,10 @@
   "565": "Rabid Dire Wolf",
   "5651": "Patrick Garrett",
   "5652": "Practice Dummy",
+  "5653": "Tyler",
+  "5654": "Edward",
+  "5655": "Robert Gossom",
+  "5656": "Richard Van Brunt",
   "5657": "Marla Fowler",
   "5658": "Chloe Curthas",
   "5659": "Andrew Hartwell",
@@ -4422,6 +4432,8 @@
   "5676": "Summoned Voidwalker",
   "5677": "Summoned Succubus",
   "568": "Shadowhide Warrior",
+  "5680": "Male Human Captive",
+  "5681": "Female Human Captive",
   "5682": "Dalin Forgewright",
   "5683": "Corma Villard",
   "5688": "Innkeeper Renee",
@@ -5069,8 +5081,11 @@
   "7882": "Security Chief Bilgewhizzle",
   "7883": "Andre Firebeard",
   "789": "Kimberly Hiett",
+  "7899": "Treasure Hunting Pirate",
   "79": "Narg the Taskmaster",
   "790": "Karen Taylor",
+  "7901": "Treasure Hunting Swashbuckler",
+  "7902": "Treasure Hunting Buccaneer",
   "791": "Lindsay Ashlock",
   "793": "Kara Adams",
   "7937": "High Tinker Mekkatorque",
@@ -5187,6 +5202,7 @@
   "8496": "Liv Rizzlefix",
   "850": "Erin",
   "8518": "Rynthariel the Keymaster",
+  "8529": "Scourge Champion",
   "8532": "Diseased Flayer",
   "854": "Young Jungle Stalker",
   "8540": "Torn Screamer",
@@ -5214,6 +5230,7 @@
   "861": "Stonard Scout",
   "8610": "Kroum",
   "8612": "Screecher Spirit",
+  "8617": "Zalashji",
   "862": "Stonard Explorer",
   "863": "Stonard Hunter",
   "8636": "Morta'gya the Keeper",
@@ -5460,7 +5477,7 @@
   "9999": "Ringo"
  },
  "partial": false,
- "received": 1795693861,
+ "received": 1795779776,
  "result": {
   "exporter": "eglink",
   "part": 1,
@@ -7929,6 +7946,35 @@
       },
       "name": "Defias Bandit"
      },
+     "11685": {
+      "buckets": {
+       "1": {
+        "items": {},
+        "kills": 1,
+        "lootable": 1,
+        "money": {
+         "copper": 193,
+         "drops": 1,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "1414": {
+        "978": 5
+       }
+      },
+      "levels": [
+       40,
+       40
+      ],
+      "maps": {
+       "1414": 1
+      },
+      "name": "Maraudine Priest"
+     },
      "11686": {
       "buckets": {
        "1": {
@@ -7962,20 +8008,20 @@
       "buckets": {
        "1": {
         "items": {},
-        "kills": 1,
-        "lootable": 1,
+        "kills": 2,
+        "lootable": 2,
         "money": {
-         "copper": 314,
-         "drops": 1,
+         "copper": 561,
+         "drops": 2,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 2
        }
       },
       "cells": {
        "1414": {
-        "978": 1,
+        "978": 2,
         "979": 3
        }
       },
@@ -7984,7 +8030,7 @@
        41
       ],
       "maps": {
-       "1414": 1
+       "1414": 2
       },
       "name": "Ghostly Marauder"
      },
@@ -8106,15 +8152,37 @@
       }
      },
      "11786": {
-      "buckets": {},
+      "buckets": {
+       "1": {
+        "items": {
+         "8146": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 1,
+        "lootable": 1,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
       "cells": {
        "1414": {
+        "978": 1,
         "979": 3
        }
       },
-      "levels": null,
+      "levels": [
+       41,
+       41
+      ],
       "maps": {
-       "1414": 4
+       "1414": 1
       },
       "name": "Ambereye Reaver",
       "skins": {
@@ -8140,24 +8208,28 @@
        "1": {
         "items": {
          "3669": {
+          "drops": 2,
+          "qty": 2
+         },
+         "3676": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 2,
-        "lootable": 1,
+        "kills": 4,
+        "lootable": 2,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 2
        }
       },
       "cells": {
        "1414": {
-        "978": 3
+        "978": 4
        }
       },
       "levels": [
@@ -8165,7 +8237,7 @@
        41
       ],
       "maps": {
-       "1414": 2
+       "1414": 4
       },
       "name": "Rock Borer"
      },
@@ -9021,24 +9093,28 @@
        "1": {
         "items": {
          "17762": {
+          "drops": 3,
+          "qty": 3
+         },
+         "3937": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 2,
-        "lootable": 1,
+        "kills": 5,
+        "lootable": 3,
         "money": {
-         "copper": 552,
-         "drops": 1,
+         "copper": 1273,
+         "drops": 3,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 3
        }
       },
       "cells": {
        "1414": {
-        "978": 1
+        "978": 3
        }
       },
       "levels": [
@@ -9046,7 +9122,7 @@
        42
       ],
       "maps": {
-       "1414": 2
+       "1414": 5
       },
       "name": "Gelk"
      },
@@ -9055,24 +9131,66 @@
        "1": {
         "items": {
          "17761": {
+          "drops": 3,
+          "qty": 3
+         },
+         "4338": {
           "drops": 1,
-          "qty": 1
+          "qty": 3
          }
         },
-        "kills": 2,
-        "lootable": 1,
+        "kills": 5,
+        "lootable": 3,
         "money": {
-         "copper": 1254,
-         "drops": 1,
+         "copper": 2514,
+         "drops": 3,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 3
        }
       },
       "cells": {
        "1414": {
-        "978": 2
+        "978": 4
+       }
+      },
+      "levels": [
+       43,
+       43
+      ],
+      "maps": {
+       "1414": 5
+      },
+      "name": "Kolk"
+     },
+     "12241": {
+      "buckets": {
+       "1": {
+        "items": {
+         "17763": {
+          "drops": 2,
+          "qty": 2
+         },
+         "4306": {
+          "drops": 1,
+          "qty": 2
+         }
+        },
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 984,
+         "drops": 2,
+         "max": null,
+         "min": null
+        },
+        "opened": 2
+       }
+      },
+      "cells": {
+       "1414": {
+        "978": 3
        }
       },
       "levels": [
@@ -9082,7 +9200,7 @@
       "maps": {
        "1414": 2
       },
-      "name": "Kolk"
+      "name": "Magra"
      },
      "12296": {
       "buckets": {},
@@ -9949,21 +10067,26 @@
      "13718": {
       "buckets": {
        "1": {
-        "items": {},
-        "kills": 2,
-        "lootable": 1,
+        "items": {
+         "4306": {
+          "drops": 1,
+          "qty": 3
+         }
+        },
+        "kills": 4,
+        "lootable": 2,
         "money": {
-         "copper": 734,
-         "drops": 1,
+         "copper": 1374,
+         "drops": 2,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 2
        }
       },
       "cells": {
        "1414": {
-        "978": 1,
+        "978": 2,
         "979": 3
        }
       },
@@ -9972,7 +10095,7 @@
        41
       ],
       "maps": {
-       "1414": 2
+       "1414": 4
       },
       "name": "The Nameless Prophet"
      },
@@ -18863,37 +18986,46 @@
       "buckets": {
        "1": {
         "items": {
+         "14113": {
+          "drops": 1,
+          "qty": 1
+         },
          "4813": {
           "drops": 2,
           "qty": 2
          },
          "5134": {
-          "drops": 11,
-          "qty": 11
+          "drops": 14,
+          "qty": 14
          },
          "6347": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 26,
-        "lootable": 26,
+        "kills": 33,
+        "lootable": 33,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 13
+        "opened": 18
        }
       },
       "cells": {
        "1439": {
+        "1037": 1,
+        "1082": 1,
+        "1084": 2,
         "1212": 1,
         "1213": 1,
         "1214": 1,
+        "1267": 2,
         "1312": 1,
         "1313": 2,
+        "1316": 1,
         "1365": 1,
         "929": 1,
         "930": 1,
@@ -18905,7 +19037,7 @@
         "980": 1,
         "982": 3,
         "983": 3,
-        "987": 1,
+        "987": 2,
         "988": 2,
         "989": 2
        }
@@ -18915,7 +19047,7 @@
        15
       ],
       "maps": {
-       "1439": 26
+       "1439": 33
       },
       "name": "Moonstalker",
       "skins": {
@@ -18953,8 +19085,8 @@
           "qty": 2
          }
         },
-        "kills": 20,
-        "lootable": 17,
+        "kills": 21,
+        "lootable": 18,
         "money": {
          "copper": 0,
          "drops": 0,
@@ -18975,7 +19107,7 @@
         "1172": 1,
         "1176": 1,
         "1219": 1,
-        "973": 3,
+        "973": 4,
         "974": 2,
         "975": 3
        }
@@ -18985,7 +19117,7 @@
        11
       ],
       "maps": {
-       "1439": 20
+       "1439": 21
       },
       "name": "Moonstalker Runt",
       "skins": {
@@ -19404,6 +19536,10 @@
       "buckets": {
        "1": {
         "items": {
+         "11406": {
+          "drops": 1,
+          "qty": 1
+         },
          "3169": {
           "drops": 2,
           "qty": 2
@@ -19413,15 +19549,15 @@
           "qty": 2
          }
         },
-        "kills": 10,
-        "lootable": 10,
+        "kills": 12,
+        "lootable": 12,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 4
+        "opened": 5
        }
       },
       "cells": {
@@ -19431,7 +19567,9 @@
         "1062": 1,
         "1071": 1,
         "1112": 1,
+        "1120": 1,
         "1128": 1,
+        "1219": 1,
         "966": 1,
         "973": 2
        }
@@ -19441,7 +19579,7 @@
        12
       ],
       "maps": {
-       "1439": 10
+       "1439": 12
       },
       "name": "Thistle Bear",
       "skins": {
@@ -19491,23 +19629,23 @@
           "qty": 10
          },
          "3170": {
-          "drops": 13,
-          "qty": 13
+          "drops": 14,
+          "qty": 14
          },
          "3173": {
-          "drops": 10,
-          "qty": 10
+          "drops": 11,
+          "qty": 11
          }
         },
-        "kills": 35,
-        "lootable": 34,
+        "kills": 39,
+        "lootable": 38,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 29
+        "opened": 31
        }
       },
       "cells": {
@@ -19518,15 +19656,16 @@
         "1213": 2,
         "1214": 1,
         "1215": 1,
+        "1216": 1,
         "1218": 1,
         "1262": 3,
         "1263": 1,
-        "1267": 2,
+        "1267": 3,
         "1316": 1,
-        "1317": 1,
+        "1317": 2,
         "1361": 1,
         "1364": 1,
-        "1365": 2,
+        "1365": 3,
         "935": 2,
         "936": 1,
         "939": 1,
@@ -19544,7 +19683,7 @@
        14
       ],
       "maps": {
-       "1439": 35
+       "1439": 39
       },
       "name": "Rabid Thistle Bear",
       "skins": {
@@ -19661,6 +19800,8 @@
       },
       "cells": {
        "1439": {
+        "1039": 1,
+        "1040": 3,
         "941": 1,
         "984": 1,
         "986": 1
@@ -19731,26 +19872,26 @@
           "qty": 1
          },
          "2589": {
-          "drops": 4,
-          "qty": 9
+          "drops": 5,
+          "qty": 11
          }
         },
-        "kills": 8,
-        "lootable": 8,
+        "kills": 9,
+        "lootable": 9,
         "money": {
-         "copper": 106,
-         "drops": 8,
+         "copper": 111,
+         "drops": 9,
          "max": null,
          "min": null
         },
-        "opened": 8
+        "opened": 9
        }
       },
       "cells": {
        "1439": {
         "1026": 3,
         "1028": 1,
-        "976": 2
+        "976": 3
        }
       },
       "levels": [
@@ -19758,9 +19899,107 @@
        13
       ],
       "maps": {
-       "1439": 8
+       "1439": 9
       },
       "name": null
+     },
+     "2168": {
+      "buckets": {
+       "1": {
+        "items": {
+         "1738": {
+          "drops": 1,
+          "qty": 1
+         },
+         "2589": {
+          "drops": 1,
+          "qty": 1
+         },
+         "2592": {
+          "drops": 3,
+          "qty": 5
+         },
+         "3012": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 9,
+        "lootable": 9,
+        "money": {
+         "copper": 265,
+         "drops": 9,
+         "max": null,
+         "min": null
+        },
+        "opened": 9
+       }
+      },
+      "cells": {
+       "1439": {
+        "1265": 1,
+        "1267": 2,
+        "1268": 1,
+        "1315": 1,
+        "1316": 3
+       }
+      },
+      "levels": [
+       16,
+       17
+      ],
+      "maps": {
+       "1439": 9
+      },
+      "name": "Blackwood Warrior"
+     },
+     "2169": {
+      "buckets": {
+       "1": {
+        "items": {
+         "2589": {
+          "drops": 1,
+          "qty": 2
+         },
+         "2592": {
+          "drops": 1,
+          "qty": 1
+         },
+         "4537": {
+          "drops": 1,
+          "qty": 1
+         },
+         "858": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 5,
+        "lootable": 5,
+        "money": {
+         "copper": 130,
+         "drops": 4,
+         "max": null,
+         "min": null
+        },
+        "opened": 4
+       }
+      },
+      "cells": {
+       "1439": {
+        "1267": 2,
+        "1315": 1,
+        "1316": 2
+       }
+      },
+      "levels": [
+       17,
+       18
+      ],
+      "maps": {
+       "1439": 5
+      },
+      "name": "Blackwood Totemic"
      },
      "217": {
       "buckets": {
@@ -20018,6 +20257,40 @@
       },
       "name": null
      },
+     "2179": {
+      "buckets": {
+       "1": {
+        "items": {
+         "858": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 47,
+         "drops": 2,
+         "max": null,
+         "min": null
+        },
+        "opened": 2
+       }
+      },
+      "cells": {
+       "1439": {
+        "1366": 2
+       }
+      },
+      "levels": [
+       15,
+       16
+      ],
+      "maps": {
+       "1439": 2
+      },
+      "name": null
+     },
      "218": {
       "buckets": {
        "1": {
@@ -20060,6 +20333,35 @@
        "1431": 4
       },
       "name": "Grave Robber"
+     },
+     "2180": {
+      "buckets": {
+       "1": {
+        "items": {},
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 56,
+         "drops": 2,
+         "max": null,
+         "min": null
+        },
+        "opened": 2
+       }
+      },
+      "cells": {
+       "1439": {
+        "1366": 2
+       }
+      },
+      "levels": [
+       16,
+       17
+      ],
+      "maps": {
+       "1439": 2
+      },
+      "name": null
      },
      "2185": {
       "buckets": {
@@ -21808,6 +22110,10 @@
       "buckets": {
        "1": {
         "items": {
+         "15301": {
+          "drops": 1,
+          "qty": 1
+         },
          "17056": {
           "drops": 2,
           "qty": 2
@@ -21817,38 +22123,39 @@
           "qty": 1
          },
          "5114": {
-          "drops": 1,
-          "qty": 1
-         },
-         "5469": {
           "drops": 2,
           "qty": 2
+         },
+         "5469": {
+          "drops": 3,
+          "qty": 3
          }
         },
-        "kills": 4,
-        "lootable": 4,
+        "kills": 6,
+        "lootable": 6,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 4
+        "opened": 6
        }
       },
       "cells": {
        "1439": {
         "1077": 2,
+        "1120": 2,
         "1129": 1,
         "982": 1
        }
       },
       "levels": [
-       12,
+       11,
        13
       ],
       "maps": {
-       "1439": 4
+       "1439": 6
       },
       "name": "Foreststrider Fledgling",
       "skins": {
@@ -21861,17 +22168,73 @@
        "skinned": 1
       }
      },
+     "2322": {
+      "buckets": {
+       "1": {
+        "items": {
+         "17056": {
+          "drops": 1,
+          "qty": 1
+         },
+         "4775": {
+          "drops": 2,
+          "qty": 2
+         },
+         "4776": {
+          "drops": 1,
+          "qty": 1
+         },
+         "5114": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 3,
+        "lootable": 3,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 3
+       }
+      },
+      "cells": {
+       "1439": {
+        "1216": 1,
+        "1218": 1,
+        "1317": 1
+       }
+      },
+      "levels": [
+       14,
+       15
+      ],
+      "maps": {
+       "1439": 3
+      },
+      "name": "Foreststrider"
+     },
      "2324": {
       "buckets": {
        "1": {
         "items": {
+         "1514": {
+          "drops": 1,
+          "qty": 1
+         },
+         "1733": {
+          "drops": 1,
+          "qty": 1
+         },
          "1735": {
           "drops": 1,
           "qty": 1
          },
          "2589": {
-          "drops": 6,
-          "qty": 10
+          "drops": 7,
+          "qty": 13
          },
          "2778": {
           "drops": 1,
@@ -21886,22 +22249,22 @@
           "qty": 1
          }
         },
-        "kills": 8,
-        "lootable": 8,
+        "kills": 12,
+        "lootable": 12,
         "money": {
-         "copper": 122,
-         "drops": 8,
+         "copper": 209,
+         "drops": 12,
          "max": null,
          "min": null
         },
-        "opened": 8
+        "opened": 12
        }
       },
       "cells": {
        "1439": {
-        "1026": 5,
+        "1026": 8,
         "1027": 1,
-        "976": 2
+        "976": 3
        }
       },
       "levels": [
@@ -21909,7 +22272,7 @@
        14
       ],
       "maps": {
-       "1439": 8
+       "1439": 12
       },
       "name": null
      },
@@ -24895,51 +25258,141 @@
       "name": "Hillsbrad Foreman"
      },
      "2505": {
-      "buckets": {},
-      "cells": {
-       "1425": {
-        "1931": 2,
-        "1933": 2,
-        "1978": 1,
-        "1979": 4,
-        "1980": 2,
-        "1981": 2,
-        "1982": 2,
-        "1983": 2,
-        "2024": 1,
-        "2025": 1,
-        "2027": 1,
-        "2028": 1,
-        "2070": 1,
-        "2074": 1,
-        "2075": 1
+      "buckets": {
+       "1": {
+        "items": {
+         "248696": {
+          "drops": 1,
+          "qty": 1
+         },
+         "248713": {
+          "drops": 1,
+          "qty": 1
+         },
+         "3712": {
+          "drops": 22,
+          "qty": 22
+         },
+         "4555": {
+          "drops": 49,
+          "qty": 49
+         },
+         "4556": {
+          "drops": 47,
+          "qty": 47
+         },
+         "4603": {
+          "drops": 7,
+          "qty": 11
+         },
+         "7973": {
+          "drops": 23,
+          "qty": 23
+         }
+        },
+        "kills": 72,
+        "lootable": 70,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 68
        }
       },
-      "levels": null,
+      "cells": {
+       "1425": {
+        "1883": 1,
+        "1884": 2,
+        "1886": 3,
+        "1931": 2,
+        "1932": 3,
+        "1933": 4,
+        "1934": 3,
+        "1936": 3,
+        "1937": 1,
+        "1978": 1,
+        "1979": 6,
+        "1980": 5,
+        "1981": 2,
+        "1982": 3,
+        "1983": 2,
+        "1984": 2,
+        "1985": 1,
+        "1986": 1,
+        "2024": 1,
+        "2025": 2,
+        "2027": 2,
+        "2028": 2,
+        "2029": 1,
+        "2030": 1,
+        "2031": 1,
+        "2032": 1,
+        "2033": 1,
+        "2034": 1,
+        "2037": 1,
+        "2069": 3,
+        "2070": 2,
+        "2071": 1,
+        "2073": 1,
+        "2074": 1,
+        "2075": 2,
+        "2077": 1,
+        "2081": 1,
+        "2083": 1,
+        "2084": 1,
+        "2085": 2,
+        "2087": 1,
+        "2120": 2,
+        "2121": 1,
+        "2123": 1,
+        "2124": 1,
+        "2125": 1,
+        "2126": 1,
+        "2131": 1,
+        "2132": 1,
+        "2133": 1,
+        "2134": 1,
+        "2136": 1
+       }
+      },
+      "levels": [
+       49,
+       50
+      ],
       "maps": {
-       "1425": 23
+       "1425": 72
       },
       "name": "Saltwater Snapjaw",
       "skins": {
        "items": {
+        "249428": {
+         "drops": 1,
+         "qty": 3
+        },
+        "249429": {
+         "drops": 1,
+         "qty": 3
+        },
         "4304": {
-         "drops": 15,
-         "qty": 15
+         "drops": 90,
+         "qty": 90
         },
         "8167": {
-         "drops": 10,
-         "qty": 17
+         "drops": 57,
+         "qty": 83
         },
         "8169": {
-         "drops": 2,
-         "qty": 2
-        },
-        "8170": {
          "drops": 6,
          "qty": 6
+        },
+        "8170": {
+         "drops": 28,
+         "qty": 28
         }
        },
-       "skinned": 23
+       "skinned": 125
       }
      },
      "250868": {
@@ -27738,6 +28191,47 @@
       },
       "name": "Twilight Shadowmancer"
      },
+     "254566": {
+      "buckets": {
+       "1": {
+        "items": {
+         "256036": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 1,
+        "lootable": 1,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "2652": {
+        "1587": 3,
+        "1589": 1,
+        "1636": 2,
+        "1637": 1,
+        "1686": 1,
+        "1688": 1,
+        "1735": 1,
+        "1738": 1
+       }
+      },
+      "levels": [
+       42,
+       42
+      ],
+      "maps": {
+       "2652": 1
+      },
+      "name": "Rowdy Rose"
+     },
      "254588": {
       "buckets": {
        "1": {
@@ -28691,8 +29185,8 @@
           "qty": 1
          },
          "2295": {
-          "drops": 12,
-          "qty": 12
+          "drops": 13,
+          "qty": 13
          },
          "248709": {
           "drops": 1,
@@ -28715,19 +29209,19 @@
           "qty": 1
          },
          "769": {
-          "drops": 21,
-          "qty": 21
+          "drops": 24,
+          "qty": 24
          }
         },
-        "kills": 65,
-        "lootable": 58,
+        "kills": 74,
+        "lootable": 67,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 37
+        "opened": 41
        }
       },
       "cells": {
@@ -28744,22 +29238,22 @@
         "1714": 2,
         "1716": 2,
         "1717": 1,
-        "1731": 2,
+        "1731": 3,
         "1732": 2,
-        "1733": 4,
+        "1733": 5,
         "1734": 1,
         "1765": 6,
         "1766": 5,
-        "1780": 2,
+        "1780": 4,
         "1781": 3,
         "1782": 1,
-        "1879": 3,
-        "1880": 2,
+        "1879": 4,
+        "1880": 3,
         "1928": 1,
-        "1929": 3,
+        "1929": 4,
         "1960": 1,
         "1965": 2,
-        "1978": 3,
+        "1978": 4,
         "2010": 1,
         "2012": 1,
         "2013": 1,
@@ -28771,25 +29265,25 @@
        39
       ],
       "maps": {
-       "2548": 65
+       "2548": 74
       },
       "name": "Mature Paletusk",
       "skins": {
        "items": {
         "4234": {
-         "drops": 56,
-         "qty": 56
+         "drops": 66,
+         "qty": 66
         },
         "4235": {
-         "drops": 6,
-         "qty": 6
+         "drops": 8,
+         "qty": 8
         },
         "4304": {
-         "drops": 11,
-         "qty": 11
+         "drops": 15,
+         "qty": 15
         }
        },
-       "skinned": 73
+       "skinned": 89
       }
      },
      "255892": {
@@ -29068,8 +29562,8 @@
           "qty": 8
          },
          "17057": {
-          "drops": 3,
-          "qty": 3
+          "drops": 4,
+          "qty": 4
          },
          "3010": {
           "drops": 3,
@@ -29084,15 +29578,15 @@
           "qty": 4
          }
         },
-        "kills": 16,
-        "lootable": 16,
+        "kills": 17,
+        "lootable": 17,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 16
+        "opened": 17
        }
       },
       "cells": {
@@ -29107,6 +29601,7 @@
         "1782": 3,
         "1783": 3,
         "1784": 4,
+        "1829": 1,
         "1830": 1,
         "1832": 1,
         "1833": 1,
@@ -29122,7 +29617,7 @@
        37
       ],
       "maps": {
-       "2548": 16
+       "2548": 17
       },
       "name": "Sand Crawler",
       "skins": {
@@ -31551,27 +32046,27 @@
           "qty": 1
          },
          "2295": {
-          "drops": 12,
-          "qty": 12
+          "drops": 13,
+          "qty": 13
          },
          "248692": {
           "drops": 1,
           "qty": 1
          },
          "3403": {
-          "drops": 7,
-          "qty": 7
+          "drops": 8,
+          "qty": 8
          }
         },
-        "kills": 44,
-        "lootable": 44,
+        "kills": 48,
+        "lootable": 48,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 20
+        "opened": 22
        }
       },
       "cells": {
@@ -31587,10 +32082,10 @@
         "1437": 1,
         "1438": 2,
         "1487": 1,
-        "1488": 4,
-        "1537": 1,
-        "1636": 3,
-        "1668": 1,
+        "1488": 5,
+        "1537": 2,
+        "1636": 4,
+        "1668": 2,
         "1717": 1,
         "1767": 1,
         "1819": 1,
@@ -31613,25 +32108,25 @@
        37
       ],
       "maps": {
-       "2548": 44
+       "2548": 48
       },
       "name": "Young Paletusk",
       "skins": {
        "items": {
         "4234": {
-         "drops": 32,
-         "qty": 32
+         "drops": 36,
+         "qty": 36
         },
         "4235": {
          "drops": 2,
          "qty": 2
         },
         "4304": {
-         "drops": 9,
-         "qty": 9
+         "drops": 11,
+         "qty": 11
         }
        },
-       "skinned": 43
+       "skinned": 49
       }
      },
      "258443": {
@@ -31785,19 +32280,20 @@
           "qty": 1
          }
         },
-        "kills": 34,
-        "lootable": 34,
+        "kills": 35,
+        "lootable": 35,
         "money": {
-         "copper": 8204,
-         "drops": 34,
+         "copper": 8433,
+         "drops": 35,
          "max": null,
          "min": null
         },
-        "opened": 34
+        "opened": 35
        }
       },
       "cells": {
        "2548": {
+        "1031": 1,
         "1078": 2,
         "1079": 10,
         "1239": 3,
@@ -31813,7 +32309,7 @@
        37
       ],
       "maps": {
-       "2548": 34
+       "2548": 35
       },
       "name": "Mudfin Oracle"
      },
@@ -32280,8 +32776,8 @@
           "qty": 5
          }
         },
-        "kills": 16,
-        "lootable": 13,
+        "kills": 18,
+        "lootable": 15,
         "money": {
          "copper": 0,
          "drops": 0,
@@ -32293,7 +32789,9 @@
       },
       "cells": {
        "2548": {
+        "1031": 1,
         "1075": 2,
+        "1077": 1,
         "1078": 4,
         "1081": 1,
         "1082": 1,
@@ -32323,7 +32821,7 @@
        39
       ],
       "maps": {
-       "2548": 16
+       "2548": 18
       },
       "name": "Freshwater Crocolisk",
       "skins": {
@@ -32333,8 +32831,8 @@
          "qty": 5
         },
         "4234": {
-         "drops": 19,
-         "qty": 19
+         "drops": 21,
+         "qty": 21
         },
         "4235": {
          "drops": 1,
@@ -32345,16 +32843,24 @@
          "qty": 12
         }
        },
-       "skinned": 34
+       "skinned": 36
       }
      },
      "259052": {
       "buckets": {
        "1": {
         "items": {
+         "262889": {
+          "drops": 1,
+          "qty": 1
+         },
+         "3815": {
+          "drops": 1,
+          "qty": 1
+         },
          "4306": {
-          "drops": 6,
-          "qty": 13
+          "drops": 12,
+          "qty": 25
          },
          "4338": {
           "drops": 2,
@@ -32363,25 +32869,35 @@
          "6416": {
           "drops": 1,
           "qty": 1
+         },
+         "9852": {
+          "drops": 1,
+          "qty": 1
          }
         },
-        "kills": 18,
-        "lootable": 18,
+        "kills": 36,
+        "lootable": 36,
         "money": {
-         "copper": 3302,
-         "drops": 18,
+         "copper": 7126,
+         "drops": 36,
          "max": null,
          "min": null
         },
-        "opened": 18
+        "opened": 36
        }
       },
       "cells": {
        "2548": {
+        "1328": 1,
         "1429": 2,
         "1430": 3,
         "1479": 2,
-        "1480": 7
+        "1480": 7,
+        "1575": 1,
+        "1625": 2,
+        "1628": 3,
+        "1629": 5,
+        "1678": 3
        }
       },
       "levels": [
@@ -32389,7 +32905,7 @@
        39
       ],
       "maps": {
-       "2548": 18
+       "2548": 36
       },
       "name": "Rog'mar Poacher"
      },
@@ -34098,10 +34614,14 @@
           "qty": 2
          },
          "4338": {
-          "drops": 2,
-          "qty": 3
+          "drops": 4,
+          "qty": 6
          },
          "5215": {
+          "drops": 1,
+          "qty": 1
+         },
+         "5429": {
           "drops": 1,
           "qty": 1
          },
@@ -34110,19 +34630,19 @@
           "qty": 1
          },
          "6438": {
-          "drops": 2,
-          "qty": 2
+          "drops": 3,
+          "qty": 3
          }
         },
-        "kills": 6,
-        "lootable": 6,
+        "kills": 13,
+        "lootable": 13,
         "money": {
-         "copper": 1432,
-         "drops": 6,
+         "copper": 2654,
+         "drops": 13,
          "max": null,
          "min": null
         },
-        "opened": 6
+        "opened": 13
        }
       },
       "cells": {
@@ -34131,11 +34651,11 @@
         "1812": 6,
         "1816": 3,
         "1862": 1,
-        "1863": 9,
+        "1863": 13,
         "1864": 4,
         "1865": 1,
         "1913": 11,
-        "1914": 5,
+        "1914": 7,
         "1915": 1
        }
       },
@@ -34144,9 +34664,43 @@
        42
       ],
       "maps": {
-       "2548": 6
+       "2548": 13
       },
       "name": "Twilight Mauler"
+     },
+     "260969": {
+      "buckets": {
+       "1": {
+        "items": {},
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 364,
+         "drops": 2,
+         "max": null,
+         "min": null
+        },
+        "opened": 2
+       }
+      },
+      "cells": {
+       "2548": {
+        "1715": 5,
+        "1812": 4,
+        "1816": 3,
+        "1862": 3,
+        "1863": 3,
+        "1865": 2
+       }
+      },
+      "levels": [
+       39,
+       39
+      ],
+      "maps": {
+       "2548": 2
+      },
+      "name": "Twilight Instigator"
      },
      "260973": {
       "buckets": {
@@ -34335,21 +34889,21 @@
          }
         },
         "kills": 12,
-        "lootable": 7,
+        "lootable": 8,
         "money": {
-         "copper": 1063,
-         "drops": 7,
+         "copper": 1335,
+         "drops": 8,
          "max": null,
          "min": null
         },
-        "opened": 7
+        "opened": 8
        }
       },
       "cells": {
        "2548": {
         "1812": 2,
         "1862": 6,
-        "1863": 3,
+        "1863": 5,
         "1864": 2,
         "1865": 3,
         "1913": 9
@@ -34969,38 +35523,40 @@
           "qty": 1
          },
          "6444": {
-          "drops": 4,
-          "qty": 4
+          "drops": 13,
+          "qty": 13
          },
          "6826": {
-          "drops": 12,
-          "qty": 12
+          "drops": 26,
+          "qty": 26
          }
         },
-        "kills": 29,
-        "lootable": 19,
+        "kills": 62,
+        "lootable": 54,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 19
+        "opened": 47
        }
       },
       "cells": {
        "2548": {
         "1478": 2,
         "1479": 2,
-        "1480": 1,
-        "1528": 1,
-        "1529": 7,
-        "1530": 5,
-        "1578": 3,
-        "1579": 7,
-        "1580": 8,
-        "1581": 6,
-        "1630": 2
+        "1480": 2,
+        "1528": 4,
+        "1529": 12,
+        "1530": 7,
+        "1578": 5,
+        "1579": 14,
+        "1580": 18,
+        "1581": 9,
+        "1629": 1,
+        "1630": 5,
+        "1631": 1
        }
       },
       "levels": [
@@ -35008,25 +35564,29 @@
        38
       ],
       "maps": {
-       "2548": 29
+       "2548": 62
       },
       "name": "Glade Viper",
       "skins": {
        "items": {
+        "249428": {
+         "drops": 1,
+         "qty": 3
+        },
         "4234": {
-         "drops": 29,
-         "qty": 29
+         "drops": 61,
+         "qty": 61
         },
         "4235": {
-         "drops": 1,
-         "qty": 1
+         "drops": 2,
+         "qty": 2
         },
         "4304": {
-         "drops": 7,
-         "qty": 7
+         "drops": 12,
+         "qty": 12
         }
        },
-       "skinned": 37
+       "skinned": 76
       }
      },
      "263315": {
@@ -35080,35 +35640,35 @@
           "qty": 1
          },
          "12037": {
-          "drops": 12,
-          "qty": 12
+          "drops": 15,
+          "qty": 15
          },
          "1464": {
-          "drops": 17,
-          "qty": 17
+          "drops": 18,
+          "qty": 18
          },
          "248692": {
           "drops": 1,
           "qty": 1
          },
          "3404": {
-          "drops": 6,
-          "qty": 6
+          "drops": 7,
+          "qty": 7
          },
          "5829": {
-          "drops": 6,
-          "qty": 6
+          "drops": 7,
+          "qty": 7
          }
         },
-        "kills": 35,
-        "lootable": 28,
+        "kills": 40,
+        "lootable": 33,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 28
+        "opened": 33
        }
       },
       "cells": {
@@ -35126,12 +35686,13 @@
         "1623": 1,
         "1626": 2,
         "1627": 3,
-        "1630": 2,
+        "1629": 1,
+        "1630": 4,
         "1632": 2,
         "1673": 3,
         "1675": 5,
-        "1676": 2,
-        "1677": 4,
+        "1676": 3,
+        "1677": 5,
         "1678": 1,
         "1681": 1,
         "1683": 1,
@@ -35146,7 +35707,7 @@
        38
       ],
       "maps": {
-       "2548": 35
+       "2548": 40
       },
       "name": "Low Plains Buzzard",
       "skins": {
@@ -35168,35 +35729,35 @@
        "1": {
         "items": {
          "11416": {
-          "drops": 3,
-          "qty": 3
+          "drops": 4,
+          "qty": 4
          },
          "11418": {
-          "drops": 5,
-          "qty": 5
+          "drops": 6,
+          "qty": 6
          },
          "1207": {
           "drops": 1,
           "qty": 1
          },
          "5116": {
-          "drops": 5,
-          "qty": 5
+          "drops": 7,
+          "qty": 7
          },
          "5829": {
           "drops": 2,
           "qty": 2
          }
         },
-        "kills": 21,
-        "lootable": 15,
+        "kills": 25,
+        "lootable": 18,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 15
+        "opened": 18
        }
       },
       "cells": {
@@ -35211,8 +35772,8 @@
         "1581": 1,
         "1582": 1,
         "1622": 3,
-        "1630": 1,
-        "1631": 1,
+        "1630": 2,
+        "1631": 2,
         "1632": 1,
         "1672": 1,
         "1673": 1,
@@ -35228,21 +35789,21 @@
        38
       ],
       "maps": {
-       "2548": 21
+       "2548": 25
       },
       "name": "Roving Tallstrider",
       "skins": {
        "items": {
         "4234": {
-         "drops": 25,
-         "qty": 25
+         "drops": 27,
+         "qty": 27
         },
         "4304": {
-         "drops": 3,
-         "qty": 3
+         "drops": 4,
+         "qty": 4
         }
        },
-       "skinned": 28
+       "skinned": 31
       }
      },
      "263380": {
@@ -35843,6 +36404,55 @@
        "1425": 17
       },
       "name": "Jade Ooze"
+     },
+     "2659": {
+      "buckets": {
+       "1": {
+        "items": {
+         "4590": {
+          "drops": 1,
+          "qty": 1
+         },
+         "4591": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 1,
+        "lootable": 1,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "1425": {
+        "1375": 1,
+        "1424": 1,
+        "1574": 1
+       }
+      },
+      "levels": [
+       46,
+       46
+      ],
+      "maps": {
+       "1425": 1
+      },
+      "name": "Razorbeak Skylord",
+      "skins": {
+       "items": {
+        "8169": {
+         "drops": 1,
+         "qty": 1
+        }
+       },
+       "skinned": 1
+      }
      },
      "266216": {
       "buckets": {
@@ -36450,6 +37060,10 @@
        "1": {
         "items": {
          "12203": {
+          "drops": 4,
+          "qty": 4
+         },
+         "4582": {
           "drops": 1,
           "qty": 1
          },
@@ -36458,38 +37072,50 @@
           "qty": 1
          }
         },
-        "kills": 1,
-        "lootable": 1,
+        "kills": 6,
+        "lootable": 6,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 5
        }
       },
       "cells": {
        "2548": {
-        "1718": 1
+        "1668": 1,
+        "1718": 1,
+        "1767": 1,
+        "1768": 1,
+        "1818": 1
        }
       },
       "levels": [
-       40,
+       39,
        40
       ],
       "maps": {
-       "2548": 1
+       "2548": 6
       },
       "name": "Plains Prowler",
       "skins": {
        "items": {
+        "4234": {
+         "drops": 2,
+         "qty": 2
+        },
         "4235": {
          "drops": 1,
          "qty": 1
+        },
+        "4304": {
+         "drops": 3,
+         "qty": 3
         }
        },
-       "skinned": 1
+       "skinned": 6
       }
      },
      "269175": {
@@ -36801,19 +37427,19 @@
           "qty": 2
          },
          "4585": {
-          "drops": 2,
-          "qty": 2
+          "drops": 3,
+          "qty": 3
          }
         },
-        "kills": 4,
-        "lootable": 4,
+        "kills": 5,
+        "lootable": 5,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 3
+        "opened": 4
        }
       },
       "cells": {
@@ -36821,7 +37447,7 @@
         "930": 1,
         "979": 1,
         "980": 1,
-        "981": 2
+        "981": 3
        }
       },
       "levels": [
@@ -36829,7 +37455,7 @@
        37
       ],
       "maps": {
-       "2548": 4
+       "2548": 5
       },
       "name": "Venomweb Spitter"
      },
@@ -39220,24 +39846,32 @@
       "buckets": {
        "1": {
         "items": {
-         "12208": {
+         "12203": {
           "drops": 1,
           "qty": 1
+         },
+         "12208": {
+          "drops": 2,
+          "qty": 2
          },
          "4583": {
           "drops": 1,
           "qty": 1
+         },
+         "8146": {
+          "drops": 1,
+          "qty": 1
          }
         },
-        "kills": 1,
-        "lootable": 1,
+        "kills": 5,
+        "lootable": 3,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 3
        }
       },
       "cells": {
@@ -39246,59 +39880,34 @@
         "826": 1,
         "827": 1,
         "874": 1,
-        "877": 1
+        "877": 1,
+        "925": 1,
+        "926": 1
        }
       },
       "levels": [
-       44,
+       43,
        44
       ],
       "maps": {
-       "1425": 1
+       "1425": 5
       },
       "name": "Silvermane Wolf",
       "skins": {
        "items": {
+        "4234": {
+         "drops": 1,
+         "qty": 1
+        },
         "4304": {
-         "drops": 3,
-         "qty": 3
+         "drops": 4,
+         "qty": 4
         }
        },
-       "skinned": 3
+       "skinned": 5
       }
      },
      "2925": {
-      "buckets": {},
-      "cells": {
-       "1425": {
-        "1023": 3,
-        "1024": 1,
-        "1072": 1,
-        "1122": 1,
-        "1173": 1,
-        "1180": 1,
-        "1229": 1,
-        "928": 1,
-        "973": 1,
-        "980": 1
-       }
-      },
-      "levels": null,
-      "maps": {
-       "1425": 3
-      },
-      "name": "Silvermane Howler",
-      "skins": {
-       "items": {
-        "4304": {
-         "drops": 3,
-         "qty": 3
-        }
-       },
-       "skinned": 3
-      }
-     },
-     "2926": {
       "buckets": {
        "1": {
         "items": {
@@ -39306,24 +39915,96 @@
           "drops": 1,
           "qty": 1
          },
-         "4583": {
+         "12208": {
+          "drops": 2,
+          "qty": 2
+         },
+         "4584": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 2,
-        "lootable": 2,
+        "kills": 3,
+        "lootable": 3,
         "money": {
          "copper": 0,
          "drops": 0,
          "max": null,
          "min": null
         },
-        "opened": 1
+        "opened": 3
        }
       },
       "cells": {
        "1425": {
+        "1023": 3,
+        "1024": 1,
+        "1025": 1,
+        "1072": 1,
+        "1122": 1,
+        "1173": 1,
+        "1180": 1,
+        "1229": 1,
+        "925": 1,
+        "928": 1,
+        "973": 1,
+        "976": 1,
+        "980": 1
+       }
+      },
+      "levels": [
+       45,
+       46
+      ],
+      "maps": {
+       "1425": 3
+      },
+      "name": "Silvermane Howler",
+      "skins": {
+       "items": {
+        "249428": {
+         "drops": 1,
+         "qty": 2
+        },
+        "4304": {
+         "drops": 6,
+         "qty": 6
+        }
+       },
+       "skinned": 7
+      }
+     },
+     "2926": {
+      "buckets": {
+       "1": {
+        "items": {
+         "12203": {
+          "drops": 3,
+          "qty": 3
+         },
+         "12208": {
+          "drops": 3,
+          "qty": 3
+         },
+         "4583": {
+          "drops": 3,
+          "qty": 3
+         }
+        },
+        "kills": 6,
+        "lootable": 6,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 5
+       }
+      },
+      "cells": {
+       "1425": {
+        "1325": 1,
         "1326": 1,
         "1327": 2,
         "1375": 1,
@@ -39332,9 +40013,11 @@
         "1427": 1,
         "1576": 1,
         "1626": 1,
+        "1672": 1,
         "1678": 1,
         "1725": 1,
         "1731": 1,
+        "1779": 1,
         "1780": 1,
         "1782": 1,
         "1832": 1
@@ -39345,28 +40028,37 @@
        48
       ],
       "maps": {
-       "1425": 2
+       "1425": 6
       },
-      "name": "Silvermane Stalker"
+      "name": "Silvermane Stalker",
+      "skins": {
+       "items": {
+        "4304": {
+         "drops": 4,
+         "qty": 4
+        }
+       },
+       "skinned": 4
+      }
      },
      "2927": {
       "buckets": {
        "1": {
         "items": {
          "12207": {
-          "drops": 4,
-          "qty": 4
+          "drops": 5,
+          "qty": 5
          }
         },
-        "kills": 7,
-        "lootable": 7,
+        "kills": 9,
+        "lootable": 9,
         "money": {
-         "copper": 1607,
-         "drops": 7,
+         "copper": 2015,
+         "drops": 9,
          "max": null,
          "min": null
         },
-        "opened": 7
+        "opened": 9
        }
       },
       "cells": {
@@ -39377,7 +40069,9 @@
         "683": 1,
         "684": 1,
         "726": 2,
-        "727": 1
+        "727": 1,
+        "926": 1,
+        "976": 1
        }
       },
       "levels": [
@@ -39385,7 +40079,7 @@
        43
       ],
       "maps": {
-       "1425": 7
+       "1425": 9
       },
       "name": "Vicious Owlbeast"
      },
@@ -39398,40 +40092,52 @@
           "qty": 1
          },
          "12207": {
-          "drops": 2,
-          "qty": 2
+          "drops": 4,
+          "qty": 4
          },
          "4599": {
           "drops": 2,
           "qty": 2
          },
          "5117": {
+          "drops": 2,
+          "qty": 2
+         },
+         "5636": {
           "drops": 1,
           "qty": 1
          },
          "8146": {
+          "drops": 2,
+          "qty": 2
+         },
+         "9934": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 4,
-        "lootable": 4,
+        "kills": 9,
+        "lootable": 9,
         "money": {
-         "copper": 839,
-         "drops": 4,
+         "copper": 2339,
+         "drops": 9,
          "max": null,
          "min": null
         },
-        "opened": 4
+        "opened": 9
        }
       },
       "cells": {
        "1425": {
+        "1024": 1,
+        "1026": 1,
         "1027": 1,
         "1028": 1,
         "1077": 1,
+        "1221": 1,
         "1222": 1,
-        "1274": 1
+        "1273": 1,
+        "1274": 2
        }
       },
       "levels": [
@@ -39439,7 +40145,7 @@
        45
       ],
       "maps": {
-       "1425": 4
+       "1425": 9
       },
       "name": "Primitive Owlbeast"
      },
@@ -58550,8 +59256,12 @@
        "1": {
         "items": {
          "1520": {
-          "drops": 4,
-          "qty": 4
+          "drops": 5,
+          "qty": 5
+         },
+         "1645": {
+          "drops": 1,
+          "qty": 1
          },
          "4338": {
           "drops": 7,
@@ -58566,23 +59276,23 @@
           "qty": 4
          },
          "9259": {
-          "drops": 7,
-          "qty": 7
+          "drops": 8,
+          "qty": 8
          },
          "9294": {
           "drops": 1,
           "qty": 1
          }
         },
-        "kills": 12,
-        "lootable": 12,
+        "kills": 13,
+        "lootable": 13,
         "money": {
-         "copper": 3959,
-         "drops": 12,
+         "copper": 4419,
+         "drops": 13,
          "max": null,
          "min": null
         },
-        "opened": 12
+        "opened": 13
        }
       },
       "cells": {
@@ -58599,7 +59309,8 @@
         "1320": 7,
         "1621": 2,
         "1622": 1,
-        "1672": 2
+        "1672": 2,
+        "1773": 1
        }
       },
       "levels": [
@@ -58607,9 +59318,55 @@
        47
       ],
       "maps": {
-       "1425": 12
+       "1425": 13
       },
       "name": "Vilebranch Scalper"
+     },
+     "4467": {
+      "buckets": {
+       "1": {
+        "items": {
+         "1520": {
+          "drops": 1,
+          "qty": 1
+         },
+         "4338": {
+          "drops": 2,
+          "qty": 2
+         }
+        },
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 818,
+         "drops": 2,
+         "max": null,
+         "min": null
+        },
+        "opened": 2
+       }
+      },
+      "cells": {
+       "1425": {
+        "1082": 1,
+        "1133": 2,
+        "1182": 2,
+        "1183": 3,
+        "1184": 1,
+        "1231": 1,
+        "1233": 2,
+        "1319": 1,
+        "1774": 2
+       }
+      },
+      "levels": [
+       47,
+       47
+      ],
+      "maps": {
+       "1425": 2
+      },
+      "name": "Vilebranch Soothsayer"
      },
      "449": {
       "buckets": {
@@ -63771,7 +64528,25 @@
       }
      },
      "5423": {
-      "buckets": {},
+      "buckets": {
+       "1": {
+        "items": {
+         "19936": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 2,
+        "lootable": 1,
+        "money": {
+         "copper": 0,
+         "drops": 0,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
       "cells": {
        "1446": {
         "1071": 2,
@@ -63780,7 +64555,7 @@
         "1166": 1,
         "1167": 4,
         "1168": 5,
-        "1169": 6,
+        "1169": 7,
         "1170": 3,
         "1171": 1,
         "1216": 3,
@@ -63796,9 +64571,12 @@
         "1620": 2
        }
       },
-      "levels": null,
+      "levels": [
+       43,
+       43
+      ],
       "maps": {
-       "1446": 1
+       "1446": 2
       },
       "name": "Scorpid Tail Lasher",
       "skins": {
@@ -64580,26 +65358,31 @@
           "drops": 1,
           "qty": 1
          },
+         "248692": {
+          "drops": 1,
+          "qty": 1
+         },
          "4338": {
           "drops": 1,
           "qty": 2
          }
         },
-        "kills": 4,
-        "lootable": 4,
+        "kills": 5,
+        "lootable": 5,
         "money": {
-         "copper": 1191,
-         "drops": 4,
+         "copper": 1488,
+         "drops": 5,
          "max": null,
          "min": null
         },
-        "opened": 4
+        "opened": 5
        }
       },
       "cells": {
        "1446": {
         "1026": 2,
         "1037": 1,
+        "1132": 1,
         "986": 1
        }
       },
@@ -64608,7 +65391,7 @@
        47
       ],
       "maps": {
-       "1446": 4
+       "1446": 5
       },
       "name": "Dunemaul Ogre Mage"
      },
@@ -72820,16 +73603,110 @@
       },
       "name": "Andre Firebeard"
      },
+     "7899": {
+      "buckets": {
+       "1": {
+        "items": {
+         "1645": {
+          "drops": 1,
+          "qty": 1
+         }
+        },
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 23,
+         "drops": 1,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "1446": {
+        "1396": 1
+       }
+      },
+      "levels": [
+       45,
+       45
+      ],
+      "maps": {
+       "1446": 2
+      },
+      "name": "Treasure Hunting Pirate"
+     },
+     "7901": {
+      "buckets": {
+       "1": {
+        "items": {},
+        "kills": 1,
+        "lootable": 1,
+        "money": {
+         "copper": 20,
+         "drops": 1,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "1446": {
+        "1396": 1
+       }
+      },
+      "levels": [
+       45,
+       45
+      ],
+      "maps": {
+       "1446": 1
+      },
+      "name": "Treasure Hunting Swashbuckler"
+     },
+     "7902": {
+      "buckets": {
+       "1": {
+        "items": {},
+        "kills": 2,
+        "lootable": 2,
+        "money": {
+         "copper": 59,
+         "drops": 1,
+         "max": null,
+         "min": null
+        },
+        "opened": 1
+       }
+      },
+      "cells": {
+       "1446": {
+        "1396": 1
+       }
+      },
+      "levels": [
+       44,
+       45
+      ],
+      "maps": {
+       "1446": 2
+      },
+      "name": "Treasure Hunting Buccaneer"
+     },
      "7977": {
       "buckets": {},
       "cells": {
        "1425": {
+        "1936": 1,
+        "2026": 2,
         "2027": 1
        }
       },
       "levels": null,
       "maps": {
-       "1425": 1
+       "1425": 4
       },
       "name": "Gammerita",
       "skins": {
@@ -72841,9 +73718,17 @@
         "8167": {
          "drops": 1,
          "qty": 3
+        },
+        "8169": {
+         "drops": 1,
+         "qty": 1
+        },
+        "8170": {
+         "drops": 2,
+         "qty": 3
         }
        },
-       "skinned": 1
+       "skinned": 4
       }
      },
      "80": {
@@ -75869,7 +76754,7 @@
   "license": "CC BY 4.0",
   "name": "EG Link output, recorded by players on WoW Forever",
   "notice": "Data from Efficient Games (https://efficient.games), licensed under CC BY 4.0\n(https://creativecommons.org/licenses/by/4.0/). Drop Tables changed it: only corpses looted solo and\ncorpses skinned without the Bountiful Harvest perk on the live servers, without quest items and items\nthe server doesn't show, summed over the builds and turned into Drop Tables counts.",
-  "url": "https://github.com/JIVESCORP/eg-link-output-wowf/tree/1339ce5600bbc2b12e8f1081e584f548f62fa57f/data/wowf"
+  "url": "https://github.com/JIVESCORP/eg-link-output-wowf/tree/c1bf99bc2835bbe1b2dad82fb99f994c0cfffe33/data/wowf"
  },
  "submitter": "import:eglink"
 }
