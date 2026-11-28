@@ -15,7 +15,7 @@ on:
         description: An issue to take in even without the share label (number); empty only rebuilds
         required: false
       allow_shrink:
-        description: Let the database shrink below 95% of what it was (a source taken out on purpose)
+        description: Let the database shrink below 98% of what it was (a source taken out on purpose)
         type: boolean
         default: false
   push:

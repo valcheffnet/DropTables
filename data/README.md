@@ -174,7 +174,7 @@ addon never records them and an import can't always tell them apart.
 
 ## Shrinking and backups
 
-A build stops before it writes or deletes anything when the new database would have less than 95% of the mobs,
+A build stops before it writes or deletes anything when the new database would have less than 98% of the mobs,
 kills, skinned corpses or mob and item pairs that `shared.json` has now. No share or refresh takes that much away, so
 a drop like that means a bug or a source that lost its data. To shrink it on purpose, for example when a source is
 taken out, run `python tools/build_data.py --allow-shrink`, or start the workflow by hand with "allow_shrink" ticked.

@@ -399,10 +399,10 @@ def shrink_guard(root):
     expect("the database shrank", (after["mobs"], after["kills"]), (1, 60))
     expect("and then the superseded export is deleted", (folder / "1-1.json").exists(), False)
     expect("a small drop goes through", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
-                                                          {"mobs": {"7": mob({1: bucket(96, 96, 96)})}}), [])
-    expect("a drop below 95% does not", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
-                                                          {"mobs": {"7": mob({1: bucket(94, 94, 94)})}}),
-           [("kills", 100, 94)])
+                                                          {"mobs": {"7": mob({1: bucket(98, 98, 98)})}}), [])
+    expect("a drop below 98% does not", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
+                                                          {"mobs": {"7": mob({1: bucket(97, 97, 97)})}}),
+           [("kills", 100, 97)])
 
 
 def shared_is_trusted():

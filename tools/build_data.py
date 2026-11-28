@@ -23,7 +23,7 @@ an import's "names" list gives it (EG Link names every creature it saw, also the
 keeps the one data/shared.json had before, so a source that stops naming it doesn't take the name away. What was left
 out is printed.
 
-A build that leaves less than 95% of the mobs, kills, skinned corpses or mob and item pairs that data/shared.json
+A build that leaves less than 98% of the mobs, kills, skinned corpses or mob and item pairs that data/shared.json
 had stops before it writes or deletes anything, since no new export or refresh takes that much away. --allow-shrink
 lets it through when that is on purpose.
 
@@ -54,7 +54,7 @@ MAX_SPOTS = 40  # kill spots kept per map of a mob, the busiest, as MAX_CELLS in
 NOT_MOBS = frozenset({"2673", "2674", "12426"})
 # Pristine Leather, Pristine Hide and Pristine Scale, as SCARCE_SKINS in DropTables/Stats.lua.
 SCARCE_SKINS = frozenset({"249427", "249428", "249429"})
-SHRINK_FLOOR = 0.95
+SHRINK_FLOOR = 0.98
 
 
 def mob_kills(mob):
