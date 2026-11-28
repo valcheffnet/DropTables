@@ -124,7 +124,7 @@ def main(argv, env=None, run=subprocess.run, send=http):
     if mode == "addon":
         title = "Forever Drop Tables %s" % version
         metadata = {"changelog": changelog_section(show("CHANGELOG.md"), version), "changelogType": "markdown",
-                    "relations": {"projects": [{"slug": env["CF_DATA_SLUG"], "projectID": env["CF_DATA_PROJECT"],
+                    "relations": {"projects": [{"slug": env["CF_DATA_SLUG"], "projectID": int(env["CF_DATA_PROJECT"]),
                                                "type": "requiredDependency"}]}}
         project, tag = env["CF_ADDON_PROJECT"], None
     else:

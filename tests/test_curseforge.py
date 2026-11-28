@@ -118,7 +118,7 @@ def runs(root):
     expect("as a beta", (meta["displayName"], meta["releaseType"]), ("Forever Drop Tables 0.7.0", "beta"))
     expect("with its changelog section", meta["changelog"], "### Changed\n\n- The database is its own addon.")
     expect("and the data addon as a required dependency", meta["relations"],
-           {"projects": [{"slug": "data-slug", "projectID": "222", "type": "requiredDependency"}]})
+           {"projects": [{"slug": "data-slug", "projectID": 222, "type": "requiredDependency"}]})
     expect("no tag for the addon", sorted(git("tag", "--list").split()),
            ["data-2026.11.28", "data-2026.11.29", "v0.7.0"])
 
