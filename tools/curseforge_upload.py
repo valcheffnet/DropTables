@@ -19,6 +19,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
 import uuid
 
@@ -70,8 +71,12 @@ def multipart(fields, file_name, file_bytes):
 
 
 def http(request):
-    with urllib.request.urlopen(request, timeout=120) as response:
-        return json.loads(response.read())
+    try:
+        with urllib.request.urlopen(request, timeout=120) as response:
+            return json.loads(response.read())
+    except urllib.error.HTTPError as error:
+        raise SystemExit("CurseForge answered %d to %s: %s" % (error.code, request.full_url,
+                                                                error.read().decode("utf-8", "replace")[:1000]))
 
 
 class CurseForge:
