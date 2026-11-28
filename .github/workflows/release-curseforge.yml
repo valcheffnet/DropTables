@@ -1,0 +1,54 @@
+name: Upload a release to CurseForge
+
+# A published GitHub release goes to CurseForge as Forever Drop Tables, with the data addon as its required dependency.
+# The data addon goes up first when it changed, so the app finds both. The release type comes from the variable
+# CF_RELEASE_TYPE (beta while that is set to beta, otherwise release); a run started by hand names the tag and type.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The release tag, for example v0.7.0
+        required: true
+      release_type:
+        description: Release type on CurseForge
+        type: choice
+        options: [beta, release, alpha]
+        default: beta
+
+concurrency:
+  group: shared-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    if: ${{ vars.CF_ADDON_PROJECT != '' }}
+    runs-on: ubuntu-latest
+    env:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_ADDON_PROJECT: ${{ vars.CF_ADDON_PROJECT }}
+      CF_DATA_PROJECT: ${{ vars.CF_DATA_PROJECT }}
+      CF_DATA_SLUG: ${{ vars.CF_DATA_SLUG }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      RELEASE_TYPE: ${{ inputs.release_type || vars.CF_RELEASE_TYPE || 'release' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Upload the data addon
+        run: python tools/curseforge_upload.py data
+
+      - name: Upload Forever Drop Tables
+        run: |
+          set -euo pipefail
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "Not a release tag: $TAG"; exit 1; fi
+          if ! [[ "$RELEASE_TYPE" =~ ^(alpha|beta|release)$ ]]; then echo "Not a release type: $RELEASE_TYPE"; exit 1; fi
+          python tools/curseforge_upload.py addon --ref "$TAG" --release-type "$RELEASE_TYPE"

@@ -1,5 +1,5 @@
 """Uploads the data folder as it is in the last commit (git archive HEAD data) to a Cloudflare R2 bucket, when the build
-changed something there or in DropTables/Data.lua, so the inputs from before a commit can come back even if the
+changed something there or in the DropTables_Data addon, so the inputs from before a commit can come back even if the
 repository is lost. Then it deletes the backups past what is kept: the newest KEEP_LATEST, and the newest of each day
 for KEEP_DAYS days. Files in the bucket with other names are left alone.
 
@@ -60,7 +60,7 @@ def main(argv, env=None, run=subprocess.run, now=None):
     def git(*args):
         return run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout
 
-    if not git("status", "--porcelain", "--", "data", "DropTables/Data.lua").strip():
+    if not git("status", "--porcelain", "--", "data", "DropTables_Data").strip():
         print("Nothing changed, so no backup.")
         return 0
     aws_env = dict(env, AWS_ACCESS_KEY_ID=env["R2_ACCESS_KEY_ID"], AWS_SECRET_ACCESS_KEY=env["R2_SECRET_ACCESS_KEY"],

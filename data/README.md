@@ -1,7 +1,8 @@
 # Drop Tables shared data
 
 This folder holds the drop counts that Drop Tables players send in. A bot rebuilds it a few minutes after every
-accepted share, and the same data ships inside the addon as `DropTables/Data.lua`.
+accepted share, and the same data ships as the Forever Drop Tables Data addon (`DropTables_Data/`), which goes to
+CurseForge every day it changes.
 
 - `shared.json` is the merged database: https://raw.githubusercontent.com/valcheffnet/DropTables/main/data/shared.json
 - `submissions/` keeps every accepted export as it came in, so the database can be rebuilt when the merge rules

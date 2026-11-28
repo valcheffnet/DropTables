@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Forever Drop Tables Data
+## Notes: The shared drop counts of Forever Drop Tables, for it and for any other addon to read.
+## Author: SasnycoN
+## Version: 2026.11.28
+## IconTexture: Interface\Icons\INV_Misc_Bag_10
+## X-License: CC BY-SA 4.0
+
+Api.lua
+Data.lua

@@ -2,7 +2,8 @@ Drop Tables data license
 
 The drop counts that players send in are shared under the Creative Commons Attribution-ShareAlike 4.0
 International license (CC BY-SA 4.0). That covers everything in data/ (shared.json and the files in
-data/submissions/ and data/imports/) and the shared database that comes with the addon (DropTables/Data.lua).
+data/submissions/ and data/imports/) and the shared database in the Forever Drop Tables Data addon
+(DropTables_Data/Data.lua).
 
 You can copy the data and build on it, commercial use included. In return, credit it as
 "Drop Tables contributors, https://github.com/valcheffnet/DropTables" and share what you make from it

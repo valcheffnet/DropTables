@@ -274,14 +274,26 @@ function ns.FormatRate(rate)
     return ("%.2f%%"):format(rate * 100)
 end
 
--- The shared database from Data.lua, npc -> { buckets, from, minLevel, maxLevel, maps, name, skins }, kept in the same
--- shape as the player's own counts. It comes with the addon, and nothing ever saves, sends or exports it.
-ns.shared = {}
+-- The shared database, npc -> { buckets, from, minLevel, maxLevel, maps, name, skins }, kept in the same shape as the
+-- player's own counts. It comes from the Forever Drop Tables Data addon (DropTables_Data, an optional dependency, so
+-- it loads first), and nothing ever saves, sends or exports it. Without that addon, or with a newer layout than this
+-- version reads, it stays empty and the chances rest on the player's and other players' counts.
+ns.DATA_FORMAT = 1
+ns.sharedData = DropTablesData and DropTablesData.format == ns.DATA_FORMAT and DropTablesData or nil
+ns.shared = ns.sharedData and ns.sharedData.mobs or {}
 
-function ns.AddSharedData(chunk)
-    for npc, mob in pairs(chunk()) do
-        ns.shared[npc] = mob
+-- "database 2026.11.28, 2405 mobs", or why there is none.
+function ns.SharedStatus()
+    if not DropTablesData then
+        return "Forever Drop Tables Data isn't installed, so the shared drop chances are missing."
+    elseif not ns.sharedData then
+        return "Forever Drop Tables Data is newer than this version can read. Update Forever Drop Tables."
     end
+    local mobs = 0
+    for _ in pairs(ns.shared) do
+        mobs = mobs + 1
+    end
+    return ("database %s, %d mobs"):format(ns.sharedData.version or "?", mobs)
 end
 
 -- Total of one count (kills, opened, ...) over a mob's buckets.
@@ -355,6 +367,12 @@ ns.On("ADDON_LOADED", function(name)
     ns.db = db
     ns.settings = db.settings
     ns.Fire("DT_READY")
+    if not ns.sharedData then
+        -- A few seconds in, so the line isn't lost among the ones every addon prints while the world loads.
+        C_Timer.After(10, function()
+            ns.Print(ns.SharedStatus())
+        end)
+    end
 end)
 
 SLASH_DROPTABLES1 = "/dt"
@@ -378,6 +396,7 @@ SlashCmdList.DROPTABLES = function(msg)
         ns.Print(("%s %s."):format(msg, ns.settings[key] and "on" or "off"))
     elseif msg == "status" then
         ns.Print("version " .. ns.Version())
+        ns.Print(ns.sharedData and "Shared " .. ns.SharedStatus() .. "." or ns.SharedStatus())
         local mobs, kills = 0, 0
         for _, mob in pairs(ns.db.mobs) do
             mobs = mobs + 1

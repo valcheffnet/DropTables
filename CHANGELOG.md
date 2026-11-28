@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0] - 2026-11-28
+
+### Added
+
+- When Forever Drop Tables Data isn't installed, Drop Tables says so once after you log in and keeps working on your own counts and what other players send you.
+- Other addons can read the shared counts through `DropTablesData.GetMob` and `DropTablesData.GetChance`.
+
+### Changed
+
+- The shared database is now an addon of its own, Forever Drop Tables Data, in the folder `DropTables_Data`. The zip on GitHub holds both addons. On CurseForge they are two projects, and installing Drop Tables brings the data along. The database can now get new counts without a new version of Drop Tables.
+- /dt status names the version of the shared database and how many mobs it knows.
+
 ## [0.6.5] - 2026-11-27
 
 ### Added

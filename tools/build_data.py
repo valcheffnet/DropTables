@@ -1,8 +1,10 @@
 """Merges the accepted submissions (data/submissions/*.json) and the imports (data/imports/*.json) into the shared
 database.
 
-Writes data/shared.json and DropTables/Data.lua, which the addon loads as one more source of counts.
-The same input always gives the same output, so a rebuild without new submissions changes nothing.
+Writes data/shared.json and the Forever Drop Tables Data addon (DropTables_Data/Data.lua and its toc), which Drop
+Tables loads as one more source of counts and other addons can read. The same input always gives the same output, so
+a rebuild without new submissions changes nothing. The data addon's version is the day of the build that changed it,
+"2026.11.28", or "2026.11.28.2" for a second one that day.
 
 An import marked partial counts looted corpses and the items in them, but not kills or empty corpses, and unless its
 "own" list names them, not money or stack sizes either. Its corpses get what's missing in the same proportion as the
@@ -724,7 +726,8 @@ def build(submissions, imports=(), quest_items=frozenset(), resets=None, previou
             elif "name" not in record and previous and latin(previous):
                 record["name"] = previous
             mobs[npc] = record
-    built = max((s["received"] for s in submissions), default=0)
+    # The newest counts in it, a share or an import refresh, so the same input gives the same file.
+    built = max((s["received"] for s in list(submissions) + list(imports)), default=0)
     database = {"built": built, "submissions": len(submissions), "mobs": mobs, "license": "CC-BY-SA-4.0",
                 "attribution": "Drop Tables contributors, https://github.com/valcheffnet/DropTables"}
     if imports:
@@ -766,16 +769,15 @@ def lua_value(value, string_keys=False):
     raise TypeError("no Lua form for %r" % (value,))
 
 
-def lua_file(database):
+def lua_file(database, version=None):
     lines = [
-        "local _, ns = ...",
-        "",
         "-- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do",
-        "-- not edit; the issue workflow rebuilds it after each accepted submission.",
+        "-- not edit; the workflows rebuild it after each accepted submission and each refresh of the imports.",
         "-- The data is under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), credited to the Drop",
-        "-- Tables contributors, https://github.com/valcheffnet/DropTables (see LICENSE-DATA there).",
+        "-- Tables contributors, https://github.com/valcheffnet/DropTables (see LICENSE-DATA there). Api.lua says how",
+        "-- to read it.",
     ]
-    # The release ships this folder alone, so each import's own notice has to travel inside this file.
+    # CurseForge ships this folder alone, so each import's own notice has to travel inside this file.
     for imp in database.get("imports", []):
         lines.append("--")
         lines.append("-- It includes %s, %s, under the %s license: %s." % (
@@ -783,10 +785,22 @@ def lua_file(database):
         if imp.get("notice"):
             lines.append("--")
             lines.extend(("-- " + line).rstrip() for line in imp["notice"].splitlines())
-    lines.append("ns.SharedBuilt = %d" % database["built"])
+    lines += [
+        "",
+        "DropTablesData.version = %s" % (lua_string(version) if version else "nil"),
+        "DropTablesData.built = %d" % database["built"],
+        "",
+        "local mobs = DropTablesData.mobs",
+        "local function add(chunk)",
+        "    for npc, mob in pairs(chunk()) do",
+        "        mobs[npc] = mob",
+        "    end",
+        "end",
+        "",
+    ]
     npcs = sorted(database["mobs"], key=int)
     for start in range(0, len(npcs), CHUNK):
-        lines.append("ns.AddSharedData(function() return {")
+        lines.append("add(function() return {")
         for npc in npcs[start:start + CHUNK]:
             lines.append("[%d]=%s," % (int(npc), lua_value(database["mobs"][npc])))
         lines.append("} end)")
@@ -845,11 +859,48 @@ def names_in(database):
     return {npc: mob["name"] for npc, mob in mobs.items() if mob.get("name")}
 
 
-def write_outputs(root, database):
-    """Writes both files and returns True when either one changed."""
+TOC = """## Interface: 16001
+## Title: Forever Drop Tables Data
+## Notes: The shared drop counts of Forever Drop Tables, for it and for any other addon to read.
+## Author: SasnycoN
+## Version: %s
+## IconTexture: Interface\\Icons\\INV_Misc_Bag_10
+## X-License: CC BY-SA 4.0
+
+Api.lua
+Data.lua
+"""
+
+
+def toc_version(text):
+    match = re.search(r"^## Version: (\S+)$", text or "", re.M)
+    return match.group(1) if match else None
+
+
+def next_version(old, today):
+    """The version of a changed build made on the day today ("2026.11.28"): the day, or the day and ".2", ".3" when
+    the day already had a build."""
+    if not old or not (old == today or old.startswith(today + ".")):
+        return today
+    return "%s.%d" % (today, int(old[len(today) + 1:] or 1) + 1)
+
+
+def read(path):
+    return path.read_text(encoding="utf-8") if path.exists() else None
+
+
+def write_outputs(root, database, today=None):
+    """Writes data/shared.json and the DropTables_Data addon and returns True when any file changed. The addon keeps
+    its version while its data stays the same."""
+    folder = root / "DropTables_Data"
+    old_version = toc_version(read(folder / "DropTables_Data.toc"))
+    version = old_version
+    if not old_version or lua_file(database, old_version) != read(folder / "Data.lua"):
+        version = next_version(old_version, today or time.strftime("%Y.%m.%d", time.gmtime()))
     targets = {
         root / "data" / "shared.json": json.dumps(database, sort_keys=True, indent=1, ensure_ascii=False) + "\n",
-        root / "DropTables" / "Data.lua": lua_file(database),
+        folder / "Data.lua": lua_file(database, version),
+        folder / "DropTables_Data.toc": TOC % version,
     }
     changed = False
     for path, text in targets.items():

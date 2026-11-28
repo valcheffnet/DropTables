@@ -10,6 +10,7 @@ from lupa import lua51
 
 ADDON_DIR = pathlib.Path(__file__).resolve().parent.parent / "DropTables"
 DEBUG_FILE = ADDON_DIR.parent / "debug" / "DropTablesDebug" / "DropTablesDebug.lua"
+DATA_DIR = ADDON_DIR.parent / "DropTables_Data"
 
 STUBS = r"""
 timers = {}
@@ -253,7 +254,8 @@ class Client:
 
     def __init__(self, name, files=ALL_FILES, saved=None, data=None, debug=False):
         """saved: Lua code run before the addon loads, e.g. to set DropTablesDB as the game would.
-        data: the text of a Data.lua (shared database) loaded right after Core.lua, as the toc does.
+        data: the text of a Data.lua (shared database), loaded with the Forever Drop Tables Data addon before Drop
+        Tables, as OptionalDeps makes the game do. Without it the data addon isn't installed.
         debug: load the Drop Tables Debug addon after it; its namespace is debug_ns and it gets every event fired."""
         self.name, self.files, self.debug = name, files, debug
         self.debug_ns = None
@@ -265,10 +267,12 @@ class Client:
             self.lua.execute(saved)
         self.ns = self.lua.table()
         loader = self.lua.execute("return function(src, name) return assert(loadstring(src, name)) end")
+        if data:
+            data_ns = self.lua.table()
+            loader((DATA_DIR / "Api.lua").read_text(encoding="utf-8"), "Api.lua")("DropTables_Data", data_ns)
+            loader(data, "Data.lua")("DropTables_Data", data_ns)
         for file_name in files:
             loader((ADDON_DIR / file_name).read_text(encoding="utf-8"), file_name)("DropTables", self.ns)
-            if file_name == "Core.lua" and data:
-                loader(data, "Data.lua")("DropTables", self.ns)
         self.fire("ADDON_LOADED", "DropTables")
         if debug:
             self.debug_ns = self.lua.table()

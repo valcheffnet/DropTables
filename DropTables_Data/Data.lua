@@ -1,9 +1,8 @@
-local _, ns = ...
-
 -- The shared database: counts from every /dt export merged on GitHub (tools/build_data.py). Generated, do
--- not edit; the issue workflow rebuilds it after each accepted submission.
+-- not edit; the workflows rebuild it after each accepted submission and each refresh of the imports.
 -- The data is under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), credited to the Drop
--- Tables contributors, https://github.com/valcheffnet/DropTables (see LICENSE-DATA there).
+-- Tables contributors, https://github.com/valcheffnet/DropTables (see LICENSE-DATA there). Api.lua says how
+-- to read it.
 --
 -- It includes Blackthornes Farmer, harvested on the WoW Forever beta, Copyright (c) 2026 Blackthornes, under the MIT license: https://github.com/Blackthornes/Blackthornes_Farmer/blob/43bc5ee7dada13896b358b33e6533182c36dbff0/Data/Data_Harvested.lua.
 --
@@ -41,8 +40,18 @@ local _, ns = ...
 -- Data from Everloot (https://everloot.app), CC BY-SA 4.0. Drop Tables changed it: only the loot and
 -- skinning windows of creatures, without quest items, counted per install and turned into Drop Tables
 -- counts, with names, levels and places from the NPC sightings.
-ns.SharedBuilt = 1795803091
-ns.AddSharedData(function() return {
+
+DropTablesData.version = "2026.11.28"
+DropTablesData.built = 1795823453
+
+local mobs = DropTablesData.mobs
+local function add(chunk)
+    for npc, mob in pairs(chunk()) do
+        mobs[npc] = mob
+    end
+end
+
+add(function() return {
 [3]={buckets={[1]={items={[887]={drops=3,max=1,min=1,qty=3},[1205]={drops=2,qty=2},[1823]={drops=1,max=1,min=1,qty=1},[2589]={drops=1,max=2,min=2,qty=2},[2592]={drops=3,max=1,min=1,qty=4},[4306]={drops=2,max=1,min=1,qty=2},[4606]={drops=1,max=1,min=1,qty=1},[6530]={drops=2,qty=2}},kills=17,lootable=15,money={copper=970,drops=15,max=100,min=35},opened=15},[2]={items={[887]={drops=1,max=1,min=1,qty=1},[2592]={drops=1,max=2,min=2,qty=2}},kills=2,lootable=2,money={copper=180,drops=2,max=112,min=68},opened=2}},from={["709d07dc05ee176a"]={[1]=2,[2]=2},eglink=6,["everloot-342b2112"]=2,["everloot-86f7f239"]=6},maps={[1431]=19},maxLevel=25,minLevel=24,name="Flesh Eater",spots={[1431]={[518]=2,[519]=2,[566]=1,[567]=1,[568]=3,[569]=3,[617]=2,[618]=2,[619]=3,[665]=1}}},
 [6]={buckets={[1]={items={[159]={drops=4,qty=4},[755]={drops=31,max=1,min=1,qty=31},[1364]={drops=1,qty=1},[1367]={drops=1,qty=1},[1368]={drops=1,qty=1},[1370]={drops=1,qty=1},[1376]={drops=1,max=1,min=1,qty=1},[1377]={drops=6,max=1,min=1,qty=6},[1380]={drops=2,max=1,min=1,qty=2},[2589]={drops=32,max=1,min=1,qty=32},[2649]={drops=1,max=1,min=1,qty=1},[2650]={drops=3,qty=3},[2653]={drops=2,qty=2},[2654]={drops=1,qty=1},[2656]={drops=2,qty=2},[3365]={drops=1,max=1,min=1,qty=1},[4536]={drops=12,max=1,min=1,qty=12},[247834]={drops=1,max=1,min=1,qty=1}},kills=94,lootable=94,money={copper=249,drops=94,max=4,min=1},opened=94}},from={eglink=79,["everloot-15b56625"]=15},maps={[1429]=94},maxLevel=2,minLevel=1,name="Kobold Vermin",spots={[1429]={[1167]=6,[1168]=5,[1169]=1,[1216]=1,[1217]=10,[1218]=16,[1219]=3,[1266]=1,[1267]=3,[1268]=17,[1269]=5}}},
 [30]={buckets={[1]={items={[1476]={drops=1,max=1,min=1,qty=1},[2590]={drops=5,qty=5},[5465]={drops=3,qty=4}},kills=8,lootable=7,money={copper=0,drops=0},opened=6}},from={eglink=7,["everloot-15b56625"]=1},maps={[1429]=8},maxLevel=6,minLevel=5,name="Forest Spider",spots={[1429]={[834]=1,[938]=1,[986]=1,[987]=3,[988]=1,[1034]=1,[1037]=1}}},
@@ -544,7 +553,7 @@ ns.AddSharedData(function() return {
 [1919]={buckets={[1]={items={[159]={drops=2,max=1,min=1,qty=2},[1370]={drops=2,max=1,min=1,qty=2},[1380]={drops=1,qty=1},[2589]={drops=5,max=1,min=1,qty=5},[4604]={drops=2,max=1,min=1,qty=2}},kills=13,lootable=13,money={copper=33,drops=12,max=4,min=1},opened=13}},from={eglink=5,["everloot-001c9ef0"]=1,["everloot-0512e71f"]=1,["everloot-1a399207"]=1,["everloot-933e529a"]=1,["everloot-9d1cf70d"]=3,["everloot-c8df3474"]=1},maps={[1420]=13},maxLevel=5,minLevel=5,name="Samuel Fipps",spots={[1420]={[930]=12,[931]=4}}},
 [1922]={buckets={[1]={items={[2672]={drops=11,max=1,min=1,qty=11},[3299]={drops=3,qty=3},[3300]={drops=2,qty=2}},kills=20,lootable=19,money={copper=0,drops=0},opened=14}},from={eglink=19,["everloot-933e529a"]=1},maps={[1429]=20},maxLevel=8,minLevel=7,name="Gray Forest Wolf",skins={from={eglink=16},items={[2318]={drops=4,qty=4},[2934]={drops=12,qty=12}},skinned=16},spots={[1429]={[1480]=1,[1481]=1,[1483]=1,[1485]=1,[1530]=1,[1533]=3,[1534]=2,[1535]=1,[1630]=1,[1631]=1,[1633]=1,[1678]=1,[1681]=1,[1683]=1,[1830]=1,[1884]=1}}},
 } end)
-ns.AddSharedData(function() return {
+add(function() return {
 [1923]={buckets={[1]={items={[2079]={drops=1,qty=1},[2672]={drops=18,qty=27},[3299]={drops=1,qty=1},[3301]={drops=4,qty=4},[15268]={drops=1,qty=1}},kills=24,lootable=24,money={copper=0,drops=0},opened=24}},from={["blackthornes-mit"]=22,eglink=2},maps={[1421]=24},maxLevel=17,minLevel=16,name="Bloodsnout Worg",skins={from={eglink=1},items={[2318]={drops=1,qty=1}},skinned=1},spots={[1421]={[1140]=4,[1237]=18,[1338]=2}}},
 [1924]={buckets={[1]={items={[1505]={drops=1,qty=1},[1507]={drops=1,qty=1},[1744]={drops=1,qty=1},[2287]={drops=1,qty=1},[2979]={drops=1,qty=1},[5635]={drops=2,qty=2}},kills=27,lootable=27,money={copper=572,drops=27},opened=27}},from={["blackthornes-mit"]=21,eglink=6},maps={[1421]=27},maxLevel=16,minLevel=15,name="Moonrage Bloodhowler",spots={[1421]={[1237]=1,[1287]=20,[1470]=3}}},
 [1931]={buckets={[1]={items={},kills=4,lootable=0,money={copper=0,drops=0},opened=0}},from={eglink=4},maps={[1420]=4},maxLevel=9,minLevel=9,name="Captured Scarlet Zealot",spots={[1420]={[1525]=1,[1526]=4}}},
@@ -1046,7 +1055,7 @@ ns.AddSharedData(function() return {
 [3641]={buckets={[1]={items={[1210]={drops=1,max=1,min=1,qty=1},[2608]={drops=6,max=1,min=1,qty=6},[5516]={drops=2,max=1,min=1,qty=2},[5523]={drops=2,max=1,min=1,qty=2},[6361]={drops=1,max=2,min=2,qty=2},[15210]={drops=1,max=1,min=1,qty=1},[248682]={drops=1,max=1,min=1,qty=1}},kills=8,lootable=8,money={copper=0,drops=0},opened=8}},from={["blackthornes-mit"]=1,["everloot-4518d2cc"]=1,["everloot-9d1cf70d"]=6},maps={[279]=1,[1414]=7},maxLevel=17,minLevel=17,name="Deviate Lurker",skins={from={eglink=4,["everloot-9d1cf70d"]=8},items={[783]={drops=2,max=1,min=1,qty=2},[2318]={drops=6,max=2,min=1,qty=9},[2319]={drops=3,max=2,min=1,qty=5},[6471]={drops=1,max=1,min=1,qty=1}},skinned=12},spots={[1414]={[1327]=7}}},
 [3653]={buckets={[1]={items={[5523]={drops=2,max=1,min=1,qty=2},[6391]={drops=1,max=1,min=1,qty=1},[6447]={drops=3,max=1,min=1,qty=3},[13245]={drops=5,max=1,min=1,qty=5},[15893]={drops=1,max=1,min=1,qty=1},[251344]={drops=1,max=1,min=1,qty=1},[252775]={drops=1,max=1,min=1,qty=1},[273084]={drops=2,max=1,min=1,qty=2}},kills=10,lootable=10,money={copper=0,drops=0},opened=10}},from={["everloot-0512e71f"]=2,["everloot-4518d2cc"]=1,["everloot-7cc41c1b"]=1,["everloot-9d1cf70d"]=3,["everloot-c8df3474"]=1,["everloot-f8c829b9"]=2},maps={},name="Kresh",skins={from={["everloot-9d1cf70d"]=3,["everloot-f8c829b9"]=1},items={[2318]={drops=3,max=2,min=2,qty=6},[2319]={drops=1,max=1,min=1,qty=1}},skinned=4}},
 } end)
-ns.AddSharedData(function() return {
+add(function() return {
 [3654]={buckets={[1]={items={[730]={drops=2,max=1,min=1,qty=2},[789]={drops=1,max=1,min=1,qty=1},[1468]={drops=2,max=1,min=1,qty=2},[5524]={drops=2,max=1,min=1,qty=2},[5784]={drops=2,max=1,min=1,qty=2},[6289]={drops=1,max=2,min=2,qty=2},[6461]={drops=3,max=1,min=1,qty=3},[6463]={drops=3,max=1,min=1,qty=3},[6563]={drops=1,max=1,min=1,qty=1},[6564]={drops=1,max=1,min=1,qty=1},[6570]={drops=2,max=1,min=1,qty=2},[6574]={drops=1,max=1,min=1,qty=1},[6576]={drops=1,max=1,min=1,qty=1},[6581]={drops=1,max=1,min=1,qty=1},[10407]={drops=1,max=1,min=1,qty=1}},kills=9,lootable=9,money={copper=648,drops=3,max=267,min=130},opened=9}},from={["everloot-0512e71f"]=1,["everloot-4518d2cc"]=2,["everloot-7cc41c1b"]=1,["everloot-9d1cf70d"]=2,["everloot-f139eb59"]=1,["everloot-f8c829b9"]=2},maps={},name="Mutanus the Devourer"},
 [3655]={buckets={[1]={items={[2455]={drops=1,qty=1},[2592]={drops=1,max=3,min=3,qty=3}},kills=6,lootable=6,money={copper=543,drops=5,max=147,min=82},opened=6}},from={["2750ad299c178787"]=1,["blackthornes-mit"]=1,eglink=1,["everloot-4518d2cc"]=1,["everloot-9d1cf70d"]=1,["everloot-f8c829b9"]=1},maps={[279]=1,[1413]=3,[1414]=5},maxLevel=18,minLevel=18,name="Mad Magglish",spots={[1413]={[1266]=2},[1414]={[1277]=2,[1327]=4}}},
 [3660]={buckets={[1]={items={},kills=1,lootable=1,money={copper=72,drops=1,max=72,min=72},opened=1}},from={["everloot-c7bdb4e6"]=1},maps={[1439]=1},maxLevel=31,minLevel=31,name="Athrikus Narassin",spots={[1439]={[1413]=1}}},
@@ -1548,7 +1557,7 @@ ns.AddSharedData(function() return {
 [5337]={buckets={[1]={items={[3989]={drops=1,max=1,min=1,qty=1},[4603]={drops=1,max=2,min=2,qty=2},[7973]={drops=1,max=1,min=1,qty=1},[17058]={drops=1,max=1,min=1,qty=1}},kills=4,lootable=4,money={copper=808,drops=4,max=306,min=75},opened=4}},from={["everloot-cde2ce19"]=4},maps={}},
 [5346]={buckets={[1]={items={[4419]={drops=1,max=1,min=1,qty=1},[8146]={drops=1,max=1,min=1,qty=1},[9960]={drops=1,max=1,min=1,qty=1},[10091]={drops=1,max=1,min=1,qty=1},[285047]={drops=1,max=1,min=1,qty=1}},kills=4,lootable=4,money={copper=1785,drops=4,max=554,min=323},opened=4}},from={["everloot-1340189e"]=1,["everloot-cde2ce19"]=3},maps={}},
 } end)
-ns.AddSharedData(function() return {
+add(function() return {
 [5419]={buckets={},from={},maps={[1446]=1},name="Glasshide Basilisk",skins={from={eglink=1},items={[4234]={drops=1,qty=1}},skinned=1}},
 [5420]={buckets={[1]={items={[4093]={drops=3,max=1,min=1,qty=3},[11387]={drops=1,qty=1},[14272]={drops=1,max=1,min=1,qty=1}},kills=5,lootable=5,money={copper=0,drops=0},opened=5}},from={eglink=1,["everloot-1340189e"]=4},maps={[1446]=1},maxLevel=46,minLevel=46,name="Glasshide Gazer",skins={from={eglink=1,["everloot-cde2ce19"]=2},items={[4304]={drops=2,max=1,min=1,qty=2},[8169]={drops=1,max=1,min=1,qty=1}},skinned=3},spots={[1446]={[973]=2,[974]=2,[1024]=1,[1025]=1,[1071]=2,[1072]=1,[1073]=4,[1074]=3,[1122]=6,[1123]=2,[1124]=2,[1172]=2,[1424]=1,[1523]=2,[1524]=2,[1526]=1,[1527]=2,[1528]=6,[1529]=3,[1572]=2,[1620]=1}}},
 [5421]={buckets={[1]={items={},kills=1,lootable=1,money={copper=0,drops=0},opened=0}},from={eglink=1},maps={[1446]=1},maxLevel=48,minLevel=48,name="Glasshide Petrifier",spots={[1446]={[730]=1}}},
@@ -2050,7 +2059,7 @@ ns.AddSharedData(function() return {
 [246888]={buckets={[1]={items={[1759]={drops=1,max=1,min=1,qty=1},[15230]={drops=1,max=1,min=1,qty=1},[276158]={drops=2,max=1,min=1,qty=2},[276160]={drops=3,max=1,min=1,qty=3}},kills=5,lootable=5,money={copper=0,drops=0},opened=5}},from={["everloot-1340189e"]=1,["everloot-83ea498a"]=1,["everloot-bab301d5"]=2,["everloot-c8ee0b15"]=1},maps={},name="Arcane Elemental"},
 [246990]={buckets={[1]={items={[4661]={drops=1,max=1,min=1,qty=1},[6438]={drops=1,max=1,min=1,qty=1},[6611]={drops=1,max=1,min=1,qty=1},[286989]={drops=1,max=1,min=1,qty=1}},kills=4,lootable=4,money={copper=0,drops=0},opened=4}},from={["everloot-83ea498a"]=2,["everloot-bab301d5"]=1,["everloot-c8ee0b15"]=1},maps={},name="Phantasm"},
 } end)
-ns.AddSharedData(function() return {
+add(function() return {
 [246992]={buckets={[1]={items={[276160]={drops=2,max=1,min=1,qty=2}},kills=2,lootable=2,money={copper=0,drops=0},opened=2}},from={["everloot-c8ee0b15"]=2},maps={}},
 [246993]={buckets={[1]={items={[248689]={drops=1,max=1,min=1,qty=1}},kills=1,lootable=1,money={copper=0,drops=0},opened=1}},from={["everloot-83ea498a"]=1},maps={},name="Mana Stalker"},
 [247001]={buckets={[1]={items={[1783]={drops=1,max=1,min=1,qty=1},[6438]={drops=2,max=1,min=1,qty=2},[6439]={drops=1,max=1,min=1,qty=1},[9820]={drops=1,max=1,min=1,qty=1},[276160]={drops=3,max=1,min=1,qty=3},[286995]={drops=1,max=1,min=1,qty=1}},kills=9,lootable=9,money={copper=0,drops=0},opened=9}},from={["everloot-0512e71f"]=1,["everloot-1340189e"]=2,["everloot-83ea498a"]=1,["everloot-bab301d5"]=4,["everloot-c8ee0b15"]=1},maps={},name="Saturated Remnant"},

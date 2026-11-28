@@ -1,0 +1,36 @@
+name: Upload the data addon to CurseForge
+
+# Every morning after the refresh of the imports, Forever Drop Tables Data goes to CurseForge when its version changed
+# since the last upload (the tag data-<version> marks it), with a changelog of what changed. A day without a change
+# uploads nothing. Runs where the CurseForge projects are set up; a fork without them skips it.
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: shared-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    if: ${{ vars.CF_DATA_PROJECT != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Upload
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ADDON_PROJECT: ${{ vars.CF_ADDON_PROJECT }}
+          CF_DATA_PROJECT: ${{ vars.CF_DATA_PROJECT }}
+          CF_DATA_SLUG: ${{ vars.CF_DATA_SLUG }}
+        run: python tools/curseforge_upload.py data

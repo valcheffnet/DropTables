@@ -2,4 +2,4 @@ Copyright (c) 2026 SasnycoN. All rights reserved.
 
 The source code is published so people can read it and check what the addon does. You may download the released addon and use it in World of Warcraft. Copying, changing or publishing the code or the addon elsewhere, in whole or in part, needs written permission from the author.
 
-This covers the code. The drop data in data/ and DropTables/Data.lua is under CC BY-SA 4.0, see LICENSE-DATA.
+This covers the code. The drop data in data/ and DropTables_Data/Data.lua is under CC BY-SA 4.0, see LICENSE-DATA.

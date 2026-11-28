@@ -136,7 +136,7 @@ def merge_rules():
     # Many mobs are written in chunks and all load.
     many = {origin(500): {20000 + i: mob({1: bucket(4, 4, 3, {100 + i % 50: 1})}, name="Mob %d" % i) for i in range(3000)}}
     lua = build_data.lua_file(build_data.build([submission(60, origin(500), many)]))
-    expect("chunks of 500 mobs", lua.count("ns.AddSharedData(function()"), 6)
+    expect("chunks of 500 mobs", lua.count("add(function()"), 6)
     client = Client("Many", data=lua)
     expect("all mobs loaded", sum(1 for _ in client.ns.shared.keys()), 3000)
 
@@ -364,12 +364,14 @@ def pruning(root):
     folder.mkdir(parents=True)
     for sub in (first, second, fewer_opened, partial, other):
         (folder / ("%d-1.json" % sub["issue"])).write_text(json.dumps(sub), encoding="utf-8")
-    before = build_data.lua_file(build_data.build(build_data.load_submissions(root)))
+    before = build_data.build(build_data.load_submissions(root))
     build_data.main(["--root", str(root)])
     expect("its file is deleted", sorted(p.name for p in folder.glob("*.json")),
            ["2-1.json", "3-1.json", "4-1.json", "5-1.json"])
-    after = (root / "DropTables" / "Data.lua").read_text(encoding="utf-8")
-    expect("the database does not change", after, before)
+    addon = root / "DropTables_Data"
+    version = build_data.toc_version((addon / "DropTables_Data.toc").read_text(encoding="utf-8"))
+    after = (addon / "Data.lua").read_text(encoding="utf-8")
+    expect("the database does not change", after, build_data.lua_file(before, version))
 
 
 def shrink_guard(root):
@@ -403,6 +405,70 @@ def shrink_guard(root):
     expect("a drop below 98% does not", build_data.shrunk({"mobs": {"7": mob({1: bucket(100, 100, 100)})}},
                                                           {"mobs": {"7": mob({1: bucket(97, 97, 97)})}}),
            [("kills", 100, 97)])
+
+
+def data_addon(root):
+    """The shared database ships as its own addon, Forever Drop Tables Data, with a version per changed build."""
+    a = origin(920)
+    wolf = submission(1, a, {a: {7: mob({1: bucket(40, 30, 20, {100: 5})})}})
+    folder = root / "data" / "submissions"
+    folder.mkdir(parents=True)
+    (folder / "1-1.json").write_text(json.dumps(wolf), encoding="utf-8")
+    addon = root / "DropTables_Data"
+
+    def built_on(day):
+        build_data.write_outputs(root, build_data.build(build_data.load_submissions(root)), day)
+        return build_data.toc_version((addon / "DropTables_Data.toc").read_text(encoding="utf-8"))
+
+    expect("the first build is named after its day", built_on("2026.11.28"), "2026.11.28")
+    expect("the toc loads the API before the data",
+           (addon / "DropTables_Data.toc").read_text(encoding="utf-8").endswith("Api.lua\nData.lua\n"), True)
+    expect("the same data keeps its version, even a day later", built_on("2026.11.29"), "2026.11.28")
+    more = submission(2, a, {a: {7: mob({1: bucket(50, 40, 30, {100: 7})})}})
+    (folder / "2-1.json").write_text(json.dumps(more), encoding="utf-8")
+    expect("new data on a new day", built_on("2026.11.29"), "2026.11.29")
+    (folder / "3-1.json").write_text(json.dumps(submission(3, a, {a: {7: mob({1: bucket(60, 50, 40, {100: 9})})}})),
+                                     encoding="utf-8")
+    expect("a second build that day", built_on("2026.11.29"), "2026.11.29.2")
+    (folder / "4-1.json").write_text(json.dumps(submission(4, a, {a: {7: mob({1: bucket(70, 60, 50, {100: 11})})}})),
+                                     encoding="utf-8")
+    expect("and a third", built_on("2026.11.29"), "2026.11.29.3")
+    expect("an import refresh moves the build time", build_data.build([wolf], [dict(wolf, received=5000, source={})])["built"],
+           5000)
+
+    lua = (addon / "Data.lua").read_text(encoding="utf-8")
+
+    def printing(client):
+        client.lua.execute("printed = {} print = function(text) printed[#printed + 1] = text end")
+        return client
+
+    def lines(client):
+        return list(client.g.printed.values())
+
+    hunter = printing(Client("Hunter", data=lua))
+    data = hunter.g.DropTablesData
+    expect("other addons read the version", (data.version, data.format), ("2026.11.29.3", 1))
+    expect("GetMob takes a string id too", data.GetMob("7").name, "Wolf")
+    chance, corpses = data.GetChance(7, 100)
+    expect("GetChance per kill: 60 of 70 kills lootable, 11 of 50 corpses", (round(chance, 2), corpses),
+           (round(100 * 60 / 70 * 11 / 50, 2), 50))
+    expect("an unknown mob has no chance", data.GetChance(8, 100), None)
+    expect("Drop Tables reads the same table", hunter.ns.shared[7].name, "Wolf")
+    hunter.g.SlashCmdList.DROPTABLES("status")
+    expect("/dt status names the database", lines(hunter)[1], "|cff66ccffForever Drop Tables|r Shared database "
+           "2026.11.29.3, 1 mobs.")
+    hunter.advance(15)
+    expect("nothing about a missing database", any("isn't installed" in line for line in lines(hunter)), False)
+
+    alone = printing(Client("Alone"))
+    expect("without the data addon the shared table is empty", len(list(alone.ns.shared.keys())), 0)
+    alone.advance(15)
+    expect("it says so once after login", sum("Data isn't installed" in line for line in lines(alone)), 1)
+    newer = printing(Client("Newer", data=lua.replace("DropTablesData.built",
+                                                      "DropTablesData.format = 2\nDropTablesData.built")))
+    expect("a newer data format is left alone", len(list(newer.ns.shared.keys())), 0)
+    newer.g.SlashCmdList.DROPTABLES("status")
+    expect("and /dt status says to update", any("newer than this version" in line for line in lines(newer)), True)
 
 
 def shared_is_trusted():
@@ -688,6 +754,8 @@ def main():
         pruning(pathlib.Path(folder))
     with tempfile.TemporaryDirectory() as folder:
         shrink_guard(pathlib.Path(folder))
+    with tempfile.TemporaryDirectory() as folder:
+        data_addon(pathlib.Path(folder))
     # A control character in a name can't break Data.lua: it goes in as an escape and reads back the same.
     literal = build_data.lua_string('Line\none "two"\\')
     expect("control characters escaped", "\n" in literal, False)

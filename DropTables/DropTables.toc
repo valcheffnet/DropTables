@@ -1,15 +1,14 @@
 ## Interface: 16001
 ## Title: Forever Drop Tables
-## Notes: Drop rates for every mob, from what players actually loot.
+## Notes: Drop chances for the mobs you kill, from your own loot and other players'.
 ## Author: SasnycoN
 ## Version: 0.6.5
 ## IconTexture: Interface\Icons\INV_Misc_Bag_10
 ## SavedVariables: DropTablesDB
-## OptionalDeps: Auctionator, TradeSkillMaster, FojjiCore, FojjiCore_Professions
+## OptionalDeps: DropTables_Data, Auctionator, TradeSkillMaster, FojjiCore, FojjiCore_Professions
 ## AddonCompartmentFunc: DropTables_OnCompartmentClick
 
 Core.lua
-Data.lua
 Wire.lua
 Collector.lua
 Places.lua

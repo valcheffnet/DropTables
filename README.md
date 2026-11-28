@@ -2,13 +2,13 @@
 
 Forever Drop Tables is a World of Warcraft: Forever addon that records what drops from the mobs you kill and shows the drop chances in game.
 
-This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it from a web page. Everything sent there goes into a shared database that comes with the addon, so a new install already has chances for mobs you've never killed.
+This is an early test build, so expect bugs. At first the tables only know your own kills. If other players run the addon too, they can fill the gaps: when you target a mob you know little about, the addon asks them, and their counts show up in your tables next to yours. You can also copy an export out of the game and send it from a web page. Everything sent there goes into a shared database, which comes along as a second addon, Forever Drop Tables Data, so a new install already has chances for mobs you've never killed.
 
 ## Download
 
 The latest version is here: https://github.com/valcheffnet/DropTables/releases/latest
 
-Under Assets, download `DropTables-x.y.z.zip`. The Source code archives are not the addon.
+Under Assets, download `DropTables-x.y.z.zip`. It holds both addons, Forever Drop Tables and Forever Drop Tables Data. The Source code archives are not the addon.
 
 ## Screenshots
 
@@ -26,15 +26,17 @@ The drop table window follows your target and shows where the kills behind each 
 
 The Loot Finder works the other way round. Its item list shows the best mob for each item, the one that brings the most gold an hour, and clicking an item lists every mob that drops it with its zone and chance. The search box finds mobs as well: type part of a name and they show up under Mobs, where a click opens the mob's drop table. The boxes above the list narrow it down by zone, level, kills and chance.
 
-![The Loot Finder listing all items sorted by gold per hour](screenshots/LootFinder.png)
+![The Loot Finder with its kills and chance filters, listing items sorted by chance](screenshots/LootFinder.png)
 
 ## Install
 
 1. Close the game.
-2. Unzip the file into `World of Warcraft\_forever_\Interface\AddOns\`. You should end up with `Interface\AddOns\DropTables\DropTables.toc`. If you get `DropTables\DropTables\DropTables.toc`, move the inner folder up one level.
-3. Start the game and check that Drop Tables is enabled in the AddOns list on the character screen.
+2. Unzip the file into `World of Warcraft\_forever_\Interface\AddOns\`. You should end up with `Interface\AddOns\DropTables\DropTables.toc` and `Interface\AddOns\DropTables_Data\DropTables_Data.toc`. If you get `DropTables\DropTables\DropTables.toc`, move the inner folders up one level.
+3. Start the game and check that both are enabled in the AddOns list on the character screen.
 
-To update, delete the old `DropTables` folder and unzip the new one. Your recorded drops live in the WTF folder, so updating doesn't touch them.
+To update, delete the old `DropTables` and `DropTables_Data` folders and unzip the new ones. Your recorded drops live in the WTF folder, so updating doesn't touch them.
+
+Without Forever Drop Tables Data the addon still works on your own kills and what other players send you, and it says once after you log in that the shared chances are missing.
 
 ## Using it
 
@@ -57,13 +59,13 @@ Commands (`/droptables` works too):
 
 ## Sharing your tables
 
-The shared database only grows when players send their tables in. Type `/dt export`, or click the share card at the bottom of the Loot Finder or the drop table window, then press Select and Ctrl+C in the window. Open the share page under the text, paste it there and press Send. You don't need an account for it. The export holds everything of yours that the shared database doesn't have yet, plus what other players sent you, so if you copy it and forget to send it, it's still there the next time. A big table can come out in several parts, and you send each part by itself. The page files it on GitHub, where a bot checks it and adds it to the shared database, usually within a few minutes. Players get the new counts with the next release of the addon.
+The shared database only grows when players send their tables in. Type `/dt export`, or click the share card at the bottom of the Loot Finder or the drop table window, then press Select and Ctrl+C in the window. Open the share page under the text, paste it there and press Send. You don't need an account for it. The export holds everything of yours that the shared database doesn't have yet, plus what other players sent you, so if you copy it and forget to send it, it's still there the next time. A big table can come out in several parts, and you send each part by itself. The page files it on GitHub, where a bot checks it and adds it to the shared database, usually within a few minutes. The new counts reach everyone with the next Forever Drop Tables Data.
 
 Every export ends with a key that only your install knows. The share page keeps the key out of the public issue and writes down only a hash of it, and once one of your exports has come in that way, only exports with the same hash count as yours, so nobody else can send counts in your install's name. The share page also turns away an export from an older version of Drop Tables and asks you to update and export again, since the old version may still have bugs the new one fixed.
 
 ## Data from other players
 
-Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, `Data.lua` in the addon). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.
+Drop Tables relies on drop counts from the players who run it. The addons swap them in the background as addon messages, so nothing shows up in your chat. Anything you send on the share page is public, and so is the shared database built from it (`data/shared.json` here, Forever Drop Tables Data in the game). Both are published under CC BY-SA 4.0. In the drop table window, Only mine hides the counts of other players and the shared database alike.
 
 ## What the addon sends
 
@@ -72,6 +74,10 @@ With Share with other players on, the addon talks to other copies of itself in t
 The counts of a mob are its kills, its looted and skinned corpses, the items and money they gave, the mob's level and the zones it died in, and its name if your game is in English. They're filed under a random install id the addon made up the first time it ran, not under your character's name. Where exactly you killed something only leaves your game through /dt export, when you send that yourself. Your gold, bags, gear, item prices and chat don't go anywhere.
 
 The addon joins its channel a few seconds after you log in, but not in combat, a battleground, an arena or a dungeon, and never as /1. Right after a loading screen it won't take a free channel number below one of yours either, since the game may still be putting General or Trade back there, so your channels keep their numbers. If it can't get in, say because you're in as many channels as the game allows, it waits a little longer after each try. Turning Share with other players off leaves the channel (after the fight, if you're in one) and stops all of it.
+
+## For other addons
+
+Forever Drop Tables Data is an addon of its own so that other addons can read the shared counts too. It keeps them in the global `DropTablesData`. `DropTablesData.GetMob(npcId)` gives the raw counts of a mob, and `DropTablesData.GetChance(npcId, itemId)` gives the chance in percent that one kill drops the item, along with the number of looted corpses behind it. `DropTablesData.format` only goes up when the layout changes in a way that breaks old readers. `Api.lua` in that folder has the details. List it in `## OptionalDeps: DropTables_Data` so it loads before your addon. The data is under CC BY-SA 4.0, see License below.
 
 ## Known issues
 
