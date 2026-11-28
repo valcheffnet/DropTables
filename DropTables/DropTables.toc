@@ -2,7 +2,7 @@
 ## Title: Forever Drop Tables
 ## Notes: Drop chances for the mobs you kill, from your own loot and other players'.
 ## Author: SasnycoN
-## Version: 0.6.5
+## Version: 0.7.0
 ## IconTexture: Interface\Icons\INV_Misc_Bag_10
 ## SavedVariables: DropTablesDB
 ## OptionalDeps: DropTables_Data, Auctionator, TradeSkillMaster, FojjiCore, FojjiCore_Professions
